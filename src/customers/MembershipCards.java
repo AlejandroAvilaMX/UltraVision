@@ -57,6 +57,11 @@ public class MembershipCards extends JFrame implements ActionListener{
         myMenuBar.add(myMenu);
         
         //Options of the menu
+        JMenuItem Menu = new JMenuItem("Main Menu");
+        myMenu.add(Menu);
+        Menu.addActionListener(this);
+        Menu.setActionCommand("menu");
+        
         JMenuItem Users = new JMenuItem("Customers");
         myMenu.add(Users);
         Users.addActionListener(this);
@@ -591,12 +596,13 @@ public class MembershipCards extends JFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String ac = e.getActionCommand();
-		//if(e.getSource()==levelIdCB) {
-		//	levelId.setText((String) levelIdCB.getSelectedItem());
-		//}
 		if(ac.equals("exit")){
             System.out.println("Exit the program");
             System.exit(0);
+        }
+		else if(ac.equals("menu")){
+            System.out.println("Going to Main Menu");
+            dispose();
         }
         else if(ac.equals("customers") || ac.equals("btnCustomers")){
             System.out.println("Going to Customers");

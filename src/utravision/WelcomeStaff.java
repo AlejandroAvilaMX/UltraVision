@@ -128,27 +128,27 @@ public class WelcomeStaff extends JFrame implements ActionListener{
         else if(ac.equals("customers") || ac.equals("btnCustomers")){
             System.out.println("Going to Customers");
             new Customers();
-            dispose();
+            //dispose();
         }
         else if(ac.equals("MemCard") || ac.equals("btnMemCard")){
             System.out.println("Going to Membership Card");
             new MembershipCards();
-            dispose();
+            //dispose();
         }
         else if(ac.equals("titles") || ac.equals("btnTitles")){
             System.out.println("Going to Titles");
             new Titles();
-            dispose();
+            //dispose();
         }
         else if(ac.equals("rent") || ac.equals("btnRent")){
             System.out.println("Going to Rent");
             new Rent();
-            dispose();
+            //dispose();
         }
         else if(ac.equals("logout")){
             System.out.println("Going back to Login");
             new LoginController();
-            dispose();
+            //dispose();
         }
     }
 }

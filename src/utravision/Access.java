@@ -52,10 +52,10 @@ public class Access extends JFrame implements ActionListener{
         myMenuBar.add(myMenu);
         
         //Options of the menu
-        JMenuItem MenuAdmin = new JMenuItem("Main Menu");
-        myMenu.add(MenuAdmin);
-        MenuAdmin.addActionListener(this);
-        MenuAdmin.setActionCommand("menuAdmin");
+        JMenuItem Menu = new JMenuItem("Main Menu");
+        myMenu.add(Menu);
+        Menu.addActionListener(this);
+        Menu.setActionCommand("menu");
         
         JMenuItem Users = new JMenuItem("Customers");
         myMenu.add(Users);
@@ -255,9 +255,8 @@ public class Access extends JFrame implements ActionListener{
             System.out.println("Exit the program");
             System.exit(0);
         }
-		else if(ac.equals("menuAdmin")){
-            System.out.println("Going to Main Menu Admin");
-            new MainMenuAdmin();
+		else if(ac.equals("menu")){
+            System.out.println("Going to Main Menu");
             dispose();
         }
         else if(ac.equals("customers")){
