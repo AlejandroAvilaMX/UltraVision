@@ -36,7 +36,6 @@ import validations.ValidLength;
 public class TV extends JFrame implements ActionListener{
 	private JLabel ltitle, ltitleId, lname, lreleaseYear, lgenre, ldirector, lcountry, llanguage, lseasons, lepisodes, lstock, lavailable, lrentPrice, lserieId;
     private JTextField titleId, lastRegister, name, releaseYear, genre, director, country, language, seasons, episodes, stock, available, rentPrice, typeId, type, serieId;
-    private int limReleaseYear = 4;
     private String res;
     private JButton btnSearch, btnNew, btnUpdateTV, btnDeleteTV, btnSaveNew, btnSaveUpdate, btnCancel;
     
@@ -388,14 +387,11 @@ public class TV extends JFrame implements ActionListener{
                     where = "WHERE titleId = '" + filter + "'";
                     System.out.println("My WHERE is: " + where);
                     try{
-                                       
-                    //JOptionPane.showMessageDialog(null, "Connected successfully");
-                                        
-                    	String deletedvd = "DELETE FROM tvboxset WHERE serieId = ?"; 
+                    	String deletetv = "DELETE FROM tvboxset WHERE serieId = ?"; 
                         
-                        PreparedStatement statementcd = conection.prepareStatement(deletedvd);
+                        PreparedStatement statementcd = conection.prepareStatement(deletetv);
                         statementcd.setString(1, titleId.getText());
-                        System.out.println("my query is: " + deletedvd);
+                        System.out.println("my query is: " + deletetv);
                         statementcd.execute();
                     
                     try {
@@ -431,13 +427,12 @@ public class TV extends JFrame implements ActionListener{
                     } catch (Exception e){      //If something goes wrong
                     	JOptionPane.showMessageDialog(null, "Error deleting the TV Box Serie!");
                     	}
-                    }
-                else{       //The ID must be a valid ID number
-                    JOptionPane.showMessageDialog(null, "Error deleting the TV Box Serie! Possible reassons: \n"
+                    } else{       //The ID must be a valid ID number
+                    	JOptionPane.showMessageDialog(null, "Error deleting the TV Box Serie! Possible reassons: \n"
                             + "	� The ID cannot be empty");
+                    	}
                 }
-            }
-        });
+            });
         
         //Save New TV button
         btnSaveNew = new JButton("Save");
@@ -455,88 +450,106 @@ public class TV extends JFrame implements ActionListener{
             				+ "   � Quantity Available\n"
             				+ "	  � Rent Price\n");
             	}else {
-            		ConectionDB con = new ConectionDB();
-                    Connection conection = con.conect();
-                    try{
-                        
-                        //JOptionPane.showMessageDialog(null, "Connected successfully");
-                                            
-                        String addtitle = "INSERT INTO title (name, releaseYear, genre, typeId, type) VALUES(?, ?, ?, ?, ?)"; 
-                        System.out.println("Query insert new Title: " + addtitle);
-                        PreparedStatement statement = conection.prepareStatement(addtitle);
-                        statement.setString(1, name.getText());
-                        statement.setString(2, releaseYear.getText());
-                        statement.setString(3, genre.getText());
-                        statement.setString(4, typeId.getText());
-                        statement.setString(5, type.getText());
-                        
-                        statement.executeUpdate();
-                        
-                        try{
-                            
-                            PreparedStatement ps = null;
-                            ResultSet rs = null;
-                            
-                            String search = "SELECT titleId FROM title ORDER BY titleId DESC LIMIT 1";
-                            
-                            System.out.println(search);
-                            ps = conection.prepareStatement(search);
-                            rs = ps.executeQuery();
-                            
-                            while(rs.next()) {
-                            	lastRegister.setText(rs.getString("titleId"));
-                            	res = rs.getString("titleId");
-                            	System.out.println("The last register is: " + rs.getString("titleId"));
-                            }
-                            
-                            try {
-                            	String addserie = "INSERT INTO tvboxset (director, country, language, seasons, episodes, stock, available, rentPrice, serieId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"; 
-                                System.out.println("Query insert new Serie: " + addserie);
-                                PreparedStatement newstatement = conection.prepareStatement(addserie);
-                                newstatement.setString(1, director.getText());
-                                newstatement.setString(2, country.getText());
-                                newstatement.setString(3, language.getText());
-                                newstatement.setString(4, seasons.getText());
-                                newstatement.setString(5, episodes.getText());
-                                newstatement.setString(6, stock.getText());
-                                newstatement.setString(7, available.getText());
-                                newstatement.setString(8, rentPrice.getText());
-                                newstatement.setString(9, lastRegister.getText());
-                                
-                                newstatement.executeUpdate();
-                            	
-                            } catch (SQLException ex) {
-                            	JOptionPane.showMessageDialog(null, "Error inserting new TV Serie...!!");
-                            }
-                            
-                        } catch (SQLException ex){
-                            JOptionPane.showMessageDialog(null, "Error finding last Register...!!");
-                        }
-                                             
-                        conection.close();
-                        
-                        JOptionPane.showMessageDialog(null, "New TV Box Serie inserted successfully");
-                        titleId.setText("");
-                        name.setText("");
-                        releaseYear.setText("");
-                        genre.setText("");
-                        director.setText("");
-                        country.setText("");
-                        language.setText("");
-                        seasons.setText("");
-                        episodes.setText("");
-                        stock.setText("");
-                        available.setText("");
-                        rentPrice.setText("");
-                        lastRegister.setText("");
-                        
-                    } catch (Exception e){      //If something goes wrong
-                        JOptionPane.showMessageDialog(null, "Error inserting a new TV Serie!");
+            		//Validation of Quantity Available and Quantity in Stock
+            		String txtStock = stock.getText(), txtAvailable = available.getText();
+                    int qttyStock = Integer.parseInt(txtStock), qttyAvailable = Integer.parseInt(txtAvailable);
+                    
+                    if(qttyAvailable > qttyStock) {
+                    	System.out.println("Qtty Stock: " + qttyStock);
+                    	System.out.println("Qtty Available " + qttyAvailable);
+                    	JOptionPane.showMessageDialog(null, "The available quantity cannot be bigger than the stock quantity");
+                    	}else {
+                    		//Validation of Current Year less than 2020
+	                    	String txtReleaseYear = releaseYear.getText();
+	                    	int yearNumber = Integer.parseInt(txtReleaseYear);
+                    	
+	                    	if(yearNumber <= 2020) {
+	                    		ConectionDB con = new ConectionDB();
+	                            Connection conection = con.conect();
+	                            try{
+	                                
+	                                //JOptionPane.showMessageDialog(null, "Connected successfully");
+	                                                    
+	                                String addtitle = "INSERT INTO title (name, releaseYear, genre, typeId, type) VALUES(?, ?, ?, ?, ?)"; 
+	                                System.out.println("Query insert new Title: " + addtitle);
+	                                PreparedStatement statement = conection.prepareStatement(addtitle);
+	                                statement.setString(1, name.getText());
+	                                statement.setString(2, releaseYear.getText());
+	                                statement.setString(3, genre.getText());
+	                                statement.setString(4, typeId.getText());
+	                                statement.setString(5, type.getText());
+	                                
+	                                statement.executeUpdate();
+	                                
+	                                try{
+	                                    
+	                                    PreparedStatement ps = null;
+	                                    ResultSet rs = null;
+	                                    
+	                                    String search = "SELECT titleId FROM title ORDER BY titleId DESC LIMIT 1";
+	                                    
+	                                    System.out.println(search);
+	                                    ps = conection.prepareStatement(search);
+	                                    rs = ps.executeQuery();
+	                                    
+	                                    while(rs.next()) {
+	                                    	lastRegister.setText(rs.getString("titleId"));
+	                                    	res = rs.getString("titleId");
+	                                    	System.out.println("The last register is: " + rs.getString("titleId"));
+	                                    }
+	                                    
+	                                    try {
+	                                    	String addserie = "INSERT INTO tvboxset (director, country, language, seasons, episodes, stock, available, rentPrice, serieId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"; 
+	                                        System.out.println("Query insert new Serie: " + addserie);
+	                                        PreparedStatement newstatement = conection.prepareStatement(addserie);
+	                                        newstatement.setString(1, director.getText());
+	                                        newstatement.setString(2, country.getText());
+	                                        newstatement.setString(3, language.getText());
+	                                        newstatement.setString(4, seasons.getText());
+	                                        newstatement.setString(5, episodes.getText());
+	                                        newstatement.setString(6, stock.getText());
+	                                        newstatement.setString(7, available.getText());
+	                                        newstatement.setString(8, rentPrice.getText());
+	                                        newstatement.setString(9, lastRegister.getText());
+	                                        
+	                                        newstatement.executeUpdate();
+	                                    	
+	                                    } catch (SQLException ex) {
+	                                    	JOptionPane.showMessageDialog(null, "Error inserting new TV Serie...!!");
+	                                    }
+	                                    
+	                                } catch (SQLException ex){
+	                                    JOptionPane.showMessageDialog(null, "Error finding last Register...!!");
+	                                }
+	                                                     
+	                                conection.close();
+	                                
+	                                JOptionPane.showMessageDialog(null, "New TV Box Serie inserted successfully");
+	                                titleId.setText("");
+	                                name.setText("");
+	                                releaseYear.setText("");
+	                                genre.setText("");
+	                                director.setText("");
+	                                country.setText("");
+	                                language.setText("");
+	                                seasons.setText("");
+	                                episodes.setText("");
+	                                stock.setText("");
+	                                available.setText("");
+	                                rentPrice.setText("");
+	                                lastRegister.setText("");
+	                                
+	                            } catch (Exception e){      //If something goes wrong
+	                                JOptionPane.showMessageDialog(null, "Error inserting a new TV Serie!");
+	                            	}
+	                    	}else {
+	                           	JOptionPane.showMessageDialog(null, "Release year cannot be after the current year");
+	                           	}
+	                    }
                     }
             	}
-            }
-        });
-        
+            });
+
         //Save Update TV button
         btnSaveUpdate = new JButton("Save");
         btnSaveUpdate.setFont(fontButton);
@@ -553,83 +566,99 @@ public class TV extends JFrame implements ActionListener{
             				+ "   � Quantity in stock\n"
             				+ "   � Quantity Available\n"
             				+ "	  � Rent Price\n");
-            	}else {
-            		ConectionDB con = new ConectionDB();
-                    Connection conection = con.conect();
-                    
-                    String filter = titleId.getText();
-                    System.out.println("My title filter is: " + filter);
-                    String filtertv = titleId.getText();
-                    System.out.println("My tv filter is: " + filter);
-                    String where = "";
-                    
-                    if(!"".equals(filter)){
-                        where = "WHERE titleId = '" + filter + "'";
-                        System.out.println("My where is: " + where);
-	                    try{
-	                                            
-	                        String updatetitle = "UPDATE title SET name = ?, releaseYear = ?, genre = ? " + where; 
-	                        System.out.println("My update title: " + updatetitle);
-	                        PreparedStatement statement = conection.prepareStatement(updatetitle);
-	                        statement.setString(1, name.getText());
-	                        statement.setString(2, releaseYear.getText());
-	                        statement.setString(3, genre.getText());
-	                        
-                            statement.execute();
-	                        
-                            if(!"".equals(filtertv)){
-                                where = "WHERE serieId = '" + filter + "'";
-                                System.out.println("My where is: " + where);
-                                try{
-                                	String updatedvd = "UPDATE tvboxset SET director = ?, country = ?, language = ?, seasons = ?, episodes = ?, stock = ?, available = ?, rentPrice = ? " + where;
-    	                            System.out.println("My update DVD: " + updatedvd);
-    	                            PreparedStatement newstatement = conection.prepareStatement(updatedvd);
+            		}else {
+	        			//Validation of Quantity Available and Quantity in Stock
+	        			String txtStock = stock.getText(), txtAvailable = available.getText();
+	        			int qttyStock = Integer.parseInt(txtStock), qttyAvailable = Integer.parseInt(txtAvailable);
 
-    	                            newstatement.setString(1, director.getText());
-                                    newstatement.setString(2, country.getText());
-                                    newstatement.setString(3, language.getText());
-                                    newstatement.setString(4, seasons.getText());
-                                    newstatement.setString(5, episodes.getText());
-                                    newstatement.setString(6, stock.getText());
-                                    newstatement.setString(7, available.getText());
-                                    newstatement.setString(8, rentPrice.getText());
+	        			if(qttyAvailable > qttyStock) {
+	                    	System.out.println("Qtty Stock: " + qttyStock);
+	                    	System.out.println("Qtty Available " + qttyAvailable);
+	                    	JOptionPane.showMessageDialog(null, "The available quantity cannot be bigger than the stock quantity");
+	                    	}else {
+	                    		//Validation of Current Year less than 2020
+		                    	String txtReleaseYear = releaseYear.getText();
+		                    	int yearNumber = Integer.parseInt(txtReleaseYear);
+	                	
+		                    	if(yearNumber <= 2020) {
+		                    		ConectionDB con = new ConectionDB();
+		                            Connection conection = con.conect();
+		                            
+		                            String filter = titleId.getText();
+		                            System.out.println("My title filter is: " + filter);
+		                            String filtertv = titleId.getText();
+		                            System.out.println("My tv filter is: " + filter);
+		                            String where = "";
+		                            
+		                            if(!"".equals(filter)){
+		                                where = "WHERE titleId = '" + filter + "'";
+		                                System.out.println("My where is: " + where);
+		        	                    try{
+		        	                                            
+		        	                        String updatetitle = "UPDATE title SET name = ?, releaseYear = ?, genre = ? " + where; 
+		        	                        System.out.println("My update title: " + updatetitle);
+		        	                        PreparedStatement statement = conection.prepareStatement(updatetitle);
+		        	                        statement.setString(1, name.getText());
+		        	                        statement.setString(2, releaseYear.getText());
+		        	                        statement.setString(3, genre.getText());
+		        	                        
+		                                    statement.execute();
+	        	                        
+		                                    if(!"".equals(filtertv)){
+		                                        where = "WHERE serieId = '" + filter + "'";
+		                                        System.out.println("My where is: " + where);
+		                                        try{
+		                                        	String updatedvd = "UPDATE tvboxset SET director = ?, country = ?, language = ?, seasons = ?, episodes = ?, stock = ?, available = ?, rentPrice = ? " + where;
+		            	                            System.out.println("My update DVD: " + updatedvd);
+		            	                            PreparedStatement newstatement = conection.prepareStatement(updatedvd);
+	
+		            	                            newstatement.setString(1, director.getText());
+		                                            newstatement.setString(2, country.getText());
+		                                            newstatement.setString(3, language.getText());
+		                                            newstatement.setString(4, seasons.getText());
+		                                            newstatement.setString(5, episodes.getText());
+		                                            newstatement.setString(6, stock.getText());
+		                                            newstatement.setString(7, available.getText());
+		                                            newstatement.setString(8, rentPrice.getText());
+	
+		            	                            newstatement.execute();
+		            	                            }catch(SQLException ex) {
+		            	                            	JOptionPane.showMessageDialog(null, "Error updating TV Serie...!!");
+	                                    				}
+		                                        }
 
-    	                            newstatement.execute();
-                                }catch(SQLException ex) {
-                                	JOptionPane.showMessageDialog(null, "Error updating TV Serie...!!");
-                            	}
-                                
-                            }
-                                               
-	                        conection.close();
-	                        
-	                        JOptionPane.showMessageDialog(null, "TV Serie updated successfully");
-	                        titleId.setText("");
-	                        name.setText("");
-	                        releaseYear.setText("");
-	                        genre.setText("");
-	                        director.setText("");
-	                        country.setText("");
-	                        language.setText("");
-	                        seasons.setText("");
-	                        episodes.setText("");
-	                        stock.setText("");
-	                        available.setText("");
-	                        rentPrice.setText("");
-	                        lastRegister.setText("");
-	                        
-	                    } catch (Exception e){      //If something goes wrong
-	                        JOptionPane.showMessageDialog(null, "Error updating TV Serie Title!");
-	                        }
-	                    }
-                    else{       //The ID must have a valid ID number
-                    	JOptionPane.showMessageDialog(null, "Error updating TV Serie! \n"
-                    			+ "	� The ID cannot be empty");
-                    	}
-                    }
-            	}
-            });
-        
+		                                    conection.close();
+	        	                        
+		        	                        JOptionPane.showMessageDialog(null, "TV Serie updated successfully");
+		        	                        titleId.setText("");
+		        	                        name.setText("");
+		        	                        releaseYear.setText("");
+		        	                        genre.setText("");
+		        	                        director.setText("");
+		        	                        country.setText("");
+		        	                        language.setText("");
+		        	                        seasons.setText("");
+		        	                        episodes.setText("");
+		        	                        stock.setText("");
+		        	                        available.setText("");
+		        	                        rentPrice.setText("");
+		        	                        lastRegister.setText("");
+		        	                        
+		        	                    } catch (Exception e){      //If something goes wrong
+		        	                        JOptionPane.showMessageDialog(null, "Error updating TV Serie Title!");
+		        	                        }
+	        	                    }else{       //The ID must have a valid ID number
+	        	                    	JOptionPane.showMessageDialog(null, "Error updating TV Serie! \n"
+	                            			+ "	� The ID cannot be empty");
+	        	                    	}
+	                            }else {
+	                            	JOptionPane.showMessageDialog(null, "Release year cannot be after the current year");
+	                            	}
+	                    	}
+        		}
+          	}
+        });
+
         //Cancel button
         btnCancel = new JButton("Cancel");
         btnCancel.setFont(fontButton);
