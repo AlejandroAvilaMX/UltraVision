@@ -470,6 +470,7 @@ public class VL extends JFrame implements ActionListener {
             				+ "   · Quantity in stock\n"
             				+ "   · Quantity Available\n"
             				+ "	  · Rent Price\n");
+            		//Test for Git Repository
             	}else {
             		//Validation of Quantity Available and Quantity in Stock
             		String txtStock = stock.getText(), txtAvailable = available.getText();
