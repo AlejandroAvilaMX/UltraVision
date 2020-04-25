@@ -282,6 +282,7 @@ public class Access extends JFrame implements ActionListener{
         else if(ac.equals("logout")){
             System.out.println("Going back to Login");
             new LoginController();
+            //new UltraVision();
             dispose();
         }	
 	}

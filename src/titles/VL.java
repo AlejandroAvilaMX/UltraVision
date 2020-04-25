@@ -12,6 +12,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -37,6 +38,7 @@ public class VL extends JFrame implements ActionListener {
 	private JLabel ltitle, ltitleId, lname, lreleaseYear, lgenre, lproductionCompany, ldirector, lcountry, lduration, llanguage, lformat, lstock, lavailable, lrentPrice;
     private JTextField titleId, name, lastRegister, releaseYear, genre, productionCompany, director, country, duration, language, format, stock, available, rentPrice, typeId, type, movieId;
     private String res;
+    private JComboBox<String> movieFormat;
     private JButton btnSearch, btnNew, btnUpdateVL, btnDeleteVL, btnSaveNew, btnSaveUpdate, btnCancel;
     
 	public VL() {
@@ -167,10 +169,6 @@ public class VL extends JFrame implements ActionListener {
         new NoLetters(titleId);
         new ValidLength(titleId, 5);
         
-        format = new JTextField();
-        format.setBounds(420, 360, 80, 25);
-        format.setText("DVD");
-        format.setVisible(false);
         lastRegister = new JTextField();
         lastRegister.setBounds(200, 360, 80, 25);
         lastRegister.setVisible(false);
@@ -324,11 +322,27 @@ public class VL extends JFrame implements ActionListener {
         lformat.setFont(fontlabel);
         lformat.setBounds(70, 590, 120, 20);
         lformat.setVisible(false);
+        movieFormat = new JComboBox<String>();
+        movieFormat.addItem("DVD");
+        movieFormat.addItem("Blue-Ray");
+        movieFormat.setBounds(70, 630, 100, 20);
+        movieFormat.setVisible(false);
+                
         format = new JTextField();
         format.setBounds(70, 630, 100, 25);
         format.setVisible(false);
+        format.setText("DVD");
         new NoNumbers(format);
         new ValidLength(format, 10);
+        movieFormat.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				format.setText(movieFormat.getSelectedItem().toString());
+			}
+		});
+
+        
+        
         
         lstock = new JLabel("Stock");
         lstock.setFont(fontlabel);
@@ -729,6 +743,7 @@ public class VL extends JFrame implements ActionListener {
         p.add(language);
         p.add(lformat);
         p.add(format);
+        p.add(movieFormat);
         p.add(lstock);
         p.add(stock);
         p.add(lavailable);
@@ -764,7 +779,8 @@ public class VL extends JFrame implements ActionListener {
 		llanguage.setVisible(true);
 		language.setVisible(true);
 		lformat.setVisible(true);
-		format.setVisible(true);
+		movieFormat.setVisible(true);
+		//format.setVisible(true);
 		lstock.setVisible(true);
 		stock.setVisible(true);
 		lavailable.setVisible(true);
@@ -795,7 +811,8 @@ public class VL extends JFrame implements ActionListener {
 		llanguage.setVisible(false);
 		language.setVisible(false);
 		lformat.setVisible(false);
-		format.setVisible(false);
+		movieFormat.setVisible(false);
+		//format.setVisible(false);
 		lstock.setVisible(false);
 		stock.setVisible(false);
 		lavailable.setVisible(false);
