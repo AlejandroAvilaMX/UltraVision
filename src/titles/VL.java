@@ -322,6 +322,7 @@ public class VL extends JFrame implements ActionListener {
         lformat.setFont(fontlabel);
         lformat.setBounds(70, 590, 120, 20);
         lformat.setVisible(false);
+        
         movieFormat = new JComboBox<String>();
         movieFormat.addItem("DVD");
         movieFormat.addItem("Blue-Ray");
@@ -341,9 +342,6 @@ public class VL extends JFrame implements ActionListener {
 			}
 		});
 
-        
-        
-        
         lstock = new JLabel("Stock");
         lstock.setFont(fontlabel);
         lstock.setBounds(220, 590, 120, 20);
@@ -666,8 +664,7 @@ public class VL extends JFrame implements ActionListener {
 		        	                            newstatement.execute();
 		                                    }catch(SQLException ex) {
 		                                    	JOptionPane.showMessageDialog(null, "Error updating Movie...!!");
-		                                	}
-		                                    
+		                                		}
 		                                }
 		                                                   
 		    	                        conection.close();
@@ -691,8 +688,8 @@ public class VL extends JFrame implements ActionListener {
 		    	                    } catch (Exception e){      //If something goes wrong
 		    	                        JOptionPane.showMessageDialog(null, "Error updating Movie Title!");
 		    	                        }
-		    	                    }
-		                        else{       //The ID must have a valid ID number
+		    	                    
+		                        }else {       //The ID must have a valid ID number
 		                        	JOptionPane.showMessageDialog(null, "Error updating Movie! \n"
 		                        			+ "	· The ID cannot be empty");
 		                        	}
@@ -780,7 +777,6 @@ public class VL extends JFrame implements ActionListener {
 		language.setVisible(true);
 		lformat.setVisible(true);
 		movieFormat.setVisible(true);
-		//format.setVisible(true);
 		lstock.setVisible(true);
 		stock.setVisible(true);
 		lavailable.setVisible(true);
@@ -812,7 +808,6 @@ public class VL extends JFrame implements ActionListener {
 		language.setVisible(false);
 		lformat.setVisible(false);
 		movieFormat.setVisible(false);
-		//format.setVisible(false);
 		lstock.setVisible(false);
 		stock.setVisible(false);
 		lavailable.setVisible(false);

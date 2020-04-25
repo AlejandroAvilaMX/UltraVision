@@ -10,6 +10,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -34,6 +35,7 @@ import validations.ValidLength;
 public class MembershipCards extends JFrame implements ActionListener{
 	private JLabel ltitle, lID, lname, lcardNumber, llevelId, llevel, lloyaltyPoints, lfreeRent, lCustomerId;
 	private JTextField ID, name, cardNumber, level, levelId, loyaltyPoints, freeRent;
+	private JComboBox<String> comboLevel;
 	private JButton btnSearch, btnNew, btnUpdateCard, btnDeleteCard, btnSaveNew, btnSaveUpdate, btnCancel;
 
 	public MembershipCards() {
@@ -254,36 +256,35 @@ public class MembershipCards extends JFrame implements ActionListener{
         cardNumber = new JTextField();
         cardNumber.setBounds(500, 440, 220, 25);
         cardNumber.setVisible(false);
-        new ToUpperCase(cardNumber);
+        new NoLetters(cardNumber);
         new ValidLength(cardNumber, 16);
         
         llevelId = new JLabel("Level ID");
         llevelId.setFont(fontlabel);
         llevelId.setBounds(70, 480, 80, 20);
         llevelId.setVisible(false);
+        
+        comboLevel = new JComboBox<String>();
+        comboLevel.addItem("VL");
+        comboLevel.addItem("ML");
+        comboLevel.addItem("TV");
+        comboLevel.addItem("PR");
+        comboLevel.setBounds(70, 510, 80, 25);
+        comboLevel.setVisible(false);
+        
         levelId = new JTextField();
-        levelId.setBounds(70, 510, 80, 25);
+        levelId.setBounds(200, 510, 80, 25);
+        levelId.setText("VL");
         levelId.setVisible(false);
+        comboLevel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				levelId.setText(comboLevel.getSelectedItem().toString());
+			}
+		});
         new NoNumbers(levelId);
         new ToUpperCase(levelId);
         new ValidLength(levelId, 2);
-        
-        /*levelIdCB = new JComboBox<String>();
-        levelIdCB.setBounds(70, 510, 80, 25);
-        levelIdCB.addItem("");
-        levelIdCB.addItem("TV");
-        levelIdCB.addItem("ML");
-        levelIdCB.addItem("VL");
-        levelIdCB.addItem("PR");
-        levelIdCB.addActionListener(this);
-        
-        JComboBox levelId = new JComboBox();
-        levelId.setBounds(70, 510, 80, 25);
-        levelId.addItem("TV");
-        levelId.addItem("ML");
-        levelId.addItem("VL");
-        levelId.addItem("PR");
-        */
         
         llevel = new JLabel("Level");
         llevel.setFont(fontlabel);
@@ -294,6 +295,7 @@ public class MembershipCards extends JFrame implements ActionListener{
         level.setBounds(180, 510, 80, 25);
         level.setVisible(false);
         
+        /*
         //Save New Card button
         btnSaveNew = new JButton("Save");
         btnSaveNew.setFont(fontButton);
@@ -352,7 +354,7 @@ public class MembershipCards extends JFrame implements ActionListener{
                 			}
             		} 
             	}
-            });
+            });*/
         
         //Update Card button
         btnSaveUpdate = new JButton("Save");
@@ -380,9 +382,7 @@ public class MembershipCards extends JFrame implements ActionListener{
                             where = "WHERE IdCard = '" + filter + "'";
                             System.out.println("My where is: " + where);
                             try{
-                                               
-                            //JOptionPane.showMessageDialog(null, "Connected successfully");
-                                                
+                    
                             String updateartist = "UPDATE membershipCard SET cardNumber = ?, levelId = ?, level = ? " + where; 
                             System.out.println(updateartist);
                             PreparedStatement statement = conection.prepareStatement(updateartist);
@@ -441,7 +441,7 @@ public class MembershipCards extends JFrame implements ActionListener{
         freeRent = new JTextField();
         freeRent.setBounds(420, 510, 80, 25);*/
         
-        //New button
+        /*//New button
         btnNew = new JButton("New");
         btnNew.setFont(fontButton);
         btnNew.setBounds(870, 400, 100, 30);
@@ -450,7 +450,7 @@ public class MembershipCards extends JFrame implements ActionListener{
             	btnSaveNew.setVisible(true);
             	editScreen();     
             }
-        });
+        });*/
         
         //Update button
         btnUpdateCard = new JButton("Update");
@@ -463,7 +463,7 @@ public class MembershipCards extends JFrame implements ActionListener{
             }
         });
         
-        //Delete button
+        /*//Delete button
         btnDeleteCard = new JButton("Delete");
         btnDeleteCard.setFont(fontButton);
         btnDeleteCard.setBounds(870, 580, 100, 30);
@@ -504,7 +504,7 @@ public class MembershipCards extends JFrame implements ActionListener{
                             + "* The Card ID cannot be empty");
                 }
             }
-        });
+        });*/
         
         p.add(ltitle);
         p.add(btnRefresh);
@@ -519,6 +519,7 @@ public class MembershipCards extends JFrame implements ActionListener{
         p.add(cardNumber);
         p.add(llevelId);
         p.add(levelId);
+        p.add(comboLevel);
         p.add(llevel);
         p.add(level);
         /*p.add(lloyaltyPoints);
@@ -526,12 +527,12 @@ public class MembershipCards extends JFrame implements ActionListener{
         p.add(lfreeRent);
         p.add(freeRent);*/
         p.add(levelId);
-        p.add(btnSaveNew);
+        //p.add(btnSaveNew);
         p.add(btnSaveUpdate);
         p.add(btnCancel);
-        p.add(btnNew);
+        //p.add(btnNew);
         p.add(btnUpdateCard);
-        p.add(btnDeleteCard);
+        //p.add(btnDeleteCard);
         
         this.validate();
         this.repaint();
@@ -543,11 +544,11 @@ public class MembershipCards extends JFrame implements ActionListener{
 		lcardNumber.setVisible(true);
 		cardNumber.setVisible(true);
 		llevelId.setVisible(true);
-		levelId.setVisible(true);
+		comboLevel.setVisible(true);
 		
-		btnNew.setVisible(false);
+		//btnNew.setVisible(false);
 		btnUpdateCard.setVisible(false);
-		btnDeleteCard.setVisible(false);
+		//btnDeleteCard.setVisible(false);
 		
 		btnCancel.setVisible(true);
 	}
@@ -558,11 +559,11 @@ public class MembershipCards extends JFrame implements ActionListener{
 		lcardNumber.setVisible(false);
 		cardNumber.setVisible(false);
 		llevelId.setVisible(false);
-		levelId.setVisible(false);
+		comboLevel.setVisible(false);
 		
-		btnNew.setVisible(true);
+		//btnNew.setVisible(true);
 		btnUpdateCard.setVisible(true);
-		btnDeleteCard.setVisible(true);
+		//btnDeleteCard.setVisible(true);
 		
 		btnCancel.setVisible(false);
 	}

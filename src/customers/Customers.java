@@ -12,6 +12,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -34,13 +35,15 @@ import validations.ToUpperCase;
 import validations.ValidLength;
 
 public class Customers extends JFrame implements ActionListener{
-	private JLabel lID, lemail, lname, lsurname, lphoneNumber, lstreet, lnumber, lpostalCode, lcity, lcountry;
-    private JTextField ID, name, surname, phoneNumber, street, number, postalCode, city, country, email;
+	private JLabel lID, lemail, lname, lsurname, lphoneNumber, lstreet, lnumber, lpostalCode, lcity, lcountry, lcardNumber, llevelId;
+    private JTextField ID, name, surname, phoneNumber, street, number, postalCode, city, country, email, cardNumber, levelId, lastRegister, level;
+    private JComboBox<String> comboLevel;
+    private String res;
     private JButton btnSearch, btnNew, btnUpdateCustomer, btnDeleteCustomer, btnSaveNew, btnSaveUpdate, btnCancel;
      
 	public Customers() {
 		this.setVisible(true);
-        this.setSize(1100, 730);     //Size of the window
+        this.setSize(1100, 760);     //Size of the window
         this.setTitle("Customers");       //Title of the window
         
         JPanel p = new JPanel();
@@ -364,6 +367,53 @@ public class Customers extends JFrame implements ActionListener{
         email.setVisible(false);
         new ValidLength(email, 70);
         
+        lcardNumber = new JLabel("Card Number");
+        lcardNumber.setFont(fontlabel);
+        lcardNumber.setBounds(70, 620, 180, 20);
+        lcardNumber.setVisible(false);
+        cardNumber = new JTextField();
+        cardNumber.setBounds(70, 650, 220, 25);
+        cardNumber.setVisible(false);
+        new NoLetters(cardNumber);
+        new ValidLength(cardNumber, 16);
+        
+        llevelId = new JLabel("Level ID");
+        llevelId.setFont(fontlabel);
+        llevelId.setBounds(360, 620, 80, 20);
+        llevelId.setVisible(false);
+        
+        comboLevel = new JComboBox<String>();
+        comboLevel.addItem("VL");
+        comboLevel.addItem("ML");
+        comboLevel.addItem("TV");
+        comboLevel.addItem("PR");
+        comboLevel.setBounds(360, 650, 80, 25);
+        comboLevel.setVisible(false);
+        
+        levelId = new JTextField();
+        levelId.setBounds(360, 650, 80, 25);
+        levelId.setText("VL");
+        levelId.setVisible(false);
+        comboLevel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				levelId.setText(comboLevel.getSelectedItem().toString());
+			}
+		});
+        new NoNumbers(levelId);
+        new ToUpperCase(levelId);
+        new ValidLength(levelId, 2);
+        
+        lastRegister = new JTextField();
+        lastRegister.setBounds(480, 650, 80, 25);
+        lastRegister.setVisible(false);
+        
+        level = new JTextField();
+        level.setEditable(false);
+        level.setBounds(180, 510, 80, 25);
+        level.setVisible(false);
+        level.setText("Video Lover");
+        
         //New button
         btnNew = new JButton("New");
         btnNew.setFont(fontButton);
@@ -382,7 +432,7 @@ public class Customers extends JFrame implements ActionListener{
         btnUpdateCustomer.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
             	btnSaveUpdate.setVisible(true);
-            	editScreen();
+            	updateScreen();
             }
         });
         
@@ -402,38 +452,50 @@ public class Customers extends JFrame implements ActionListener{
                     where = "WHERE custId = '" + filter + "'";
                     System.out.println("My WHERE is: " + where);
                     try{
-                                       
-                    //JOptionPane.showMessageDialog(null, "Connected successfully");
-                                        
-                    String updateuser = "DELETE FROM customer WHERE custId = ?"; 
+                    	
+                    	String deleteCard = "DELETE FROM membershipCard WHERE IdCard = ?"; 
+                        
+                        PreparedStatement statement = conection.prepareStatement(deleteCard);
+                        statement.setString(1, ID.getText());
+                        System.out.println("my query is: " + deleteCard);
+                        statement.execute();
+                        
+                        try {
+                        	String deleteCustomer = "DELETE FROM customer WHERE custId = ?"; 
+                            
+                            PreparedStatement stt = conection.prepareStatement(deleteCustomer);
+                            stt.setString(1, ID.getText());
+                            System.out.println("my query is: " + deleteCustomer);
+                            stt.execute();
+                               
+                            conection.close();
+                        	
+                        } catch(SQLException ex) {
+                        	JOptionPane.showMessageDialog(null, "Error deleting the Membership Card...!!");
+                        	}
+                        
+                        JOptionPane.showMessageDialog(null, "Customer deleted successfully");
+	                    ID.setText("");
+	                    name.setText("");
+	                    surname.setText("");
+	                    street.setText("");
+	                    number.setText("");
+	                    postalCode.setText("");
+	                    city.setText("");
+	                    country.setText("");
+	                    phoneNumber.setText("");
+	                    email.setText("");
+	                    cardNumber.setText("");
+	                    lastRegister.setText("");
+
+                    } catch (Exception e){      //If something goes wrong
+                    	JOptionPane.showMessageDialog(null, "Error deleting the Customer!");
+                    	}
                     
-                    PreparedStatement statement = conection.prepareStatement(updateuser);
-                    statement.setString(1, ID.getText());
-                    System.out.println("my query is: " +updateuser);
-                    statement.execute();
-                       
-                    conection.close();
-                    
-                    JOptionPane.showMessageDialog(null, "Customer deleted successfully");
-                    ID.setText("");
-                    name.setText("");
-                    surname.setText("");
-                    street.setText("");
-                    number.setText("");
-                    postalCode.setText("");
-                    city.setText("");
-                    country.setText("");
-                    phoneNumber.setText("");
-                    email.setText("");
-                    
-                } catch (Exception e){      //If something goes wrong
-                    JOptionPane.showMessageDialog(null, "Error deleting the Customer!");
-                }
-                }
-                else{       //The ID must be a valid ID number
+                }else {       //The ID must be a valid ID number
                     JOptionPane.showMessageDialog(null, "Error deleting the Customer! Possible reassons: \n"
                             + "* The ID cannot be empty");
-                }
+                	}
             }
         });
         
@@ -448,12 +510,13 @@ public class Customers extends JFrame implements ActionListener{
             	if(name.getText().equals("") || surname.getText().equals("")) {
             		JOptionPane.showMessageDialog(null, "Name and Surname cannot be empty");
             	}else {
+            		
+            		levelDescription();
+            		
             		ConectionDB con = new ConectionDB();
                     Connection conection = con.conect();
                     
                     try{
-                        
-                        //JOptionPane.showMessageDialog(null, "Connected successfully");
                                             
                         String adduser = "INSERT INTO customer (name, surname, street, number, postalCode, city, country, phoneNumber, email) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"; 
                         
@@ -469,7 +532,47 @@ public class Customers extends JFrame implements ActionListener{
                         statement.setString(9, email.getText());
                         
                         statement.executeUpdate();
-                           
+                        
+                        try{
+                            
+                            PreparedStatement ps = null;
+                            ResultSet rs = null;
+                            
+                            String search = "SELECT custId FROM customer ORDER BY custId DESC LIMIT 1";
+                            
+                            System.out.println(search);
+                            ps = conection.prepareStatement(search);
+                            rs = ps.executeQuery();
+                            
+                            while(rs.next()) {
+                            	lastRegister.setText(rs.getString("custId"));
+                            	res = rs.getString("custId");
+                            	System.out.println("The last register is: " + rs.getString("custId"));
+                            }
+
+                            try{
+                                
+                                String addcard = "INSERT INTO membershipCard (cardNumber, levelId, level, custId) VALUES(?, ?, ?, ?)"; 
+                                System.out.println(cardNumber.getText());
+                                System.out.println(levelId.getText());
+                                System.out.println(level.getText());
+                                System.out.println(lastRegister.getText());
+                                System.out.println(addcard);
+                                PreparedStatement stt = conection.prepareStatement(addcard);
+                                stt.setString(1, cardNumber.getText());
+                                stt.setString(2, levelId.getText());
+                                stt.setString(3, level.getText());
+                                stt.setString(4, lastRegister.getText());
+                                System.out.println("The levelID is: " + levelId.getText());
+                                stt.executeUpdate();
+                                
+                            } catch (Exception e){      //If something goes wrong
+                            	JOptionPane.showMessageDialog(null, "Error inserting a new Membership Card!");
+                            	}
+                        } catch (SQLException ex){
+                            JOptionPane.showMessageDialog(null, "Error finding last Register...!!");
+                        }
+                        
                         conection.close();
                         
                         JOptionPane.showMessageDialog(null, "New User inserted successfully");
@@ -483,6 +586,7 @@ public class Customers extends JFrame implements ActionListener{
                         country.setText("");
                         phoneNumber.setText("");
                         email.setText("");
+                        cardNumber.setText("");
                         
                     } catch (Exception e){      //If something goes wrong
                         JOptionPane.showMessageDialog(null, "Error inserting a new User!");
@@ -512,8 +616,6 @@ public class Customers extends JFrame implements ActionListener{
                         where = "WHERE custId = '" + filter + "'";
                         System.out.println("My where is: " + where);
                         try{
-                                           
-                        //JOptionPane.showMessageDialog(null, "Connected successfully");
                                             
                         String updateartist = "UPDATE customer SET name = ?, surname = ?, street = ?, number = ?, postalCode = ?, city = ?, country = ?, phoneNumber = ?, email = ? " + where; 
                         System.out.println(updateartist);
@@ -593,6 +695,13 @@ public class Customers extends JFrame implements ActionListener{
         p.add(phoneNumber);
         p.add(lemail);
         p.add(email);
+        p.add(lcardNumber);
+        p.add(cardNumber);
+        p.add(llevelId);
+        p.add(comboLevel);
+        p.add(levelId);
+        p.add(lastRegister);
+        p.add(level);
         p.add(btnNew);
         p.add(btnUpdateCustomer);
         p.add(btnDeleteCustomer);
@@ -621,6 +730,10 @@ public class Customers extends JFrame implements ActionListener{
 		phoneNumber.setVisible(true);
 		lemail.setVisible(true);
 		email.setVisible(true);
+		lcardNumber.setVisible(true);
+		cardNumber.setVisible(true);
+		llevelId.setVisible(true);
+		comboLevel.setVisible(true);
 		btnNew.setVisible(false);
 		btnUpdateCustomer.setVisible(false);
 		btnDeleteCustomer.setVisible(false);
@@ -644,10 +757,65 @@ public class Customers extends JFrame implements ActionListener{
 		phoneNumber.setVisible(false);
 		lemail.setVisible(false);
 		email.setVisible(false);
+		lcardNumber.setVisible(false);
+		cardNumber.setVisible(false);
+		llevelId.setVisible(false);
+		comboLevel.setVisible(false);
 		btnNew.setVisible(true);
 		btnUpdateCustomer.setVisible(true);
 		btnDeleteCustomer.setVisible(true);
 		btnCancel.setVisible(false);
+	}
+	
+	public void updateScreen() {
+		lsurname.setVisible(true);
+		surname.setVisible(true);
+		lstreet.setVisible(true);
+		street.setVisible(true);
+		lnumber.setVisible(true);
+		number.setVisible(true);
+		lpostalCode.setVisible(true);
+		postalCode.setVisible(true);
+		lcity.setVisible(true);
+		city.setVisible(true);
+		lcountry.setVisible(true);
+		country.setVisible(true);
+		lphoneNumber.setVisible(true);
+		phoneNumber.setVisible(true);
+		lemail.setVisible(true);
+		email.setVisible(true);
+
+		btnNew.setVisible(false);
+		btnUpdateCustomer.setVisible(false);
+		btnDeleteCustomer.setVisible(false);
+		btnCancel.setVisible(true);
+	}
+	
+	
+	public void levelDescription() {
+		if(levelId.getText().equals("PR")) {
+    		System.out.println("LevelId: " + levelId.getText());
+    		level.setText("Premium");
+    		System.out.println("Level Description: " + level.getText());
+		}else {
+			if(levelId.getText().equals("TV")) {
+                		System.out.println("LevelId: " + levelId.getText());
+                		level.setText("TV Lover");
+                		System.out.println("Level Description: " + level.getText());
+			}else {
+				if(levelId.getText().equals("ML")) {
+                		System.out.println("LevelId: " + levelId.getText());
+                		level.setText("Music Lover");
+                		System.out.println("Level Description: " + level.getText());
+				}else {
+					if(levelId.getText().equals("VL")) {
+                		System.out.println("LevelId: " + levelId.getText());
+                		level.setText("Video Lover");
+                		System.out.println("Level Description: " + level.getText());
+					}
+				}
+			}
+		}
 	}
 	
 	@Override
