@@ -1,3 +1,8 @@
+/**
+ * This is the Access Window, we can add and delete users to use the program
+ * 
+ * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
+ */
 package utravision;
 
 import java.awt.Font;
@@ -50,7 +55,6 @@ public class Access extends JFrame implements ActionListener{
     
         JMenu myMenu = new JMenu("File");       //Title of the menu
         myMenuBar.add(myMenu);
-        
         //Options of the menu
         JMenuItem Menu = new JMenuItem("Main Menu");
         myMenu.add(Menu);
@@ -86,11 +90,10 @@ public class Access extends JFrame implements ActionListener{
         myMenu.add(Close);
         Close.addActionListener(this);
         Close.setActionCommand("exit");
-        
+        //Title of the window
         ltitle = new JLabel("Access");
         ltitle.setFont(fonttitle);
         ltitle.setBounds(220, 50, 230, 20);
-        
         //Button refresh
         JButton btnRefresh = new JButton("Refresh");
         btnRefresh.setFont(fontButton);
@@ -105,7 +108,7 @@ public class Access extends JFrame implements ActionListener{
                     
                     PreparedStatement ps = null;
                     ResultSet rs = null;
-                    
+                    //'refresh' will be the query that we will show all the information on the table access
                     String refresh = "SELECT username, password FROM access;";
                     //Adding the result to the rows of the table
                     ps = conection.prepareStatement(refresh);
@@ -125,6 +128,7 @@ public class Access extends JFrame implements ActionListener{
                         }
                         
                         model.addRow(col);
+                        
                     }
 
                     JTable table = new JTable(model);
@@ -152,25 +156,22 @@ public class Access extends JFrame implements ActionListener{
         lpassword.setBounds(380, 280, 80, 20);
         password = new JTextField();
         password.setBounds(380, 310, 120, 25);
-        
-        //New button
+        //Button New
         JButton btnNew = new JButton("New");
         btnNew.setFont(fontButton);
         btnNew.setBounds(100, 400, 100, 30);
         btnNew.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-            	
-            	if(username.getText().equals("") || password.getText().equals("")) {
+            	//Validation of mandatory fields
+            	if(username.getText().equals("") || password.getText().equals("")) {		//we must type something in username and password
             		JOptionPane.showMessageDialog(null, "Username and Password cannot be empty");
-            	}else {
+            	} else {
             		ConectionDB con = new ConectionDB();
                     Connection conection = con.conect();
                     
                     try{
-                        
-                        //JOptionPane.showMessageDialog(null, "Connected successfully");
-                                            
-                        String adduser = "INSERT INTO access (username, password) VALUES(?, ?)"; 
+                    	//'adduser' will be the query that we will send to the database to add the new access
+                    	String adduser = "INSERT INTO access (username, password) VALUES(?, ?)"; 
                         
                         PreparedStatement statement = conection.prepareStatement(adduser);
                         statement.setString(1, username.getText());
@@ -200,22 +201,21 @@ public class Access extends JFrame implements ActionListener{
             public void actionPerformed(ActionEvent arg0){
                 ConectionDB con = new ConectionDB();
                 Connection conection = con.conect();
-                
+                //We will use the username as the filter
                 String filter = username.getText();
                 String where = "";
                 System.out.println("My filter is " + filter);
+                //Our filter must not be empty
                 if(!"".equals(filter)){     //
                     where = "WHERE username = '" + filter + "'";
                     System.out.println("My WHERE is: " + where);
                     try{
-                                       
-                    //JOptionPane.showMessageDialog(null, "Connected successfully");
-                                        
-                    String updateuser = "DELETE FROM access WHERE username = ?"; 
+                    	//'deleteuser' will be the query that we will send to the database to delete the access
+                    String deleteuser = "DELETE FROM access WHERE username = ?"; 
                     
-                    PreparedStatement statement = conection.prepareStatement(updateuser);
+                    PreparedStatement statement = conection.prepareStatement(deleteuser);
                     statement.setString(1, username.getText());
-                    System.out.println("my query is: " +updateuser);
+                    System.out.println("my query is: " +deleteuser);
                     statement.execute();
                        
                     conection.close();
@@ -224,11 +224,11 @@ public class Access extends JFrame implements ActionListener{
                     username.setText("");
                     password.setText("");
                     
-                } catch (Exception e){      //If something goes wrong
-                    JOptionPane.showMessageDialog(null, "Error deleting the Access!");
-                }
-                }
-                else{       //The username must be a valid username
+                    } catch (Exception e){      //If something goes wrong
+                    	JOptionPane.showMessageDialog(null, "Error deleting the Access!");
+                    }
+                    
+                } else {       //The username must be a valid username
                     JOptionPane.showMessageDialog(null, "Error deleting the Access! Possible reassons: \n"
                             + "* The username cannot be empty");
                 }
@@ -254,32 +254,26 @@ public class Access extends JFrame implements ActionListener{
 		if(ac.equals("exit")){
             System.out.println("Exit the program");
             System.exit(0);
-        }
-		else if(ac.equals("menu")){
+        } else if(ac.equals("menu")){
             System.out.println("Going to Main Menu");
             dispose();
-        }
-        else if(ac.equals("customers")){
+        } else if(ac.equals("customers")){
             System.out.println("Going to Customers");
             new Customers();
             dispose();
-        }
-        else if(ac.equals("MemCard")){
+        } else if(ac.equals("MemCard")){
             System.out.println("Going to Membership Card");
             new MembershipCards();
             dispose();
-        }
-        else if(ac.equals("titles")){
+        } else if(ac.equals("titles")){
             System.out.println("Going to Titles");
             new Titles();
             dispose();
-        }
-        else if(ac.equals("rent")){
+        } else if(ac.equals("rent")){
             System.out.println("Going to Rent");
             new Rent();
             dispose();
-        }
-        else if(ac.equals("logout")){
+        } else if(ac.equals("logout")){
             System.out.println("Going back to Login");
             new LoginController();
             //new UltraVision();

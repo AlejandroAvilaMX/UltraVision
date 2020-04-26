@@ -1,3 +1,10 @@
+/**
+ * This is the Customers window.
+ * We can see the details of the all the Customers, updated them and Delete them.
+ * It will be able to search the information, using the Customer name
+ * 
+ * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
+ */
 package customers;
 
 import java.awt.Font;
@@ -58,7 +65,6 @@ public class Customers extends JFrame implements ActionListener{
     
         JMenu myMenu = new JMenu("File");       //Title of the menu
         myMenuBar.add(myMenu);
-        
         //Options of the menu
         JMenuItem Menu = new JMenuItem("Main Menu");
         myMenu.add(Menu);
@@ -94,7 +100,6 @@ public class Customers extends JFrame implements ActionListener{
         myMenu.add(Close);
         Close.addActionListener(this);
         Close.setActionCommand("exit");
-        
         //Button refresh
         JButton btnRefresh = new JButton("Refresh");
         btnRefresh.setFont(fontButton);
@@ -109,7 +114,7 @@ public class Customers extends JFrame implements ActionListener{
                     
                     PreparedStatement ps = null;
                     ResultSet rs = null;
-                    
+                    //'refresh' will be the query that we will send to the database to show all the Customers
                     String refresh = "SELECT custId, name, surname, street, number, postalCode, city, country, phoneNumber, email FROM customer;";
                     //Adding the result to the rows of the table
                     ps = conection.prepareStatement(refresh);
@@ -159,7 +164,6 @@ public class Customers extends JFrame implements ActionListener{
         btnMemCard.setBounds(865, 70, 170, 30);
         btnMemCard.addActionListener(this);
         btnMemCard.setActionCommand("btnMembership");
-        
         //My JTable
         try{
             ConectionDB con = new ConectionDB();
@@ -168,7 +172,7 @@ public class Customers extends JFrame implements ActionListener{
                     
             PreparedStatement ps = null;
             ResultSet rs = null;
-                   
+            //'refresh' will be the query that we will send to the database to show all the Membership Cards
             String refresh = "SELECT custId, name, surname, street, number, postalCode, city, country, phoneNumber, email FROM customer";     //Showing all the information of the table
                     
             ps = conection.prepareStatement(refresh);
@@ -224,8 +228,7 @@ public class Customers extends JFrame implements ActionListener{
         name.setBounds(70, 440, 220, 25);
         new ValidLength(name, 50);
         new NoNumbers(name);
-        
-        //Search button
+        //Button Search
         btnSearch = new JButton("Search");
         btnSearch.setFont(fontButton);
         btnSearch.setBounds(340, 435, 110, 30);
@@ -236,7 +239,7 @@ public class Customers extends JFrame implements ActionListener{
                 
                 String filter = name.getText();
                 String where = "";
-                
+                //Our filter must not be empty
                 if(!"".equals(filter)){
                     where = "WHERE name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
                 }
@@ -246,7 +249,7 @@ public class Customers extends JFrame implements ActionListener{
                     
                     PreparedStatement ps = null;
                     ResultSet rs = null;
-                    
+                    //'search' will be the query that we will send to the database to find the results
                     String search = "SELECT custId, name, surname, street, number, postalCode, city, country, phoneNumber, email FROM customer " + where;
                     
                     System.out.println(search);
@@ -381,7 +384,7 @@ public class Customers extends JFrame implements ActionListener{
         llevelId.setFont(fontlabel);
         llevelId.setBounds(360, 620, 80, 20);
         llevelId.setVisible(false);
-        
+        //JComboBox to select the Level Id
         comboLevel = new JComboBox<String>();
         comboLevel.addItem("VL");
         comboLevel.addItem("ML");
@@ -392,12 +395,13 @@ public class Customers extends JFrame implements ActionListener{
         
         levelId = new JTextField();
         levelId.setBounds(360, 650, 80, 25);
-        levelId.setText("VL");
+        levelId.setText("VL");		//The default value of the JTextField will be 'VL' (same as the JComboBox)
         levelId.setVisible(false);
+        //This will be write the Level Id to a JTextField depending on the selection of the JComboBox
         comboLevel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				levelId.setText(comboLevel.getSelectedItem().toString());
+				levelId.setText(comboLevel.getSelectedItem().toString());		//We will catch the selection of the ComboBox and convert it to String
 			}
 		});
         new NoNumbers(levelId);
@@ -413,7 +417,6 @@ public class Customers extends JFrame implements ActionListener{
         level.setBounds(180, 510, 80, 25);
         level.setVisible(false);
         level.setText("Video Lover");
-        
         //New button
         btnNew = new JButton("New");
         btnNew.setFont(fontButton);
@@ -424,7 +427,6 @@ public class Customers extends JFrame implements ActionListener{
             	editScreen();
             }
         });
-        
         //Update button
         btnUpdateCustomer = new JButton("Update");
         btnUpdateCustomer.setFont(fontButton);
@@ -435,7 +437,6 @@ public class Customers extends JFrame implements ActionListener{
             	updateScreen();
             }
         });
-        
         //Delete button
         btnDeleteCustomer = new JButton("Delete");
         btnDeleteCustomer.setFont(fontButton);
@@ -444,15 +445,16 @@ public class Customers extends JFrame implements ActionListener{
             public void actionPerformed(ActionEvent arg0){
                 ConectionDB con = new ConectionDB();
                 Connection conection = con.conect();
-                
+                //Declaring our 'where' condition to be used as filter
                 String filter = ID.getText();
                 String where = "";
                 System.out.println("My filter is " + filter);
+                //Our filter must not be empty
                 if(!"".equals(filter)){     //
                     where = "WHERE custId = '" + filter + "'";
                     System.out.println("My WHERE is: " + where);
                     try{
-                    	
+                    	//'deleteCard' will be the query that we will send to the database to delete Membership Card
                     	String deleteCard = "DELETE FROM membershipCard WHERE IdCard = ?"; 
                         
                         PreparedStatement statement = conection.prepareStatement(deleteCard);
@@ -461,6 +463,7 @@ public class Customers extends JFrame implements ActionListener{
                         statement.execute();
                         
                         try {
+                        	//'deleteCustomer' will be the query that we will send to the database to delete Customer
                         	String deleteCustomer = "DELETE FROM customer WHERE custId = ?"; 
                             
                             PreparedStatement stt = conection.prepareStatement(deleteCustomer);
@@ -470,9 +473,9 @@ public class Customers extends JFrame implements ActionListener{
                                
                             conection.close();
                         	
-                        } catch(SQLException ex) {
+                        } catch(SQLException ex) {		//If something goes wrong when trying to delete the Membership Card
                         	JOptionPane.showMessageDialog(null, "Error deleting the Membership Card...!!");
-                        	}
+                        }
                         
                         JOptionPane.showMessageDialog(null, "Customer deleted successfully");
 	                    ID.setText("");
@@ -488,17 +491,16 @@ public class Customers extends JFrame implements ActionListener{
 	                    cardNumber.setText("");
 	                    lastRegister.setText("");
 
-                    } catch (Exception e){      //If something goes wrong
+                    } catch (Exception e){      //If something goes wrong when trying to delete the Customer
                     	JOptionPane.showMessageDialog(null, "Error deleting the Customer!");
-                    	}
+                    }
                     
-                }else {       //The ID must be a valid ID number
+                }else {       //The ID must not be a empty
                     JOptionPane.showMessageDialog(null, "Error deleting the Customer! Possible reassons: \n"
                             + "* The ID cannot be empty");
-                	}
+                }
             }
         });
-        
         //Save New VL button
         btnSaveNew = new JButton("Save");
         btnSaveNew.setFont(fontButton);
@@ -506,8 +508,8 @@ public class Customers extends JFrame implements ActionListener{
         btnSaveNew.setVisible(false);
         btnSaveNew.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-            	
-            	if(name.getText().equals("") || surname.getText().equals("")) {
+            	//Validation of required fields
+            	if(name.getText().equals("") || surname.getText().equals("")) {		//We must type a Name and surname 
             		JOptionPane.showMessageDialog(null, "Name and Surname cannot be empty");
             	}else {
             		
@@ -517,7 +519,7 @@ public class Customers extends JFrame implements ActionListener{
                     Connection conection = con.conect();
                     
                     try{
-                                            
+                        //'adduser' will be query that will be send to the database to add a new register on the table customer                    
                         String adduser = "INSERT INTO customer (name, surname, street, number, postalCode, city, country, phoneNumber, email) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"; 
                         
                         PreparedStatement statement = conection.prepareStatement(adduser);
@@ -532,26 +534,26 @@ public class Customers extends JFrame implements ActionListener{
                         statement.setString(9, email.getText());
                         
                         statement.executeUpdate();
-                        
+                        //Once the information of the table customer is inserted, we will take the last Customer Id registered
                         try{
                             
                             PreparedStatement ps = null;
                             ResultSet rs = null;
-                            
+                            //'search' will be the query that will be send to the database to find the last Customer Id added
                             String search = "SELECT custId FROM customer ORDER BY custId DESC LIMIT 1";
                             
                             System.out.println(search);
                             ps = conection.prepareStatement(search);
                             rs = ps.executeQuery();
-                            
+                            //We will take the result of the query and this will be written on the JTextField 'lastRegister'
                             while(rs.next()) {
                             	lastRegister.setText(rs.getString("custId"));
                             	res = rs.getString("custId");
                             	System.out.println("The last register is: " + rs.getString("custId"));
                             }
-
+                            //Once we know the last Customer Id and when the Id is already on the JTextField we will insert the information on the table membershiCard
                             try{
-                                
+                                //'addcard' will be the query that will be send to the database to add a the Card details of the new customer
                                 String addcard = "INSERT INTO membershipCard (cardNumber, levelId, level, custId) VALUES(?, ?, ?, ?)"; 
                                 System.out.println(cardNumber.getText());
                                 System.out.println(levelId.getText());
@@ -566,10 +568,10 @@ public class Customers extends JFrame implements ActionListener{
                                 System.out.println("The levelID is: " + levelId.getText());
                                 stt.executeUpdate();
                                 
-                            } catch (Exception e){      //If something goes wrong
+                            } catch (Exception e){      //If something goes wrong when we try to save the details of the Membership Card 
                             	JOptionPane.showMessageDialog(null, "Error inserting a new Membership Card!");
                             	}
-                        } catch (SQLException ex){
+                        } catch (SQLException ex){		//If something goes wrong when we try to find the Id of the last Customer 
                             JOptionPane.showMessageDialog(null, "Error finding last Register...!!");
                         }
                         
@@ -602,24 +604,25 @@ public class Customers extends JFrame implements ActionListener{
         btnSaveUpdate.setVisible(false);
         btnSaveUpdate.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-            	if(name.getText().equals("") || surname.getText().equals("")) {
+            	//Validation of the mandatory fields
+            	if(name.getText().equals("") || surname.getText().equals("")) {		//We must type a name and surname
             		JOptionPane.showMessageDialog(null, "Name and surname cannot be empty");
             	}else {
             		ConectionDB con = new ConectionDB();
                     Connection conection = con.conect();
-                    
+                    //Declaring our 'where' condition to be used as filter
                     String filter = ID.getText();
                     System.out.println("My filter is: " + filter);
                     String where = "";
-                    
+                    //Our filter must not be empty
                     if(!"".equals(filter)){
                         where = "WHERE custId = '" + filter + "'";
                         System.out.println("My where is: " + where);
                         try{
-                                            
-                        String updateartist = "UPDATE customer SET name = ?, surname = ?, street = ?, number = ?, postalCode = ?, city = ?, country = ?, phoneNumber = ?, email = ? " + where; 
-                        System.out.println(updateartist);
-                        PreparedStatement statement = conection.prepareStatement(updateartist);
+                        //'updatecustomer' will be the query that we will send to the database to find the results             
+                        String updatecustomer = "UPDATE customer SET name = ?, surname = ?, street = ?, number = ?, postalCode = ?, city = ?, country = ?, phoneNumber = ?, email = ? " + where; 
+                        System.out.println(updatecustomer);
+                        PreparedStatement statement = conection.prepareStatement(updatecustomer);
                         statement.setString(1, name.getText());
                         statement.setString(2, surname.getText());
                         statement.setString(3, street.getText());
@@ -646,19 +649,18 @@ public class Customers extends JFrame implements ActionListener{
                         phoneNumber.setText("");
                         email.setText("");
                         
-                    } catch (Exception e){
-                        JOptionPane.showMessageDialog(null, "Error updating Customer! \n"
-                                + "* Customer ID must be a valid numeric ID");
+                        } catch (Exception e){
+                        	JOptionPane.showMessageDialog(null, "Error updating Customer! \n"		//If the Customer ID is not valid
+                        			+ "* Customer ID must be a valid numeric ID");
                         }
-                        }
-                    else{       //The ID must have a valid ID number
+                        
+                    } else{       //The ID must not be empty
                         JOptionPane.showMessageDialog(null, "Error updating Customer! \n"
                                 + "* The ID cannot be empty");
                     }
             	}
             }
         });
-        
         //Cancel button
         btnCancel = new JButton("Cancel");
         btnCancel.setFont(fontButton);
@@ -712,7 +714,7 @@ public class Customers extends JFrame implements ActionListener{
         this.validate();
         this.repaint();
 	}
-	
+	//This will modify the window to be able to see all the required information to add a new customer and his membership card
 	public void editScreen() {
 		lsurname.setVisible(true);
 		surname.setVisible(true);
@@ -739,7 +741,7 @@ public class Customers extends JFrame implements ActionListener{
 		btnDeleteCustomer.setVisible(false);
 		btnCancel.setVisible(true);
 	}
-	
+	//This method will return the components of the window to their original state.
 	public void normalScreen() {
 		lsurname.setVisible(false);
 		surname.setVisible(false);
@@ -766,7 +768,7 @@ public class Customers extends JFrame implements ActionListener{
 		btnDeleteCustomer.setVisible(true);
 		btnCancel.setVisible(false);
 	}
-	
+	//This will modify the window to be able to see all the required information to update Customers
 	public void updateScreen() {
 		lsurname.setVisible(true);
 		surname.setVisible(true);
@@ -791,7 +793,7 @@ public class Customers extends JFrame implements ActionListener{
 		btnCancel.setVisible(true);
 	}
 	
-	
+	//This will take the written value of the Level Id and depending on it, it will add the description of the level
 	public void levelDescription() {
 		if(levelId.getText().equals("PR")) {
     		System.out.println("LevelId: " + levelId.getText());
@@ -824,22 +826,18 @@ public class Customers extends JFrame implements ActionListener{
 		if(ac.equals("exit")){
             System.out.println("Exit the program");
             System.exit(0);
-        }
-		else if(ac.equals("menu")){
+        } else if(ac.equals("menu")){
             System.out.println("Going to Main Menu");
             dispose();
-        }
-        else if(ac.equals("customers")){
+        } else if(ac.equals("customers")){
             System.out.println("Going to Customers");
             new Customers();
             dispose();
-        }
-        else if(ac.equals("MemCard") || ac.equals("btnMembership")){
+        } else if(ac.equals("MemCard") || ac.equals("btnMembership")){
             System.out.println("Going to Membership Card");
             new MembershipCards();
             dispose();
-        }
-        else if(ac.equals("titles")){
+        } else if(ac.equals("titles")){
             System.out.println("Going to Titles");
             new Titles();
             dispose();
@@ -848,8 +846,7 @@ public class Customers extends JFrame implements ActionListener{
             System.out.println("Going to Rent");
             new Rent();
             dispose();
-        }
-        else if(ac.equals("logout")){
+        } else if(ac.equals("logout")){
             System.out.println("Going back to Login");
             new LoginController();
             dispose();

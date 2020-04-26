@@ -1,3 +1,8 @@
+/**
+ * This is the Login Controller class, it will validate the username and pasword
+ * 
+ * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
+ */
 package utravision;
 
 import java.awt.event.ActionEvent;

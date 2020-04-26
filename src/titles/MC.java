@@ -1,3 +1,11 @@
+/**
+ * This is the class for the MC option (CD Music Titles).
+ * It will contain all the information related to CD.
+ * It will be possible to add new CD Titles, as well as update and delete them.
+ * Search tool will be available
+ * 
+ * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
+ */
 package titles;
 
 import java.awt.Font;
@@ -57,7 +65,6 @@ public class MC extends JFrame implements ActionListener{
     
         JMenu myMenu = new JMenu("File");       //Title of the menu
         myMenuBar.add(myMenu);
-        
         //Options of the menu
         JMenuItem Menu = new JMenuItem("Main Menu");
         myMenu.add(Menu);
@@ -93,11 +100,10 @@ public class MC extends JFrame implements ActionListener{
         myMenu.add(Close);
         Close.addActionListener(this);
         Close.setActionCommand("exit");
-        
+        //Title of the Window
         ltitle = new JLabel("CD Music Titles");
         ltitle.setFont(fonttitle);
         ltitle.setBounds(450, 50, 230, 20);
-        
         //Button refresh
         JButton btnRefresh = new JButton("Refresh");
         btnRefresh.setFont(fontButton);
@@ -112,7 +118,7 @@ public class MC extends JFrame implements ActionListener{
 		                    
 		                PreparedStatement ps = null;
 		                ResultSet rs = null;
-		                    
+		                //'refresh' will be the query that we will send to the database to show all the titles that are of the CD type
 		                String refresh = "SELECT title.titleId, title.name, title.releaseYear, title.genre, music.artist, music.productionCompany, music.format, music.stock, music.available, music.rentPrice  "
 		                		+ "FROM title  INNER JOIN music "
 		                		+ "ON title.titleId=music.musicId "
@@ -181,7 +187,7 @@ public class MC extends JFrame implements ActionListener{
         name.setBounds(70, 470, 320, 25);
         new ValidLength(name, 50);
         
-        //Search button
+        //Button search
         btnSearch = new JButton("Search");
         btnSearch.setFont(fontButton);
         btnSearch.setBounds(420, 465, 90, 30);
@@ -192,7 +198,7 @@ public class MC extends JFrame implements ActionListener{
                 
                 String filter = name.getText();
                 String where = "";
-                
+                //Our filter must not be empty
                 if(!"".equals(filter)){
                     where = "WHERE title.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
                 }
@@ -202,7 +208,7 @@ public class MC extends JFrame implements ActionListener{
                     
                     PreparedStatement ps = null;
                     ResultSet rs = null;
-                    
+                    //'search' will be the query that we will send to the database to show the search result
                     String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, music.artist, music.productionCompany, music.format, music.stock, music.available, music.rentPrice "
                     		+ "FROM title "
                     		+ "INNER JOIN music ON title.titleId=music.musicId " + where +" AND format = 'CD'";
@@ -318,11 +324,11 @@ public class MC extends JFrame implements ActionListener{
         typeId = new JTextField();
         typeId.setBounds(620, 620, 80, 25);
         typeId.setVisible(false);
-        typeId.setText("MC");
+        typeId.setText("MC");		//By default, the type Id will be MC
         type = new JTextField();
         type.setBounds(710, 620, 80, 25);
         type.setVisible(false);
-        type.setText("Music");
+        type.setText("Music");		//By default, the type will be Music
         
         //New button
         btnNew = new JButton("New");
@@ -355,17 +361,16 @@ public class MC extends JFrame implements ActionListener{
                 
             	ConectionDB con = new ConectionDB();
                 Connection conection = con.conect();
-                
+                //Declaring our 'where' condition to be used as filter
                 String filter = titleId.getText();
                 String where = "";
                 System.out.println("My filter is " + filter);
+                //Our filter must not be empty
                 if(!"".equals(filter)){     //
                     where = "WHERE titleId = '" + filter + "'";
                     System.out.println("My WHERE is: " + where);
                     try{
-                                       
-                    //JOptionPane.showMessageDialog(null, "Connected successfully");
-                                        
+                    	//'deletecd' will be the query that we will send to the database to delete the cd
                     	String deletecd = "DELETE FROM music WHERE musicId = ?"; 
                         
                         PreparedStatement statementcd = conection.prepareStatement(deletecd);
@@ -373,41 +378,39 @@ public class MC extends JFrame implements ActionListener{
                         System.out.println("my query is: " + deletecd);
                         statementcd.execute();
                     
-                    try {
-                    	
-                        String deletetitle = "DELETE FROM title WHERE titleId = ?"; 
-                        
-                        PreparedStatement statement = conection.prepareStatement(deletetitle);
-                        statement.setString(1, titleId.getText());
-                        System.out.println("my query is: " + deletetitle);
-                        statement.execute();
-                    	
-                    } catch(SQLException ex) {
-                    	JOptionPane.showMessageDialog(null, "Error deleting CD...!!");
-                    }
-                       
-                    conection.close();
+	                    try {
+	                    	//'deletetitle' will be the query that we will send to the database to delete the title
+	                        String deletetitle = "DELETE FROM title WHERE titleId = ?"; 
+	                        
+	                        PreparedStatement statement = conection.prepareStatement(deletetitle);
+	                        statement.setString(1, titleId.getText());
+	                        System.out.println("my query is: " + deletetitle);
+	                        statement.execute();
+	                    	
+	                    } catch(SQLException ex) {
+	                    	JOptionPane.showMessageDialog(null, "Error deleting CD...!!");		//If something goes wrong when trying to delete the CD
+	                    }
+	                    conection.close();
                     
-                    JOptionPane.showMessageDialog(null, "CD Title deleted successfully");
-                    titleId.setText("");
-                    name.setText("");
-                    releaseYear.setText("");
-                    genre.setText("");
-                    typeId.setText("");
-                    artist.setText(""); 
-                    productionCompany.setText("");
-                    stock.setText("");
-                    available.setText("");
-                    rentPrice.setText("");
-                    lastRegister.setText("");
+	                    JOptionPane.showMessageDialog(null, "CD Title deleted successfully");
+	                    titleId.setText("");
+	                    name.setText("");
+	                    releaseYear.setText("");
+	                    genre.setText("");
+	                    typeId.setText("");
+	                    artist.setText(""); 
+	                    productionCompany.setText("");
+	                    stock.setText("");
+	                    available.setText("");
+	                    rentPrice.setText("");
+	                    lastRegister.setText("");
                     
                     } catch (Exception e){      //If something goes wrong
                     	JOptionPane.showMessageDialog(null, "Error deleting the CD Title!");
-                    	}
-                    }
-                else{       //The ID must be a valid ID number
+                    }    
+                } else {       //The ID must not be empty
                     JOptionPane.showMessageDialog(null, "Error deleting the CD Title! Possible reassons: \n"
-                            + "	� The ID cannot be empty");
+                    		+ "	� The ID cannot be empty");
                 }
             }
         });
@@ -419,7 +422,7 @@ public class MC extends JFrame implements ActionListener{
         btnSaveNew.setVisible(false);
         btnSaveNew.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-            	
+            	//Validation of required fields
             	if(name.getText().equals("") || releaseYear.getText().equals("") || artist.getText().equals("") || stock.getText().equals("") || available.getText().equals("") || rentPrice.getText().equals("")) {
             		JOptionPane.showMessageDialog(null, "One or more required fields are empty, please check: \n"
             				+ "	  � Name\n"
@@ -428,94 +431,98 @@ public class MC extends JFrame implements ActionListener{
             				+ "   � Quantity in stock\n"
             				+ "   � Quantity Available\n"
             				+ "	  � Rent Price\n");
-            		}else {
+            	}else {
             		//Validation of Quantity Available and Quantity in Stock
             		String txtStock = stock.getText(), txtAvailable = available.getText();
                     int qttyStock = Integer.parseInt(txtStock), qttyAvailable = Integer.parseInt(txtAvailable);
                     
-                    if(qttyAvailable > qttyStock) {
+                    if(qttyAvailable > qttyStock) {		//Quantity available must be bigger than quantity in stock
                     	System.out.println("Qtty Stock: " + qttyStock);
                     	System.out.println("Qtty Available " + qttyAvailable);
                     	JOptionPane.showMessageDialog(null, "The available quantity cannot be bigger than the stock quantity");
-                    	}else {
-                    		//Validation of Current Year less than 2020
-	                    	String txtReleaseYear = releaseYear.getText();
-	                    	int yearNumber = Integer.parseInt(txtReleaseYear);
+                    }else {
+                    	//Validation of Current Year less than 2020
+	                    String txtReleaseYear = releaseYear.getText();
+	                    int yearNumber = Integer.parseInt(txtReleaseYear);
                     	
-	                    	if(yearNumber <= 2020) {
-	                    		ConectionDB con = new ConectionDB();
-	                            Connection conection = con.conect();
-	                            	try{
-	                            		String addtitle = "INSERT INTO title (name, releaseYear, genre, typeId, type) VALUES(?, ?, ?, ?, ?)"; 
-		                                System.out.println("Query insert new title: " + addtitle);
-		                                PreparedStatement statement = conection.prepareStatement(addtitle);
-		                                statement.setString(1, name.getText());
-		                                statement.setString(2, releaseYear.getText());
-		                                statement.setString(3, genre.getText());
-		                                statement.setString(4, typeId.getText());
-		                                statement.setString(5, type.getText());
+	                    if(yearNumber <= 2020) {		//Year number must be equal or less than current year (2020)
+	                    	ConectionDB con = new ConectionDB();
+	                        Connection conection = con.conect();
+	                       	try{
+	                       		//'addtitle' will be the query that we will send to the database to add the title
+	                          	String addtitle = "INSERT INTO title (name, releaseYear, genre, typeId, type) VALUES(?, ?, ?, ?, ?)"; 
+		                        System.out.println("Query insert new title: " + addtitle);
+		                        PreparedStatement statement = conection.prepareStatement(addtitle);
+		                        statement.setString(1, name.getText());
+		                        statement.setString(2, releaseYear.getText());
+		                        statement.setString(3, genre.getText());
+		                        statement.setString(4, typeId.getText());
+		                        statement.setString(5, type.getText());
+		                           
+		                        statement.executeUpdate();
+		                        //Once the information of the table title is inserted, we will take the last title Id registered
+		                        try{
+		                         	PreparedStatement ps = null;
+		                            ResultSet rs = null;
+		                            //'search' will be the query that will be send to the database to find the last Title Id added
+		                            String search = "SELECT titleId FROM title ORDER BY titleId DESC LIMIT 1";
+		                            
+		                            System.out.println(search);
+		                            ps = conection.prepareStatement(search);
+		                            rs = ps.executeQuery();
+		                            //We will take the result of the query and this will be written on the JTextField 'lastRegister'
+		                            while(rs.next()) {
+		                            	lastRegister.setText(rs.getString("titleId"));
+		                                res = rs.getString("titleId");
+		                                System.out.println("The last register is: " + rs.getString("titleId"));
+		                            }
+		                            //Once we know the last Title Id and when the Id is already on the JTextField we will insert the information on the table music
+		                            try {
+		                              	//'addcd' will be the query that will be send to the database to add a the music details of the new Title
+		                               	String addcd = "INSERT INTO music (artist, productionCompany, format, stock, available, rentPrice, musicId) VALUES(?, ?, ?, ?, ?, ?, ?)"; 
+		                                System.out.println("Query insert new CD: " + addcd);
+		                                PreparedStatement newstatement = conection.prepareStatement(addcd);
+		                                newstatement.setString(1, artist.getText());
+		                                newstatement.setString(2, productionCompany.getText());
+		                                newstatement.setString(3, format.getText());
+		                                newstatement.setString(4, stock.getText());
+		                                newstatement.setString(5, available.getText());
+		                                newstatement.setString(6, rentPrice.getText());
+		                                newstatement.setString(7, lastRegister.getText());
 		                                
-		                                statement.executeUpdate();
-		                                
-		                                try{
-		                                	PreparedStatement ps = null;
-		                                    ResultSet rs = null;
-		                                    
-		                                    String search = "SELECT titleId FROM title ORDER BY titleId DESC LIMIT 1";
-		                                    
-		                                    System.out.println(search);
-		                                    ps = conection.prepareStatement(search);
-		                                    rs = ps.executeQuery();
-		                                    
-		                                    while(rs.next()) {
-		                                    	lastRegister.setText(rs.getString("titleId"));
-		                                    	res = rs.getString("titleId");
-		                                    	System.out.println("The last register is: " + rs.getString("titleId"));
-		                                    	}
-		                                    
-		                                    try {
-		                                    	String addcd = "INSERT INTO music (artist, productionCompany, format, stock, available, rentPrice, musicId) VALUES(?, ?, ?, ?, ?, ?, ?)"; 
-		                                        System.out.println("Query insert new CD: " + addcd);
-		                                        PreparedStatement newstatement = conection.prepareStatement(addcd);
-		                                        newstatement.setString(1, artist.getText());
-		                                        newstatement.setString(2, productionCompany.getText());
-		                                        newstatement.setString(3, format.getText());
-		                                        newstatement.setString(4, stock.getText());
-		                                        newstatement.setString(5, available.getText());
-		                                        newstatement.setString(6, rentPrice.getText());
-		                                        newstatement.setString(7, lastRegister.getText());
-		                                        
-		                                        newstatement.executeUpdate();
-		                                        } catch (SQLException ex) {
-		                                        	JOptionPane.showMessageDialog(null, "Error inserting new CD...!!");
-		                                        	}
-		                                    } catch (SQLException ex){
-		                                    	JOptionPane.showMessageDialog(null, "Error finding last Register...!!");
-		                                    	}
-		                                conection.close();
+		                                newstatement.executeUpdate();
+		                                       
+		                            } catch (SQLException ex) {
+		                            	JOptionPane.showMessageDialog(null, "Error inserting new CD...!!");		//If something goes wrong when trying to insert a new CD
+		                            }    
+		                        } catch (SQLException ex){		//If something goes wrong when we try to find the Id of the last Title
+		                           	JOptionPane.showMessageDialog(null, "Error finding last Register...!!");
+		                        }
+		                            	
+		                        conection.close();
                                 
-		                                JOptionPane.showMessageDialog(null, "New CD Title inserted successfully");
-		                                titleId.setText("");
-		                                name.setText("");
-		                                releaseYear.setText("");
-		                                genre.setText("");
-		                                artist.setText(""); 
-		                                productionCompany.setText("");
-		                                stock.setText("");
-		                                available.setText("");
-		                                rentPrice.setText("");
-		                                lastRegister.setText(""); 
-		                                
-	                            	} catch (Exception e){      //If something goes wrong
-	                            		JOptionPane.showMessageDialog(null, "Error inserting a new CD Title!");
-	                            		}
-	                        }else {
-	                            JOptionPane.showMessageDialog(null, "Release year cannot be after the current year");
-	                            }
-	                    }
-                    }
-            	}
-            });
+		                        JOptionPane.showMessageDialog(null, "New CD Title inserted successfully");
+		                        titleId.setText("");
+		                        name.setText("");
+		                        releaseYear.setText("");
+		                        genre.setText("");
+		                        artist.setText(""); 
+		                        productionCompany.setText("");
+		                        stock.setText("");
+		                        available.setText("");
+		                        rentPrice.setText("");
+		                        lastRegister.setText(""); 
+		                    
+	                       	} catch (Exception e){      //If something goes wrong
+	                        	JOptionPane.showMessageDialog(null, "Error inserting a new CD Title!");
+	                        }
+	                    }else {		//If the Release Year is greater than current year (2020)
+	                    	JOptionPane.showMessageDialog(null, "Release year cannot be after the current year");
+	                    }   
+                    }   
+            	}	
+            }    
+        });
         
         //Save Update MC button
         btnSaveUpdate = new JButton("Save");
@@ -524,7 +531,7 @@ public class MC extends JFrame implements ActionListener{
         btnSaveUpdate.setVisible(false);
         btnSaveUpdate.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-            	
+            	//Validation of required fields
             	if(name.getText().equals("") || releaseYear.getText().equals("") || artist.getText().equals("") || stock.getText().equals("") || available.getText().equals("") || rentPrice.getText().equals("")) {
             		JOptionPane.showMessageDialog(null, "One or more required fields are empty, please check: \n"
             				+ "	  � Name\n"
@@ -539,84 +546,84 @@ public class MC extends JFrame implements ActionListener{
 	        		String txtStock = stock.getText(), txtAvailable = available.getText();
 	        		int qttyStock = Integer.parseInt(txtStock), qttyAvailable = Integer.parseInt(txtAvailable);
 
-	        		if(qttyAvailable > qttyStock) {
+	        		if(qttyAvailable > qttyStock) {		//Quantity available must be bigger than quantity in stock
 	                   	System.out.println("Qtty Stock: " + qttyStock);
 	                   	System.out.println("Qtty Available " + qttyAvailable);
 	                   	JOptionPane.showMessageDialog(null, "The available quantity cannot be bigger than the stock quantity");
-	                   	}else {
-	                   		//Validation of Current Year less than 2020
-		                   	String txtReleaseYear = releaseYear.getText();
-		                   	int yearNumber = Integer.parseInt(txtReleaseYear);
+	        		}else {
+	        			//Validation of Current Year less than 2020
+		                String txtReleaseYear = releaseYear.getText();
+		                int yearNumber = Integer.parseInt(txtReleaseYear);
 	                	
-		                   	if(yearNumber <= 2020) {
-		                   		ConectionDB con = new ConectionDB();
-		                        Connection conection = con.conect();
-		                        
-		                        String filter = titleId.getText();
-		                        System.out.println("My title filter is: " + filter);
-		                        String filtercd = titleId.getText();
-		                        System.out.println("My cd filter is: " + filter);
-		                        String where = "";
-		                        
-		                        if(!"".equals(filter)){
-		                            where = "WHERE titleId = '" + filter + "'";
-		                            System.out.println("My where is: " + where);
-		    	                    try{
-		    	                                            
-		    	                        String updatetitle = "UPDATE title SET name = ?, releaseYear = ?, genre = ? " + where; 
-		    	                        System.out.println("My update title: " + updatetitle);
-		    	                        PreparedStatement statement = conection.prepareStatement(updatetitle);
-		    	                        statement.setString(1, name.getText());
-		    	                        statement.setString(2, releaseYear.getText());
-		    	                        statement.setString(3, genre.getText());
+		                if(yearNumber <= 2020) {		//Year number must be equal or less than current year (2020)
+		                	ConectionDB con = new ConectionDB();
+		                    Connection conection = con.conect();
+		                    //Declaring our 'where' condition to be used as filter
+		                    String filter = titleId.getText();
+		                    System.out.println("My title filter is: " + filter);
+		                    String filtercd = titleId.getText();
+		                    System.out.println("My cd filter is: " + filter);
+		                    String where = "";
+		                    //Our filter must not be empty
+		                    if(!"".equals(filter)){
+		                    	where = "WHERE titleId = '" + filter + "'";
+		                        System.out.println("My where is: " + where);
+		    	                try{
+		    	                	//'updatetitle' will be the query that we will send to the database to update the title           
+		    	                	String updatetitle = "UPDATE title SET name = ?, releaseYear = ?, genre = ? " + where; 
+		    	                    System.out.println("My update title: " + updatetitle);
+		    	                    PreparedStatement statement = conection.prepareStatement(updatetitle);
+		    	                    statement.setString(1, name.getText());
+		    	                    statement.setString(2, releaseYear.getText());
+		    	                    statement.setString(3, genre.getText());
+		    	                     
+		                            statement.execute();
+		                            //Our filter must not be empty
+		                            if(!"".equals(filtercd)){
+		                            	where = "WHERE musicId = '" + filter + "'";
+		                                System.out.println("My where is: " + where);
+		                                try{
+		                                	//'updatecd' will be the query that we will send to the database to find the results
+		                                	String updatecd = "UPDATE music SET artist = ?, productionCompany = ?, stock = ?, available = ?, rentPrice = ? " + where;
+		        	                        System.out.println("My update CD: " + updatecd);
+		        	                        PreparedStatement newstatement = conection.prepareStatement(updatecd);
+		        	                        
+		        	                        newstatement.setString(1, artist.getText());
+		        	                        newstatement.setString(2, productionCompany.getText());
+		        	                        newstatement.setString(3, stock.getText());
+		        	                        newstatement.setString(4, available.getText());
+		        	                        newstatement.setString(5, rentPrice.getText());
+		        	                        newstatement.execute();
+		                                }catch(SQLException ex) {
+		                                  	JOptionPane.showMessageDialog(null, "Error updating CD...!!");		//If something goes wrong when trying to update a CD
+		                                }  
+		                            }
+		                             
+		                            conection.close();
 		    	                        
-		                                statement.execute();
-		                                
-		                                if(!"".equals(filtercd)){
-		                                    where = "WHERE musicId = '" + filter + "'";
-		                                    System.out.println("My where is: " + where);
-		                                    try{
-		                                    	String updatecd = "UPDATE music SET artist = ?, productionCompany = ?, stock = ?, available = ?, rentPrice = ? " + where;
-		        	                            System.out.println("My update CD: " + updatecd);
-		        	                            PreparedStatement newstatement = conection.prepareStatement(updatecd);
-		        	                            
-		        	                            newstatement.setString(1, artist.getText());
-		        	                            newstatement.setString(2, productionCompany.getText());
-		        	                            newstatement.setString(3, stock.getText());
-		        	                            newstatement.setString(4, available.getText());
-		        	                            newstatement.setString(5, rentPrice.getText());
-		        	                            newstatement.execute();
-		                                    }catch(SQLException ex) {
-		                                    	JOptionPane.showMessageDialog(null, "Error updating CD...!!");
-		                                	}
-		                                    
-		                                }
-		                                                   
-		    	                        conection.close();
-		    	                        
-		    	                        JOptionPane.showMessageDialog(null, "CD Title updated successfully");
-		    	                        titleId.setText("");
-		    	                        name.setText("");
-		    	                        releaseYear.setText("");
-		    	                        genre.setText("");
-		    	                        artist.setText(""); 
-		    	                        productionCompany.setText("");
-		    	                        stock.setText("");
-		    	                        available.setText("");
-		    	                        rentPrice.setText("");
-		    	                        lastRegister.setText("");
-		    	                    } catch (Exception e){      //If something goes wrong
-		    	                        JOptionPane.showMessageDialog(null, "Error updating CD Title!");
-		    	                        }
+		    	                    JOptionPane.showMessageDialog(null, "CD Title updated successfully");
+		    	                    titleId.setText("");
+		    	                    name.setText("");
+		    	                    releaseYear.setText("");
+		    	                    genre.setText("");
+		    	                    artist.setText(""); 
+		    	                    productionCompany.setText("");
+		    	                    stock.setText("");
+		    	                    available.setText("");
+		    	                    rentPrice.setText("");
+		    	                    lastRegister.setText("");
 		    	                    
-		                        }else{       //The ID must have a valid ID number
-			                        JOptionPane.showMessageDialog(null, "Error updating CD! \n"
-			                        		+ "	� The ID cannot be empty");
-		                        	}
-		                   	}else {
-		                   		JOptionPane.showMessageDialog(null, "Release year cannot be after the current year");
-		                        }
-	                    }
+		    	                } catch (Exception e){
+		    	                	JOptionPane.showMessageDialog(null, "Error updating CD Title!");		//If something goes wrong when trying to update a Title
+		    	                }        
+		                    }else{       //The ID must not be empty
+			                    JOptionPane.showMessageDialog(null, "Error updating CD! \n"
+			                    		+ "	� The ID cannot be empty");
+		                    }    
+		                }else {		//If the Release Year is greater than current year (2020)
+		                   	JOptionPane.showMessageDialog(null, "Release year cannot be after the current year");
+		                }   
+	        		}
         		}
         	}
         });
@@ -669,7 +676,7 @@ public class MC extends JFrame implements ActionListener{
         this.validate();
         this.repaint();
 	}
-	
+	//This will modify the window to be able to see all the required information to update the membership card
 	public void editScreen() {
 		lreleaseYear.setVisible(true);
 		releaseYear.setVisible(true);
@@ -692,7 +699,7 @@ public class MC extends JFrame implements ActionListener{
 		
 		btnCancel.setVisible(true);
 	}
-	
+	//This method will return the components of the window to their original state
 	public void normalScreen() {
 		lreleaseYear.setVisible(false);
 		releaseYear.setVisible(false);
@@ -722,32 +729,26 @@ public class MC extends JFrame implements ActionListener{
 		if(ac.equals("exit")){
             System.out.println("Exit the program");
             System.exit(0);
-        }
-		else if(ac.equals("menu")){
+        } else if(ac.equals("menu")){
             System.out.println("Going to Main Menu");
             dispose();
-        }
-        else if(ac.equals("customers")){
+        } else if(ac.equals("customers")){
             System.out.println("Going to Customers");
             new Customers();
             dispose();
-        }
-        else if(ac.equals("MemCard")){
+        } else if(ac.equals("MemCard")){
             System.out.println("Going to Membership Card");
             new MembershipCards();
             dispose();
-        }
-        else if(ac.equals("titles")){
+        } else if(ac.equals("titles")){
             System.out.println("Going to Titles");
             new Titles();
             dispose();
-        }
-        else if(ac.equals("rent")){
+        } else if(ac.equals("rent")){
             System.out.println("Going to Rent");
             new Rent();
             dispose();
-        }
-        else if(ac.equals("logout")){
+        } else if(ac.equals("logout")){
             System.out.println("Going back to Login");
             new LoginController();
             dispose();

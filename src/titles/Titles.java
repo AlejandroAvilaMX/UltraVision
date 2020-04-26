@@ -1,3 +1,10 @@
+/**
+ * This is the Titles window.
+ * We can see the details of the all the existing Titles
+ * It will be able to see the detailed information of every different type of title
+ * 
+ * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
+ */
 package titles;
 
 import java.awt.Font;
@@ -44,10 +51,9 @@ public class Titles extends JFrame implements ActionListener{
         //My Menu Bar
         JMenuBar myMenuBar = new JMenuBar();
         this.setJMenuBar(myMenuBar);
-    
-        JMenu myMenu = new JMenu("File");       //Title of the menu
+        //Title of the menu
+        JMenu myMenu = new JMenu("File");
         myMenuBar.add(myMenu);
-        
         //Options of the menu
         JMenuItem Menu = new JMenuItem("Main Menu");
         myMenu.add(Menu);
@@ -83,11 +89,10 @@ public class Titles extends JFrame implements ActionListener{
         myMenu.add(Close);
         Close.addActionListener(this);
         Close.setActionCommand("exit");
-        
+        //Title of window
         ltitle = new JLabel("Titles");
         ltitle.setFont(fonttitle);
         ltitle.setBounds(500, 50, 230, 20);
-        
         //Table with the information of All Titles
         ConectionDB con = new ConectionDB();
         Connection conection = con.conect();
@@ -165,7 +170,7 @@ public class Titles extends JFrame implements ActionListener{
         	
         });
         
-      //TV Filter
+        //TV Filter
         JButton btnTV = new JButton("TV");
         btnTV.setFont(fontButton);
         btnTV.setBounds(925, 390, 110, 30);
@@ -192,36 +197,29 @@ public class Titles extends JFrame implements ActionListener{
 		if(ac.equals("exit")){
             System.out.println("Exit the program");
             System.exit(0);
-        }
-		else if(ac.equals("menu")){
+        } else if(ac.equals("menu")){
             System.out.println("Going to Main Menu");
             dispose();
-        }
-        else if(ac.equals("customers")){
+        } else if(ac.equals("customers")){
             System.out.println("Going to Customers");
             new Customers();
             dispose();
-        }
-        else if(ac.equals("MemCard")){
+        } else if(ac.equals("MemCard")){
             System.out.println("Going to Membership Card");
             new MembershipCards();
             dispose();
-        }
-        else if(ac.equals("titles")){
+        } else if(ac.equals("titles")){
             System.out.println("Going to Titles");
             new Titles();
             dispose();
-        }
-        else if(ac.equals("rent")){
+        } else if(ac.equals("rent")){
             System.out.println("Going to Rent");
             new Rent();
             dispose();
-        }
-        else if(ac.equals("logout")){
+        } else if(ac.equals("logout")){
             System.out.println("Going back to Login");
             new LoginController();
             dispose();
         }
 	}
-
 }

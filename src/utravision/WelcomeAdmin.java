@@ -1,3 +1,10 @@
+/**
+ * This is the Main Menu and it will be displayed only if the user is the Administrator.
+ * It will have buttons to access to all the diferent windows of the program.
+ * 
+ * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
+ */
+
 package utravision;
 
 import java.awt.Font;
@@ -38,7 +45,6 @@ public class WelcomeAdmin extends JFrame implements ActionListener{
         JMenu myMenu = new JMenu("File");       //Title of the menu
         myMenuBar.add(myMenu);
         //Options of the menu
-        
         JMenuItem Access = new JMenuItem("Access");
         myMenu.add(Access);
         Access.addActionListener(this);
@@ -73,11 +79,10 @@ public class WelcomeAdmin extends JFrame implements ActionListener{
         myMenu.add(Close);
         Close.addActionListener(this);
         Close.setActionCommand("exit");
-        
+        //Title of the window
         ltitle = new JLabel("Main Menu");
         ltitle.setFont(fonttitle);
         ltitle.setBounds(180, 50, 230, 20);
-       
         //Button Access
         JButton btnAccess = new JButton("Access");
         btnAccess.setFont(fontButton);
@@ -96,13 +101,13 @@ public class WelcomeAdmin extends JFrame implements ActionListener{
         btnMemCard.setBounds(360, 140, 110, 30);
         btnMemCard.addActionListener(this);
         btnMemCard.setActionCommand("btnMemCard");
-        //Button btnTitles
+        //Button Tiles
         JButton btnTitles = new JButton("Titles");
         btnTitles.setFont(fontButton);
         btnTitles.setBounds(110, 240, 110, 30);
         btnTitles.addActionListener(this);
         btnTitles.setActionCommand("btnTitles");
-        //Button Art Pieces
+        //Button Rent
         JButton btnRent = new JButton("Rent");
         btnRent.setFont(fontButton);
         btnRent.setBounds(295, 240, 110, 30);
@@ -127,33 +132,27 @@ public class WelcomeAdmin extends JFrame implements ActionListener{
         if(ac.equals("exit")){
             System.out.println("Exit the program");
             System.exit(0);
-        }
-        else if(ac.equals("access") || ac.equals("btnAccess")){
+        } else if(ac.equals("access") || ac.equals("btnAccess")){
             System.out.println("Going to Access");
             new Access();
             //dispose();
-        }
-        else if(ac.equals("customers") || ac.equals("btnCustomers")){
+        } else if(ac.equals("customers") || ac.equals("btnCustomers")){
             System.out.println("Going to Customers");
             new Customers();
             //dispose();
-        }
-        else if(ac.equals("MemCard") || ac.equals("btnMemCard")){
+        } else if(ac.equals("MemCard") || ac.equals("btnMemCard")){
             System.out.println("Going to Membership Card");
             new MembershipCards();
             //dispose();
-        }
-        else if(ac.equals("titles") || ac.equals("btnTitles")){
+        } else if(ac.equals("titles") || ac.equals("btnTitles")){
             System.out.println("Going to Titles");
             new Titles();
             //dispose();
-        }
-        else if(ac.equals("rent") || ac.equals("btnRent")){
+        } else if(ac.equals("rent") || ac.equals("btnRent")){
             System.out.println("Going to Rent");
             new Rent();
             //dispose();
-        }
-        else if(ac.equals("logout")){
+        } else if(ac.equals("logout")){
             System.out.println("Going back to Login");
             new LoginController();
             dispose();

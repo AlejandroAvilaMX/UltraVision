@@ -1,3 +1,10 @@
+/**
+ * This is Membership Card window.
+ * We can see the details of the Membership Card as well as edit them.
+ * It will be able to search the information, using the Customer name
+ * 
+ * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
+ */
 package customers;
 
 import java.awt.Font;
@@ -57,7 +64,6 @@ public class MembershipCards extends JFrame implements ActionListener{
     
         JMenu myMenu = new JMenu("File");       //Title of the menu
         myMenuBar.add(myMenu);
-        
         //Options of the menu
         JMenuItem Menu = new JMenuItem("Main Menu");
         myMenu.add(Menu);
@@ -93,11 +99,10 @@ public class MembershipCards extends JFrame implements ActionListener{
         myMenu.add(Close);
         Close.addActionListener(this);
         Close.setActionCommand("exit");
-        
+        //Title of the Window
         ltitle = new JLabel("Membership Cards");
         ltitle.setFont(fonttitle);
         ltitle.setBounds(420, 50, 290, 40);
-        
         //Button refresh
         JButton btnRefresh = new JButton("Refresh");
         btnRefresh.setFont(fontButton);
@@ -112,7 +117,7 @@ public class MembershipCards extends JFrame implements ActionListener{
                     
                     PreparedStatement ps = null;
                     ResultSet rs = null;
-                    
+                    //'refresh' will be the query that we will send to the database to show all the Membership Cards
                     String refresh = "SELECT membershipCard.idCard, CONCAT(customer.name, ' ', customer.surname) AS customerName, customer.custId, membershipCard.cardNumber, membershipCard.levelId, membershipCard.level, membershipCard.loyaltyPoints, membershipCard.freeRent "
                     		+ "FROM membershipCard "
                     		+ "INNER JOIN customer ON membershipCard.idCard=customer.custId;";
@@ -155,8 +160,7 @@ public class MembershipCards extends JFrame implements ActionListener{
                 }
             }
         });
-        
-        //Button MembershipCardss
+        //Button MembershipCards
         JButton btnCustomers = new JButton("Customers");
         btnCustomers.setFont(fontButton);
         btnCustomers.setBounds(865, 70, 100, 30);
@@ -183,8 +187,7 @@ public class MembershipCards extends JFrame implements ActionListener{
         name.setBounds(70, 440, 220, 25);
         new ValidLength(name, 50);
         new NoNumbers(name);
-
-        //Search button
+        //Button search
         btnSearch = new JButton("Search");
         btnSearch.setFont(fontButton);
         btnSearch.setBounds(340, 435, 110, 30);
@@ -195,7 +198,7 @@ public class MembershipCards extends JFrame implements ActionListener{
                 
                 String filter = name.getText();
                 String where = "";
-                
+                //Our filter must not be empty
                 if(!"".equals(filter)){
                     where = "WHERE customer.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
                 }
@@ -205,7 +208,7 @@ public class MembershipCards extends JFrame implements ActionListener{
                     
                     PreparedStatement ps = null;
                     ResultSet rs = null;
-                    
+                    //'search' will be the query that we will send to the database to find the results
                     String search = "SELECT membershipCard.idCard, CONCAT(customer.name, ' ', customer.surname) AS customerName, customer.custId, membershipCard.cardNumber, membershipCard.levelId, membershipCard.level, membershipCard.loyaltyPoints, membershipCard.freeRent "
                     		+ "FROM membershipCard "
                     		+ "INNER JOIN customer ON membershipCard.idCard=customer.custId " + where;
@@ -263,7 +266,7 @@ public class MembershipCards extends JFrame implements ActionListener{
         llevelId.setFont(fontlabel);
         llevelId.setBounds(70, 480, 80, 20);
         llevelId.setVisible(false);
-        
+        //JComboBox to select the Level Id
         comboLevel = new JComboBox<String>();
         comboLevel.addItem("VL");
         comboLevel.addItem("ML");
@@ -274,12 +277,13 @@ public class MembershipCards extends JFrame implements ActionListener{
         
         levelId = new JTextField();
         levelId.setBounds(200, 510, 80, 25);
-        levelId.setText("VL");
+        levelId.setText("VL");		//The default value of the JTextField will be 'VL' (same as the JComboBox)
         levelId.setVisible(false);
+        //This will be write the Level Id to a JTextField depending on the selection of the JComboBox
         comboLevel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				levelId.setText(comboLevel.getSelectedItem().toString());
+				levelId.setText(comboLevel.getSelectedItem().toString());		//We will catch the selection of the ComboBox and convert it to String
 			}
 		});
         new NoNumbers(levelId);
@@ -363,51 +367,50 @@ public class MembershipCards extends JFrame implements ActionListener{
         btnSaveUpdate.setVisible(false);
         btnSaveUpdate.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-            	
-            	if(cardNumber.getText().equals("") || levelId.getText().equals("")) {
+            	//Validation of the mandatory fields
+            	if(cardNumber.getText().equals("") || levelId.getText().equals("")) {		//We must type a Card Number and Level Id
             		JOptionPane.showMessageDialog(null, "Card Number and Level ID cannot be empty");
             	}else {
-            		if(levelId.getText().equals("PR") || levelId.getText().equals("TV") || levelId.getText().equals("ML") || levelId.getText().equals("VL")) {
+            		if(levelId.getText().equals("PR") || levelId.getText().equals("TV") || levelId.getText().equals("ML") || levelId.getText().equals("VL")) {		//If something goes wrong with our JComboBox we must type the Level Id correct
 
-            			levelDescription();
+            			levelDescription();		//Go to check the Description of the selected Level
                 		
                 		ConectionDB con = new ConectionDB();
                         Connection conection = con.conect();
-                        
+                        //Declaring our 'where' condition to be used as filter
                         String filter = ID.getText();
                         System.out.println("My filter is: " + filter);
                         String where = "";
-                        
+                        //Our filter must not be empty
                         if(!"".equals(filter)){
                             where = "WHERE IdCard = '" + filter + "'";
                             System.out.println("My where is: " + where);
                             try{
-                    
-                            String updateartist = "UPDATE membershipCard SET cardNumber = ?, levelId = ?, level = ? " + where; 
-                            System.out.println(updateartist);
-                            PreparedStatement statement = conection.prepareStatement(updateartist);
-                            statement.setString(1, cardNumber.getText());
-                            statement.setString(2, levelId.getText());
-                            statement.setString(3, level.getText());
-                            statement.execute();
-                               
-                            conection.close();
+	                            //'updatecard' will be the query that we will send to the database to find the results
+	                            String updatecard = "UPDATE membershipCard SET cardNumber = ?, levelId = ?, level = ? " + where; 
+	                            System.out.println(updatecard);
+	                            PreparedStatement statement = conection.prepareStatement(updatecard);
+	                            statement.setString(1, cardNumber.getText());
+	                            statement.setString(2, levelId.getText());
+	                            statement.setString(3, level.getText());
+	                            statement.execute();
+	                               
+	                            conection.close();
+	                            
+	                            JOptionPane.showMessageDialog(null, "Membeship Card updated successfully");
+	                            ID.setText("");
+	                            name.setText("");
+	                            levelId.setText("");
+	                            cardNumber.setText("");
                             
-                            JOptionPane.showMessageDialog(null, "Membeship Card updated successfully");
-                            ID.setText("");
-                            name.setText("");
-                            levelId.setText("");
-                            cardNumber.setText("");
-                            
-                            normalScreen();
-                            btnSaveUpdate.setVisible(false);
-                            
-                            } catch (Exception e){
-                            	JOptionPane.showMessageDialog(null, "Error updating Membership Card! \n"
-                                + "· Card ID must be a valid numeric ID");
-                            	}
-                            }
-                        else{       //The ID must have a valid ID number
+	                            normalScreen();
+	                            btnSaveUpdate.setVisible(false);
+	                            
+	                            } catch (Exception e){		//If something goes wrong
+	                            	JOptionPane.showMessageDialog(null, "Error updating Membership Card! \n"
+	                            			+ "· Card ID must be a valid numeric ID");
+	                            }
+                        } else{       //The ID must have a valid ID number
                             JOptionPane.showMessageDialog(null, "Error updating Customer! \n"
                                     + "· The ID cannot be empty");
                         }
@@ -415,7 +418,6 @@ public class MembershipCards extends JFrame implements ActionListener{
             	}         
             }
         });
-        
         //Cancel button
         btnCancel = new JButton("Cancel");
         btnCancel.setFont(fontButton);
@@ -537,7 +539,7 @@ public class MembershipCards extends JFrame implements ActionListener{
         this.validate();
         this.repaint();
 	}
-
+	//This will modify the window to be able to see all the required information to update the membership card
 	public void editScreen() {
 		lID.setVisible(false);
 		lCustomerId.setVisible(true);
@@ -552,7 +554,7 @@ public class MembershipCards extends JFrame implements ActionListener{
 		
 		btnCancel.setVisible(true);
 	}
-	
+	//This method will return the components of the window to their original state
 	public void normalScreen() {
 		lID.setVisible(true);
 		lCustomerId.setVisible(false);
@@ -567,7 +569,7 @@ public class MembershipCards extends JFrame implements ActionListener{
 		
 		btnCancel.setVisible(false);
 	}
-	
+	//This will take the written value of the Level Id and depending on it, it will add the description of the level
 	public void levelDescription() {
 		if(levelId.getText().equals("PR")) {
     		System.out.println("LevelId: " + levelId.getText());
@@ -600,32 +602,26 @@ public class MembershipCards extends JFrame implements ActionListener{
 		if(ac.equals("exit")){
             System.out.println("Exit the program");
             System.exit(0);
-        }
-		else if(ac.equals("menu")){
+        } else if(ac.equals("menu")){
             System.out.println("Going to Main Menu");
             dispose();
-        }
-        else if(ac.equals("customers") || ac.equals("btnCustomers")){
+        } else if(ac.equals("customers") || ac.equals("btnCustomers")){
             System.out.println("Going to Customers");
             new Customers();
             dispose();
-        }
-        else if(ac.equals("MemCard")){
+        } else if(ac.equals("MemCard")){
             System.out.println("Going to Membership Card");
             new MembershipCards();
             dispose();
-        }
-        else if(ac.equals("titles")){
+        } else if(ac.equals("titles")){
             System.out.println("Going to Titles");
             new Titles();
             dispose();
-        }
-        else if(ac.equals("rent")){
+        } else if(ac.equals("rent")){
             System.out.println("Going to Rent");
             new Rent();
             dispose();
-        }
-        else if(ac.equals("logout")){
+        } else if(ac.equals("logout")){
             System.out.println("Going back to Login");
             new LoginController();
             dispose();

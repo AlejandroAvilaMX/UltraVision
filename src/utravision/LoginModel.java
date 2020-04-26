@@ -1,3 +1,8 @@
+/**
+ * Login Model class
+ * 
+ * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
+ */
 package utravision;
 
 import java.sql.Connection;

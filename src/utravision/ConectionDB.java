@@ -1,3 +1,8 @@
+/**
+ * This is the class with the connection to the Database
+ * 
+ * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
+ */
 package utravision;
 
 import java.sql.Connection;

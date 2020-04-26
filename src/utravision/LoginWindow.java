@@ -1,3 +1,9 @@
+/**
+ * This is Login Window Class.
+ * It will contain the interface for the login
+ * 
+ * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
+ */
 package utravision;
 
 import java.awt.Font;
@@ -39,7 +45,7 @@ public class LoginWindow extends JFrame implements ActionListener{
         JPanel p = new JPanel();
         p.setLayout(null);
         this.add(p);
-        p.setBackground(java.awt.Color.blue);     //Color of the window
+        p.setBackground(java.awt.Color.orange);     //Color of the window
         Font fonttitle = new Font("Arial", Font.BOLD, 28);      //Font style (title)
         Font fontlabel = new Font("Calibri", Font.PLAIN, 16);       //Font style (label)
         Font fontbutton = new Font("Tahoma", Font.BOLD, 12);        //Font style (buttons)
