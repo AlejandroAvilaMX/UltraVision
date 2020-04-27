@@ -86,7 +86,12 @@ public class WelcomeStaff extends JFrame implements ActionListener{
         //Title of the window
         ltitle = new JLabel("Main Menu");
         ltitle.setFont(fonttitle);
-        ltitle.setBounds(80, 50, 230, 20);
+        ltitle.setBounds(90, 50, 330, 20);
+        //Button LogOut
+        JButton btnLogOut = new JButton("LogOut");
+        btnLogOut.setBounds(450, 10, 80, 20);
+        btnLogOut.addActionListener(this);
+        btnLogOut.setActionCommand("btnLogOut");
         //Button Customers
         JButton btnCustomers = new JButton("Customers");
         btnCustomers.setFont(fontButton);
@@ -117,6 +122,7 @@ public class WelcomeStaff extends JFrame implements ActionListener{
         p.add(btnMemCard);
         p.add(btnTitles);
         p.add(btnRent);
+        p.add(btnLogOut);
         
         this.validate();
         this.repaint();

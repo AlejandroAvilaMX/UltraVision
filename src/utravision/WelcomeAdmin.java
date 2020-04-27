@@ -84,6 +84,11 @@ public class WelcomeAdmin extends JFrame implements ActionListener{
         ltitle = new JLabel("Main Menu");
         ltitle.setFont(fonttitle);
         ltitle.setBounds(180, 50, 230, 20);
+        //Button LogOut
+        JButton btnLogOut = new JButton("LogOut");
+        btnLogOut.setBounds(450, 10, 80, 20);
+        btnLogOut.addActionListener(this);
+        btnLogOut.setActionCommand("btnLogOut");
         //Button Access
         JButton btnAccess = new JButton("Access");
         btnAccess.setFont(fontButton);
@@ -121,6 +126,7 @@ public class WelcomeAdmin extends JFrame implements ActionListener{
         p.add(btnMemCard);
         p.add(btnTitles);
         p.add(btnRent);
+        p.add(btnLogOut);
         
         this.validate();
         this.repaint();
@@ -153,7 +159,7 @@ public class WelcomeAdmin extends JFrame implements ActionListener{
             System.out.println("Going to Rent");
             new Rent();
             //dispose();
-        } else if(ac.equals("logout")){
+        } else if(ac.equals("logout") || ac.equals("btnLogOut")){
             System.out.println("Going back to Login");
             new LoginController();
             dispose();

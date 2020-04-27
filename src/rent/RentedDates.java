@@ -75,7 +75,7 @@ public class RentedDates extends JFrame implements ActionListener{
 
 }
 
-
+/*
 
 if(ID.getText().equals("") || ltitleId.getText().equals("")) {		//We must type a Customer ID and Title ID
 	JOptionPane.showMessageDialog(null, "Customer ID and Title ID cannot be empty");
@@ -191,4 +191,4 @@ if(ID.getText().equals("") || ltitleId.getText().equals("")) {		//We must type a
     } catch (Exception e){      //If something goes wrong
         JOptionPane.showMessageDialog(null, "Error finding Stock!");
     }
-}
+}*/

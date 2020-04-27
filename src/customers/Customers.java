@@ -91,11 +91,11 @@ public class Customers extends JFrame implements ActionListener{
         myMenu.add(Rent);
         Rent.addActionListener(this);
         Rent.setActionCommand("rent");
-        //LogOut
+        /*//LogOut
         JMenuItem LogOut = new JMenuItem("Logout");
         myMenu.add(LogOut);
         LogOut.addActionListener(this);
-        LogOut.setActionCommand("logout");
+        LogOut.setActionCommand("logout");*/
         //Close the program
         JMenuItem Close = new JMenuItem("Exit");
         myMenu.add(Close);
