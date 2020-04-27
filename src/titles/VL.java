@@ -121,7 +121,7 @@ public class VL extends JFrame implements ActionListener {
 		                PreparedStatement ps = null;
 		                ResultSet rs = null;
 		                //'refresh' will be the query that we will send to the database to show all the all titles that are of the Movies
-		                String refresh = "SELECT title.titleId, title.name, title.releaseYear, title.genre, movie.productionCompany, movie.director, movie.country, movie.duration, movie.language, movie.format, movie.stock, movie.available, movie.rentPrice "
+		                String refresh = "SELECT title.titleId, title.name, title.releaseYear, title.genre, movie.productionCompany, movie.director, movie.country, movie.duration, movie.language, movie.format "
 		                		+ "FROM title "
 		                		+ "INNER JOIN movie ON title.titleId=movie.movieId; ";
 		                //Adding the result to the rows of the table
@@ -141,9 +141,6 @@ public class VL extends JFrame implements ActionListener {
 		                model.addColumn("Duration");
 		                model.addColumn("Language");
 		                model.addColumn("Format");
-		                model.addColumn("Stock");
-		                model.addColumn("Available");
-		                model.addColumn("Rent Price");
 		                    
 		                while(rs.next()){
 		                    Object[] col = new Object[qttycol];
@@ -208,7 +205,7 @@ public class VL extends JFrame implements ActionListener {
                     PreparedStatement ps = null;
                     ResultSet rs = null;
                     //'search' will be the query that we will send to the database to show the search result
-                    String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, movie.productionCompany, movie.director, movie.country, movie.duration, movie.language, movie.format, movie.stock, movie.available, movie.rentPrice "
+                    String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, movie.productionCompany, movie.director, movie.country, movie.duration, movie.language, movie.format "
                     		+ "FROM title "
                     		+ "INNER JOIN movie ON title.titleId=movie.movieId " + where;
                     
@@ -229,9 +226,6 @@ public class VL extends JFrame implements ActionListener {
 	                model.addColumn("Duration");
 	                model.addColumn("Language");
 	                model.addColumn("Format");
-	                model.addColumn("Stock");
-	                model.addColumn("Available");
-	                model.addColumn("Rent Price");
                     
                     while(rs.next()){
                         Object[] col = new Object[qttycol];
@@ -512,7 +506,7 @@ public class VL extends JFrame implements ActionListener {
 	                        Connection conection = con.conect();
 	                        try{
 	                        	//'addtitle' will be the query that we will send to the database to find the results            
-	                        	String addtitle = "INSERT INTO title (name, releaseYear, genre, typeId, type) VALUES(?, ?, ?, ?, ?)"; 
+	                        	String addtitle = "INSERT INTO title (name, releaseYear, genre, typeId, type, stock, available, rentPrice) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"; 
 	                            System.out.println("Query insert new Title: " + addtitle);
 	                            PreparedStatement statement = conection.prepareStatement(addtitle);
 	                            statement.setString(1, name.getText());
@@ -520,6 +514,9 @@ public class VL extends JFrame implements ActionListener {
 	                            statement.setString(3, genre.getText());
 	                            statement.setString(4, typeId.getText());
 	                            statement.setString(5, type.getText());
+	                            statement.setString(6, stock.getText());
+	                            statement.setString(7, available.getText());
+	                            statement.setString(8, rentPrice.getText());
 	                               
 	                            statement.executeUpdate();
 	                            //Once the information of the table title is inserted, we will take the last title Id registered     
@@ -541,7 +538,7 @@ public class VL extends JFrame implements ActionListener {
 	                                }
 	                                //Once we know the last Title Id and when the Id is already on the JTextField we will insert the information on the table movie    
 	                                try {
-	                                   	String addmovie = "INSERT INTO movie (productionCompany, director, country, duration, language, format, stock, available, rentPrice, movieId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; 
+	                                   	String addmovie = "INSERT INTO movie (productionCompany, director, country, duration, language, format, movieId) VALUES(?, ?, ?, ?, ?, ?, ?)"; 
 	                                    System.out.println("Query insert new DVD: " + addmovie);
 	                                    PreparedStatement newstatement = conection.prepareStatement(addmovie);
 	                                    newstatement.setString(1, productionCompany.getText());
@@ -550,10 +547,7 @@ public class VL extends JFrame implements ActionListener {
 	                                    newstatement.setString(4, duration.getText());
 	                                    newstatement.setString(5, language.getText());
 	                                    newstatement.setString(6, format.getText());
-	                                    newstatement.setString(7, stock.getText());
-	                                    newstatement.setString(8, available.getText());
-	                                    newstatement.setString(9, rentPrice.getText());
-	                                    newstatement.setString(10, lastRegister.getText());
+	                                    newstatement.setString(7, lastRegister.getText());
 	                                    
 	                                    newstatement.executeUpdate();
 	                                    	
@@ -639,12 +633,15 @@ public class VL extends JFrame implements ActionListener {
 		                        System.out.println("My where is: " + where);
 		    	                try{
 		    	                	//'updatetitle' will be the query that we will send to the database to update the title                 
-		    	                    String updatetitle = "UPDATE title SET name = ?, releaseYear = ?, genre = ? " + where; 
+		    	                    String updatetitle = "UPDATE title SET name = ?, releaseYear = ?, genre = ?, stock = ?, available = ?, rentPrice = ? " + where; 
 		    	                    System.out.println("My update title: " + updatetitle);
 		    	                    PreparedStatement statement = conection.prepareStatement(updatetitle);
 		    	                    statement.setString(1, name.getText());
 		    	                    statement.setString(2, releaseYear.getText());
 		    	                    statement.setString(3, genre.getText());
+		    	                    statement.setString(4, stock.getText());
+		    	                    statement.setString(5, available.getText());
+		    	                    statement.setString(6, rentPrice.getText());
 		    	                    
 		                            statement.execute();
 		                            //Our filter must not be empty
@@ -653,7 +650,7 @@ public class VL extends JFrame implements ActionListener {
 		                                System.out.println("My where is: " + where);
 		                                try{
 		                                	//'updatedvd' will be the query that we will send to the database to update the title  
-		                                    String updatedvd = "UPDATE movie SET productionCompany = ?, director = ?, country = ?, duration = ?, language = ?, format = ?, stock = ?, available = ?, rentPrice = ? " + where;
+		                                    String updatedvd = "UPDATE movie SET productionCompany = ?, director = ?, country = ?, duration = ?, language = ?, format = ? " + where;
 		        	                        System.out.println("My update DVD: " + updatedvd);
 		        	                        PreparedStatement newstatement = conection.prepareStatement(updatedvd);
 		        	                        newstatement.setString(1, productionCompany.getText());
@@ -661,10 +658,7 @@ public class VL extends JFrame implements ActionListener {
 		                                    newstatement.setString(3, country.getText());
 		                                    newstatement.setString(4, duration.getText());
 		                                    newstatement.setString(5, language.getText());
-		                                    newstatement.setString(6, format.getText());
-		                                    newstatement.setString(7, stock.getText());
-		                                    newstatement.setString(8, available.getText());
-		                                    newstatement.setString(9, rentPrice.getText());
+		                                    newstatement.setString(6, format.getText());;
 		        	                        
 		        	                        newstatement.execute();
 		                                }catch(SQLException ex) {

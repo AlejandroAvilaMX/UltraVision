@@ -42,7 +42,7 @@ import validations.ToUpperCase;
 import validations.ValidLength;
 
 public class Customers extends JFrame implements ActionListener{
-	private JLabel lID, lemail, lname, lsurname, lphoneNumber, lstreet, lnumber, lpostalCode, lcity, lcountry, lcardNumber, llevelId;
+	private JLabel ltitle, lID, lemail, lname, lsurname, lphoneNumber, lstreet, lnumber, lpostalCode, lcity, lcountry, lcardNumber, llevelId;
     private JTextField ID, name, surname, phoneNumber, street, number, postalCode, city, country, email, cardNumber, levelId, lastRegister, level;
     private JComboBox<String> comboLevel;
     private String res;
@@ -57,6 +57,7 @@ public class Customers extends JFrame implements ActionListener{
         p.setLayout(null);
         this.add(p);
         p.setBackground(java.awt.Color.orange);     //Color of the window
+        Font fonttitle = new Font("Arial", Font.BOLD, 28);      //Font style (title)
         Font fontlabel = new Font("Calibri", Font.PLAIN, 16);       //Font style (labels)
         Font fontButton = new Font("Tahoma", Font.BOLD, 12);        //Font style (buttons)
         //My Menu Bar
@@ -100,6 +101,10 @@ public class Customers extends JFrame implements ActionListener{
         myMenu.add(Close);
         Close.addActionListener(this);
         Close.setActionCommand("exit");
+        //Title of window
+        ltitle = new JLabel("Customers");
+        ltitle.setFont(fonttitle);
+        ltitle.setBounds(500, 50, 230, 20);
         //Button refresh
         JButton btnRefresh = new JButton("Refresh");
         btnRefresh.setFont(fontButton);

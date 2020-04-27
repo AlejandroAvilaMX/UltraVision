@@ -119,7 +119,7 @@ public class TV extends JFrame implements ActionListener{
 		                PreparedStatement ps = null;
 		                ResultSet rs = null;
 		                //'refresh' will be the query that we will send to the database to show all the all TV Box series
-		                String refresh = "SELECT title.titleId, title.name, title.releaseYear, title.genre, tvboxset.director, tvboxset.country, tvboxset.language, tvboxset.seasons, tvboxset.episodes, tvboxset.stock, tvboxset.available, tvboxset.rentPrice "
+		                String refresh = "SELECT title.titleId, title.name, title.releaseYear, title.genre, tvboxset.director, tvboxset.country, tvboxset.language, tvboxset.seasons, tvboxset.episodes, title.stock, title.available, title.rentPrice "
 		                		+ "FROM title "
 		                		+ "INNER JOIN tvboxset ON title.titleId=tvboxset.serieId;";
 		                //Adding the result to the rows of the table
@@ -205,7 +205,7 @@ public class TV extends JFrame implements ActionListener{
                     PreparedStatement ps = null;
                     ResultSet rs = null;
                     //'search' will be the query that we will send to the database to show the search result
-                    String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, tvboxset.director, tvboxset.country, tvboxset.language, tvboxset.seasons, tvboxset.episodes, tvboxset.stock, tvboxset.available, tvboxset.rentPrice  "
+                    String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, tvboxset.director, tvboxset.country, tvboxset.language, tvboxset.seasons, tvboxset.episodes, title.stock, title.available, tvbtitleoxset.rentPrice  "
                     		+ "FROM title "
                     		+ "INNER JOIN tvboxset ON title.titleId=tvboxset.serieId " + where;
                     
@@ -482,7 +482,7 @@ public class TV extends JFrame implements ActionListener{
 	                        Connection conection = con.conect();
 	                        try{
 	                        	//'addtitle' will be the query that we will send to the database to find the results
-	                        	String addtitle = "INSERT INTO title (name, releaseYear, genre, typeId, type) VALUES(?, ?, ?, ?, ?)"; 
+	                        	String addtitle = "INSERT INTO title (name, releaseYear, genre, typeId, type, stock, available, rentPrice) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"; 
 	                            System.out.println("Query insert new Title: " + addtitle);
 	                            PreparedStatement statement = conection.prepareStatement(addtitle);
 	                            statement.setString(1, name.getText());
@@ -490,6 +490,9 @@ public class TV extends JFrame implements ActionListener{
 	                            statement.setString(3, genre.getText());
 	                            statement.setString(4, typeId.getText());
 	                            statement.setString(5, type.getText());
+	                            statement.setString(6, stock.getText());
+	                            statement.setString(7, available.getText());
+	                            statement.setString(8, rentPrice.getText());
 	                               
 	                            statement.executeUpdate();
 	                            //Once the information of the table title is inserted, we will take the last title Id registered     
@@ -511,7 +514,7 @@ public class TV extends JFrame implements ActionListener{
 	                                }
 	                                //Once we know the last Title Id and when the Id is already on the JTextField we will insert the information on the table tvboxset    
 	                                try {
-	                                  	String addserie = "INSERT INTO tvboxset (director, country, language, seasons, episodes, stock, available, rentPrice, serieId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"; 
+	                                  	String addserie = "INSERT INTO tvboxset (director, country, language, seasons, episodes, serieId) VALUES(?, ?, ?, ?, ?, ?)"; 
 	                                    System.out.println("Query insert new Serie: " + addserie);
 	                                    PreparedStatement newstatement = conection.prepareStatement(addserie);
 	                                    newstatement.setString(1, director.getText());
@@ -519,10 +522,7 @@ public class TV extends JFrame implements ActionListener{
 	                                    newstatement.setString(3, language.getText());
 	                                    newstatement.setString(4, seasons.getText());
 	                                    newstatement.setString(5, episodes.getText());
-	                                    newstatement.setString(6, stock.getText());
-	                                    newstatement.setString(7, available.getText());
-	                                    newstatement.setString(8, rentPrice.getText());
-	                                    newstatement.setString(9, lastRegister.getText());
+	                                    newstatement.setString(6, lastRegister.getText());
 	                                    
 	                                    newstatement.executeUpdate();
 	                                    	
@@ -606,12 +606,15 @@ public class TV extends JFrame implements ActionListener{
 		                        System.out.println("My where is: " + where);
 		        	            try{
 		        	            	//'updatetitle' will be the query that we will send to the database to update the title                 
-		        	                String updatetitle = "UPDATE title SET name = ?, releaseYear = ?, genre = ? " + where; 
+		        	                String updatetitle = "UPDATE title SET name = ?, releaseYear = ?, genre = ?, stock = ?, available = ?, rentPrice = ? " + where; 
 		        	                System.out.println("My update title: " + updatetitle);
 		        	                PreparedStatement statement = conection.prepareStatement(updatetitle);
 		        	                statement.setString(1, name.getText());
 		        	                statement.setString(2, releaseYear.getText());
 		        	                statement.setString(3, genre.getText());
+		        	                statement.setString(4, stock.getText());
+		        	                statement.setString(5, available.getText());
+		        	                statement.setString(6, rentPrice.getText());
 		        	                      
 		                            statement.execute();
 		                            //Our filter must not be empty
@@ -619,8 +622,8 @@ public class TV extends JFrame implements ActionListener{
 		                            	where = "WHERE serieId = '" + filter + "'";
 		                                System.out.println("My where is: " + where);
 		                                try{
-		                                	//'updatetitle' will be the query that we will send to the database to update the title 
-		                                    String updatetv = "UPDATE tvboxset SET director = ?, country = ?, language = ?, seasons = ?, episodes = ?, stock = ?, available = ?, rentPrice = ? " + where;
+		                                	//'updatetv' will be the query that we will send to the database to update the title 
+		                                    String updatetv = "UPDATE tvboxset SET director = ?, country = ?, language = ?, seasons = ?, episodes = ? " + where;
 		            	                    System.out.println("My update DVD: " + updatetv);
 		            	                    PreparedStatement newstatement = conection.prepareStatement(updatetv);
 	
@@ -629,9 +632,6 @@ public class TV extends JFrame implements ActionListener{
 		                                    newstatement.setString(3, language.getText());
 		                                    newstatement.setString(4, seasons.getText());
 		                                    newstatement.setString(5, episodes.getText());
-		                                    newstatement.setString(6, stock.getText());
-		                                    newstatement.setString(7, available.getText());
-		                                    newstatement.setString(8, rentPrice.getText());
 	
 		                                    newstatement.execute();
 		            	                    
