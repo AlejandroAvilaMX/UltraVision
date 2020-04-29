@@ -568,6 +568,9 @@ public class MembershipCards extends JFrame implements ActionListener{
 		//btnDeleteCard.setVisible(true);
 		
 		btnCancel.setVisible(false);
+		
+		cardNumber.setText("");
+    	ID.setText("");
 	}
 	//This will take the written value of the Level Id and depending on it, it will add the description of the level
 	public void levelDescription() {

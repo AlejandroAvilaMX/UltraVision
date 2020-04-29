@@ -514,8 +514,8 @@ public class Customers extends JFrame implements ActionListener{
         btnSaveNew.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
             	//Validation of required fields
-            	if(name.getText().equals("") || surname.getText().equals("")) {		//We must type a Name and surname 
-            		JOptionPane.showMessageDialog(null, "Name and Surname cannot be empty");
+            	if(name.getText().equals("") || surname.getText().equals("") || cardNumber.getText().equals("")) {		//We must type a Name and surname 
+            		JOptionPane.showMessageDialog(null, "Name, Surname and Card Number cannot be empty");
             	}else {
             		
             		levelDescription();

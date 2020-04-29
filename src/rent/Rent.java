@@ -36,10 +36,11 @@ import validations.ValidLength;
 
 public class Rent extends JFrame implements ActionListener{
 	private JLabel ltitle, lname, lID, ltitleId, lCDtitle, lDVDtitle, lMovietitle, lSerietitle;
-	private JTextField name, ID, titleId, CDtitle, DVDtitle, Movietitle, Serietitle, rentedDay, returnDay, stock, newAvailable, available, loyaltyPoints, newloyaltyPoints;
-	private String res;
-	private int qttyStock, qttyAvailable;
-	private JButton btnRefresh, btnNewCDRent, btnNewDVDRent, btnNewMovieRent, btnNewSerieRent, btnSearchName, btnSearchCD, btnSearchDVD, btnSearchMovie, btnSearchSerie, btnSaveRent, btnCancel;
+	private JTextField name, ID, titleId, CDtitle, DVDtitle, Movietitle, Serietitle, rentedDay, returnDay, stock, newAvailable, available, loyaltyPoints, newloyaltyPoints, freeRent, newfreeRent;
+	private String res, resn, stravailable, strloyaltyPoints, qttyLoyaltyPoints, strfreeRent, qttyfreeRent;
+	private int qttyStock, qttyAvailable, intloyaltyPoints, intfreeRent;
+	boolean rentIsFree = false;
+	private JButton btnRefresh, btnNewCDRent, btnNewDVDRent, btnNewMovieRent, btnNewSerieRent, btnSearchName, btnSearchCD, btnSearchDVD, btnSearchMovie, btnSearchSerie, btnSaveRent, btnCancel, btnFreeRent, btnSaveFreeRent;
 
 	public Rent() {
 		this.setVisible(true);
@@ -223,7 +224,6 @@ public class Rent extends JFrame implements ActionListener{
             	//btnSaveUpdate.setVisible(false);
             }
         });
-        
                 
         //New Rent DVD Video Music button
         btnNewDVDRent = new JButton("Rent DVD Music");
@@ -381,11 +381,13 @@ public class Rent extends JFrame implements ActionListener{
                 ConectionDB con = new ConectionDB();
                 Connection conection = con.conect();
                 
-                String filter = name.getText();
+                String filter = CDtitle.getText();
+                System.out.println("My filter is " + filter);
                 String where = "";
                 //Our filter must not be empty
                 if(!"".equals(filter)){
                     where = "WHERE title.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
+                    System.out.println("My where SQL is " + where);
                 }
                 try{
                     
@@ -456,7 +458,7 @@ public class Rent extends JFrame implements ActionListener{
                 ConectionDB con = new ConectionDB();
                 Connection conection = con.conect();
                 
-                String filter = name.getText();
+                String filter = DVDtitle.getText();
                 String where = "";
                 //Our filter must not be empty
                 if(!"".equals(filter)){
@@ -531,7 +533,7 @@ public class Rent extends JFrame implements ActionListener{
                 ConectionDB con = new ConectionDB();
                 Connection conection = con.conect();
                 
-                String filter = name.getText();
+                String filter = Movietitle.getText();
                 String where = "";
                 //Our filter must not be empty
                 if(!"".equals(filter)){
@@ -606,7 +608,7 @@ public class Rent extends JFrame implements ActionListener{
                 ConectionDB con = new ConectionDB();
                 Connection conection = con.conect();
                 
-                String filter = name.getText();
+                String filter = Serietitle.getText();
                 String where = "";
                 //Our filter must not be empty
                 if(!"".equals(filter)){
@@ -699,12 +701,18 @@ public class Rent extends JFrame implements ActionListener{
         newloyaltyPoints.setBounds(200, 630, 100, 25);
         newloyaltyPoints.setVisible(false);
         
+        freeRent = new JTextField();
+        freeRent.setBounds(70, 170, 100, 25);
+        freeRent.setVisible(false);
         
+        newfreeRent = new JTextField();
+        newfreeRent.setBounds(70, 170, 100, 25);
+        newfreeRent.setVisible(false);
         
         //Save Rent button
-        btnSaveRent = new JButton("Save");
+        btnSaveRent = new JButton("Rent Title");
         btnSaveRent.setFont(fontButton);
-        btnSaveRent.setBounds(300, 580, 100, 30);
+        btnSaveRent.setBounds(300, 550, 100, 30);
         btnSaveRent.setVisible(false);
         btnSaveRent.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
@@ -738,68 +746,15 @@ public class Rent extends JFrame implements ActionListener{
             	        //The quantity in Stock must be more than 0
             	        qttyStock = Integer.parseInt(stock.getText());
             	        if(qttyStock > 0) {
-            	        	try{
-            	        		//Check availability
-            	        		PreparedStatement pst = null;
-                    	        ResultSet rst = null;
-                    	        
-                    	        //'newsearch' will be the query that will be send to the database to find the stock and available
-                    	        String newsearch = "SELECT available FROM title " + where;
-                    	        System.out.println(newsearch);
-                    	        pst = conection.prepareStatement(newsearch);
-                    	        rst = pst.executeQuery();
-                    	        //We will take the result of the query and this will be written on the JTextField 'available'
-                    	        while(rst.next()) {
-                    	        	available.setText(rst.getString("available"));
-                    	            res = rst.getString("available");
-                    	            System.out.println("Available: " + rst.getString("available"));
-                    	        }
-                    	        //The quantity available must not be less than quantity in Stock
-                    	        qttyAvailable = Integer.parseInt(available.getText());
-                    	        if(qttyAvailable == 0) {
-                    	        	JOptionPane.showMessageDialog(null, "The rent is not possible! \n"
-                    	        			+ "There is not enough titles availables to rent");
-                    	        }else {
-                    	        	try {
-                    	        		//'addrent' will be query that will be send to the database to add a new register on the table rent                    
-                                        String addrent = "INSERT INTO rent (rentDay, returnDay, titleId, custId) VALUES(?, ?, ?, ?)"; 
-                                        System.out.println("Query new Rent " + addrent);
-                                        PreparedStatement statement = conection.prepareStatement(addrent);
-                                        statement.setString(1, rentedDay.getText());
-                                        statement.setString(2, returnDay.getText());
-                                        statement.setString(3, titleId.getText());
-                                        statement.setString(4, ID.getText());
-                                        
-                                        statement.executeUpdate();
 
-                                        //Check if there is enough title quantities to rent
-                                        checkAvailability();
-                                        //Manage the LoyaltyPoints
-                                        loyaltyPoints();
-                                        
-                                        
-                                        conection.close();
-                                        
-                                        JOptionPane.showMessageDialog(null, "New Title rented successfully");
-                                        ID.setText("");
-                                        titleId.setText("");
-                                        available.setText("");
-                                        newAvailable.setText("");
-                                        
-                    	        	}catch (Exception e){      //If something goes wrong
-                                        JOptionPane.showMessageDialog(null, "Error renting a Title!\n"
-                                        		+ "Please check the Customer ID");
-                                    }
-                    	        }
-                    	    } catch (Exception e){      //If something goes wrong
-                                JOptionPane.showMessageDialog(null, "Error finding Availability!");
-                            }
+            	        	checkAvailability();
+
             	        }else {
             	        	JOptionPane.showMessageDialog(null, "The rent is not possible! \n"
             	        			+ "Stock quantity of the Title is 0");
             	        }
             	    } catch (Exception e){      //If something goes wrong
-            	        JOptionPane.showMessageDialog(null, "Error finding theStock quantity! \n"
+            	        JOptionPane.showMessageDialog(null, "Error finding the Stock quantity! \n"
             	        		+ "Please check the ID of the Title");
             	    }
             	}
@@ -809,11 +764,34 @@ public class Rent extends JFrame implements ActionListener{
         //Cancel button
         btnCancel = new JButton("Cancel");
         btnCancel.setFont(fontButton);
-        btnCancel.setBounds(600, 580, 100, 30);
+        btnCancel.setBounds(600, 550, 100, 30);
         btnCancel.setVisible(false);
         btnCancel.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
             	normalScreen();
+            	resetTextField();
+            }
+        });
+        
+        btnFreeRent = new JButton("Free Rent");
+        btnFreeRent.setFont(fontButton);
+        btnFreeRent.setBounds(450, 600, 100, 30);
+        btnFreeRent.setVisible(false);//If the Customer has a Free Rent
+        btnFreeRent.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent arg0){
+            	checkFreeRent();
+                
+            }
+        });
+        
+        btnSaveFreeRent = new JButton("Use Free Rent");
+        btnSaveFreeRent.setFont(fontButton);
+        btnSaveFreeRent.setBounds(300, 550, 140, 30);
+        btnSaveFreeRent.setVisible(false); 
+        btnSaveFreeRent.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent arg0){
+            	useFreeRent();
+                
             }
         });
         
@@ -851,6 +829,10 @@ public class Rent extends JFrame implements ActionListener{
         p.add(available);
         p.add(loyaltyPoints);
         p.add(newloyaltyPoints);
+        p.add(btnFreeRent);
+        p.add(freeRent);
+        p.add(newfreeRent);
+        p.add(btnSaveFreeRent);
         
         this.validate();
         this.repaint();
@@ -877,6 +859,7 @@ public class Rent extends JFrame implements ActionListener{
 		
 		btnSaveRent.setVisible(true);
 		btnCancel.setVisible(true);
+		btnFreeRent.setVisible(true);
 	}
 	
 	public void normalScreen() {
@@ -908,70 +891,101 @@ public class Rent extends JFrame implements ActionListener{
 		
 		btnSaveRent.setVisible(false);
 		btnCancel.setVisible(false);
+		btnFreeRent.setVisible(false);
+		btnSaveFreeRent.setVisible(false);
 	}
 	
-	//This will check if the title has enough quantity to rent
-		public void checkAvailability() {
+	//This will check if the title has enough quantity to rent	
+	public void checkAvailability() {
 			
 			ConectionDB con = new ConectionDB();
 	        Connection conection = con.conect();
-	        try{
-	        	//Declaring our 'where' condition to be used as filter
-	        	String filter = titleId.getText();
-		        String where = "";
-		        //Our filter must not be empty
-		        if(!"".equals(filter)){
-		            where = "WHERE titleID = " + filter;
-		        }
-		    	PreparedStatement ps = null;
-		        ResultSet rs = null;
-		        
-		        //'search' will be the query that will be send to the database to find the stock and available
-		        String search = "SELECT available FROM title " + where;
-		        System.out.println(search);
-		        ps = conection.prepareStatement(search);
-		        rs = ps.executeQuery();
-		        //We will take the result of the query and this will be written on the JTextField 'available'
-		        while(rs.next()) {
-		        	available.setText(rs.getString("available"));
-		            res = rs.getString("available");
-		            System.out.println("Available: " + rs.getString("available"));
-		        }
-		        
-		        String strAvailable = available.getText();		//Storing the content of the JTextField on a String
-		        System.out.println(strAvailable);
-		        int intAvailable = Integer.parseInt(available.getText());		//Converting the value of that String to an Integer
-		        intAvailable--;		//Subtracting 1 to the quantity available
-		        System.out.println(intAvailable);
-		        
-		        String qttyAvailable = Integer.toString(intAvailable);		//Converting the new value to a String
-		        
-		        newAvailable.setText(qttyAvailable);		//The value of that String will be written on a JTextField
-		        System.out.println("New Available: " + qttyAvailable);
-		        try{
-		        	
-		        	//'newavailable' will be the query that we will send to the database to find the results
-	            	String newavailable = "UPDATE title SET available = ? " + where;
-	                System.out.println("My update available: " + newavailable);
-	                PreparedStatement newstatement = conection.prepareStatement(newavailable);
-	                
-	                newstatement.setString(1, newAvailable.getText());
-	                
-	                newstatement.execute();
-		        	
-		        }catch (Exception e){      //If something goes wrong
-	            	JOptionPane.showMessageDialog(null, "Error inserting a new CD Title!");
-	            }
-		        
-		        conection.close();
-		        
-		        JOptionPane.showMessageDialog(null, "Available updated successfully");
-	            available.setText("");
-	            newAvailable.setText("");
-		        
-	        } catch (Exception e){      //If something goes wrong
-	        	JOptionPane.showMessageDialog(null, "Error inserting Availability!");
+	        
+	        String filter = titleId.getText();
+	        String where = "";
+	        //Our filter must not be empty
+	        if(!"".equals(filter)){
+	            where = "WHERE titleID = " + filter;
 	        }
+	        
+        	try{
+        		
+        		PreparedStatement pst = null;
+    	        ResultSet rst = null;
+    	        
+    	        //'newsearch' will be the query that will be send to the database to find the stock and available
+    	        String newsearch = "SELECT available FROM title " + where;
+    	        System.out.println(newsearch);
+    	        pst = conection.prepareStatement(newsearch);
+    	        rst = pst.executeQuery();
+    	        //We will take the result of the query and this will be written on the JTextField 'available'
+    	        while(rst.next()) {
+    	        	available.setText(rst.getString("available"));
+    	            res = rst.getString("available");
+    	            System.out.println("Available: " + rst.getString("available"));
+    	        }
+    	        //The quantity available must not be less than quantity in Stock
+    	        qttyAvailable = Integer.parseInt(available.getText());
+    	        if(qttyAvailable == 0) {
+    	        	JOptionPane.showMessageDialog(null, "The rent is not possible! \n"
+    	        			+ "There is not enough titles availables to rent");
+    	        }else {
+    	        	try {
+    	        		//'addrent' will be query that will be send to the database to add a new register on the table rent                    
+                        String addrent = "INSERT INTO rent (rentDay, returnDay, titleId, custId) VALUES(?, ?, ?, ?)"; 
+                        System.out.println("Query new Rent " + addrent);
+                        PreparedStatement statement = conection.prepareStatement(addrent);
+                        statement.setString(1, rentedDay.getText());
+                        statement.setString(2, returnDay.getText());
+                        statement.setString(3, titleId.getText());
+                        statement.setString(4, ID.getText());
+                        
+                        statement.executeUpdate();
+                        
+                        //Calculating to new Available quantity
+    		    	    
+    		    	    qttyAvailable --;		//Subtracting -1 to the quantity Available
+    		    	    System.out.println("Available Integer -1: " + qttyAvailable);
+        	        	stravailable = Integer.toString(qttyAvailable);		//Converting the new quantity available to an Integer
+        	        	System.out.println("stravailable: " + stravailable);
+        	        	newAvailable.setText(stravailable);		//The value of that String will be written on a JTextField
+        	        	System.out.println("New Qtty Availalble: " + stravailable);
+        	        	//Updating quantity available
+    		    	    try {
+    		    	    	//'updateavailable' will be the query that we will send to the database to find the results
+                        	String updateavailable = "UPDATE title SET available = ? " + where;
+                            System.out.println("My update Available: " + updateavailable);
+                            PreparedStatement newstatement = conection.prepareStatement(updateavailable);
+                            
+                            newstatement.setString(1, newAvailable.getText());
+                            
+                            newstatement.execute();
+                            
+    		    	    }catch (Exception e){      //If something goes wrong
+    		    	    	JOptionPane.showMessageDialog(null, "Error updating quantity Available");
+                        }
+
+                        //Manage the LoyaltyPoints
+                        loyaltyPoints();
+                        
+                        conection.close();
+                        
+                        JOptionPane.showMessageDialog(null, "New Title rented successfully");
+                        ID.setText("");
+                        titleId.setText("");
+                        available.setText("");
+                        newAvailable.setText("");
+                        
+                        normalScreen();
+                        
+    	        	}catch (Exception e){      //If something goes wrong
+                        JOptionPane.showMessageDialog(null, "Error renting a Title!\n"
+                        		+ "Please check the Customer and Title ID");
+                    }
+    	        }
+    	    } catch (Exception e){      //If something goes wrong
+                JOptionPane.showMessageDialog(null, "Error finding Availability!");
+            }
 		}
 		
 		//This will manage the Loyalty Points	
@@ -1003,13 +1017,13 @@ public class Rent extends JFrame implements ActionListener{
     	            System.out.println("Loyalty Points: " + rs.getString("loyaltyPoints"));
     	        }
     	        
-    	        String strloyaltyPoints = loyaltyPoints.getText();		//Storing the content of the JTextField on a String
+    	        strloyaltyPoints = loyaltyPoints.getText();		//Storing the content of the JTextField on a String
     	        System.out.println(strloyaltyPoints);
-    	        int intloyaltyPoints = Integer.parseInt(loyaltyPoints.getText());		//Converting the value of that String to an Integer
+    	        intloyaltyPoints = Integer.parseInt(loyaltyPoints.getText());		//Converting the value of that String to an Integer
     	        intloyaltyPoints = intloyaltyPoints +10;		//Adding +10 to the Loyalty Points of the Customer
     	        System.out.println(intloyaltyPoints);
     	        
-    	        String qttyLoyaltyPoints = Integer.toString(intloyaltyPoints);
+    	        qttyLoyaltyPoints = Integer.toString(intloyaltyPoints);
     	        
     	        newloyaltyPoints.setText(qttyLoyaltyPoints);		//The value of that String will be written on a JTextField
     	        System.out.println("New Loyalty Points: " + qttyLoyaltyPoints);
@@ -1028,6 +1042,8 @@ public class Rent extends JFrame implements ActionListener{
                 	JOptionPane.showMessageDialog(null, "Error inserting Loyalty Points!");
                 }
     	        
+    	        freeRent();
+    	        
     	        conection.close();
     	        
     	        //JOptionPane.showMessageDialog(null, "Loyalty Points updated successfully");
@@ -1040,15 +1056,346 @@ public class Rent extends JFrame implements ActionListener{
             }
 				
 		}
-	
-	//This method will configure the format of the dates	
-	public static String formatCalendar(Calendar dayRented) {
-		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
 		
-		return dateFormat.format(dayRented.getTime());	
-	}
+		public void freeRent() {
+			if(intloyaltyPoints % 100 == 0) {		//The free rent will be available when the loyalty points is any number multiple of 100
+				numberOffreeRent();		//Check the Number of Free Rents available
+				JOptionPane.showMessageDialog(null, "Congratulations! \n"
+	        			+ "You have " + intloyaltyPoints + " Loyalty Points\n"
+	        					+ "You have " + qttyfreeRent + " available Free Rent(s)");
+	        	rentIsFree = true;		//The Customer has at least one Free Rent
+	        }
+		}
+		
+		public void numberOffreeRent() {
+			
+			ConectionDB con = new ConectionDB();
+	        Connection conection = con.conect();
+	        
+	        try{
+	        	
+	        	String filter = ID.getText();
+		        String where = "";
+		        //Our filter must not be empty
+		        if(!"".equals(filter)){
+		            where = "WHERE custId = " + filter;
+		        }
+		    	PreparedStatement ps = null;
+		        ResultSet rs = null;
+		        
+		        //'search' will be the query that will be send to the database to find the stock and available
+		        String search = "SELECT freeRent FROM membershipCard " + where;
+		        System.out.println(search);
+		        ps = conection.prepareStatement(search);
+		        rs = ps.executeQuery();
+		        //We will take the result of the query and this will be written on the JTextField 'stock'
+		        while(rs.next()) {
+		        	freeRent.setText(rs.getString("freeRent"));
+		            res = rs.getString("freeRent");
+		            System.out.println("Free Rent: " + rs.getString("freeRent"));
+		        }
+		        
+		        strfreeRent = freeRent.getText();
+		        System.out.println(strfreeRent);
+		        intfreeRent = Integer.parseInt(freeRent.getText());
+		        intfreeRent = intloyaltyPoints /100;
+		        System.out.println(intfreeRent);
+		        
+		        qttyfreeRent = Integer.toString(intfreeRent);
+		        
+		        newfreeRent.setText(qttyfreeRent);
+		        System.out.println("Quantity of Free rent: " + qttyfreeRent);
+		        
+		        try{
+		        	
+		        	//'freeRentLeft' will be the query that we will send to the database to find the results
+	            	String freeRentLeft = "UPDATE membershipCard SET freeRent = ? " + where;
+	                System.out.println("My update Free Rent: " + freeRentLeft);
+	                PreparedStatement newstatement = conection.prepareStatement(freeRentLeft);
+	                
+	                newstatement.setString(1, newfreeRent.getText());
+	                
+	                newstatement.execute();
+		        	
+		        }catch (Exception e){      //If something goes wrong
+	            	JOptionPane.showMessageDialog(null, "Error calculating Free Rent left!");
+	            }
+		        conection.close();
+		        
+		        //JOptionPane.showMessageDialog(null, "Free Rent used successfully");
+		        freeRent.setText("");
+		        newfreeRent.setText("");
+		        
+	        } catch (Exception e){      //If something goes wrong
+	        	JOptionPane.showMessageDialog(null, "Error finding Free Rent!");
+	        }
+		}
 	
+		public void checkFreeRent() {
+			ConectionDB con = new ConectionDB();
+            Connection conection = con.conect();
+            if(ID.getText().equals("")) {
+            	JOptionPane.showMessageDialog(null, "Customer ID empty!");
+            }else {
+            	try{
+            		
+            		String filter = ID.getText();
+        	        String where = "";
+        	        //Our filter must not be empty
+        	        if(!"".equals(filter)){
+        	            where = "WHERE custId = " + filter;
+        	        }
+        	    	PreparedStatement ps = null;
+        	        ResultSet rs = null;
+        	        
+        	        //'search' will be the query that will be send to the database to find the stock and available
+        	        String search = "SELECT freeRent FROM membershipCard " + where;
+        	        System.out.println(search);
+        	        ps = conection.prepareStatement(search);
+        	        rs = ps.executeQuery();
+        	        //We will take the result of the query and this will be written on the JTextField 'freeRent'
+        	        while(rs.next()) {
+        	        	freeRent.setText(rs.getString("freeRent"));
+        	            res = rs.getString("freeRent");
+        	            System.out.println("Free Rent: " + rs.getString("freeRent"));
+        	        }
+        	        
+        	        strfreeRent = freeRent.getText();
+        	        System.out.println(strfreeRent);
+        	        intfreeRent = Integer.parseInt(freeRent.getText());
+        	        //Validation if the Customer has any Free Rent Available
+        	        if(intfreeRent > 0) {
+        	        	JOptionPane.showMessageDialog(null, "This Customer has " + intfreeRent + " Free Rent available(s)");
+        	        	btnSaveFreeRent.setVisible(true);
+        	        	btnFreeRent.setVisible(false);
+        	        	btnSaveRent.setVisible(false);
+        	        	
+        	        } else {
+        	        	JOptionPane.showMessageDialog(null, "The Customer does not have any Free Rent Available");
+        	        }
+                } catch (Exception e){      //If something goes wrong
+                	JOptionPane.showMessageDialog(null, "Error finding Loyalty Points!");
+                }
+            }
+		}
+		
+		public void useFreeRent() {
+			ConectionDB con = new ConectionDB();
+	        Connection conection = con.conect();
+	        //Title ID must not be empty
+	        if(titleId.getText().equals("")) {
+            	JOptionPane.showMessageDialog(null, "Title ID empty!");
+            } else {
+	        
+	        String filter = titleId.getText();
+	        String whereTitleId = "";
+	        //Our filter must not be empty
+	        if(!"".equals(filter)){
+	        	whereTitleId = "WHERE titleID = " + filter;
+	            System.out.println("whereTitleId: " + whereTitleId);
+	        }	
+	        //Check if the Title has availability
+	        try {
+	        	PreparedStatement pst = null;
+		        ResultSet rst = null;
+		        
+		        //'newsearch' will be the query that will be send to the database to find the stock and available
+		        String newsearch = "SELECT available FROM title " + whereTitleId;
+		        System.out.println("newsearch: " + newsearch);
+		        pst = conection.prepareStatement(newsearch);
+		        rst = pst.executeQuery();
+		        //We will take the result of the query and this will be written on the JTextField 'available'
+		        while(rst.next()) {
+		        	available.setText(rst.getString("available"));
+		            res = rst.getString("available");
+		            System.out.println("Available: " + rst.getString("available"));
+		        }
+		        
+		        qttyAvailable = Integer.parseInt(available.getText());
+		        System.out.println("Available Integer" + qttyAvailable);
+		        //The quantity available must not be 0
+		        if(qttyAvailable == 0) {
+		        	JOptionPane.showMessageDialog(null, "The rent is not possible! \n"
+		        			+ "There is not enough titles availables to rent");
+		        } else {
+		        	//Calculating to new Available quantity
+		    	    
+		    	    qttyAvailable --;		//Subtracting -1 to the quantity Available
+		    	    System.out.println("Available Integer -1: " + qttyAvailable);
+    	        	stravailable = Integer.toString(qttyAvailable);		//Converting the new quantity available to an Integer
+    	        	System.out.println("stravailable: " + stravailable);
+    	        	newAvailable.setText(stravailable);		//The value of that String will be written on a JTextField
+    	        	System.out.println("New Qtty Availalble: " + stravailable);
+    	        	//Updating quantity available
+		    	    try {
+		    	    	//'updateavailable' will be the query that we will send to the database to find the results
+                    	String updateavailable = "UPDATE title SET available = ? " + whereTitleId;
+                        System.out.println("My update Available: " + updateavailable);
+                        PreparedStatement newstatement = conection.prepareStatement(updateavailable);
+                        
+                        newstatement.setString(1, newAvailable.getText());
+                        
+                        newstatement.execute();
+                        //JOptionPane.showMessageDialog(null, "available updated");
+                        //Saving information of the rent of the Title
+                        try {
+    		        		
+                        	//'addrent' will be query that will be send to the database to add a new register on the table rent                    
+	                        String addrent = "INSERT INTO rent (rentDay, returnDay, titleId, custId) VALUES(?, ?, ?, ?)"; 
+	                        System.out.println("Query new Rent " + addrent);
+	                        PreparedStatement statement = conection.prepareStatement(addrent);
+	                        statement.setString(1, rentedDay.getText());
+	                        statement.setString(2, returnDay.getText());
+	                        statement.setString(3, titleId.getText());
+	                        statement.setString(4, ID.getText());
+	                        
+	                        statement.executeUpdate();
+	                        //JOptionPane.showMessageDialog(null, "information updated");
+	                        //Check and calculate Loyalty Points
+	                        try {
+	                        	String newfilter = ID.getText();
+	                            String whereCustId = "";
+	                            //Our filter must not be empty
+	                            if(!"".equals(newfilter)){
+	                            	whereCustId = "WHERE custId = " + newfilter;
+	                                System.out.println("whereCustId: " + whereCustId);
+	                            }	        
+	                            
+	                        	PreparedStatement ps = null;
+	                	        ResultSet rs = null;
+	                	        
+	                        	//'search' will be the query that will be send to the database to find the stock and available
+	                	        String search = "SELECT loyaltyPoints FROM membershipCard " + whereCustId;
+	                	        System.out.println(search);
+	                	        ps = conection.prepareStatement(search);
+	                	        rs = ps.executeQuery();
+	                	        //We will take the result of the query and this will be written on the JTextField 'loyaltyPoints'
+	                	        while(rs.next()) {
+	                	        	loyaltyPoints.setText(rs.getString("loyaltyPoints"));
+	                	            res = rs.getString("loyaltyPoints");
+	                	            System.out.println("Loyalty Points: " + rs.getString("loyaltyPoints"));
+	                	        }
+	                	        
+	                	        strloyaltyPoints = loyaltyPoints.getText();		//Storing the content of the JTextField on a String
+	                	        System.out.println(strloyaltyPoints);
+	                	        intloyaltyPoints = Integer.parseInt(loyaltyPoints.getText());		//Converting the value of that String to an Integer
+	                	        //The Customer must have at least 100 Loyalty Points
+	                	        if(intloyaltyPoints < 100) {
+	                	        	JOptionPane.showMessageDialog(null, "The Customer does not have enough Loyalty Points for a Free Rent!");
+	                	        	btnSaveRent.setVisible(true);
+	                	        	btnFreeRent.setVisible(true);
+	                	        	btnSaveFreeRent.setVisible(false);
+	                	        	resetTextField();
+	                	        } else {
+	                	        	intloyaltyPoints = intloyaltyPoints -100;		//Adding +10 to the Loyalty Points of the Customer
+		                	        System.out.println(intloyaltyPoints);
+		                	        
+		                	        qttyLoyaltyPoints = Integer.toString(intloyaltyPoints);
+	                	        
+		                	        newloyaltyPoints.setText(qttyLoyaltyPoints);		//The value of that String will be written on a JTextField
+		                	        System.out.println("New Loyalty Points: " + qttyLoyaltyPoints);
+		                	        
+		                	        //Updating Loyalty Points
+		                	        try {
+		                	        	
+		                	        	//'newloyaltypoints' will be the query that we will send to the database to find the results
+		                            	String newloyaltypoints = "UPDATE membershipCard SET loyaltyPoints = ? " + whereCustId;
+		                                System.out.println("My update Loyalty Points: " + newloyaltypoints);
+		                                PreparedStatement newstatement1 = conection.prepareStatement(newloyaltypoints);
+		                                
+		                                newstatement1.setString(1, newloyaltyPoints.getText());
+		                                
+		                                newstatement1.execute();
+		                                //JOptionPane.showMessageDialog(null, "Loyalty Points updated!");
+		                                //Check and calculate new quantity of Free Rent
+		                                try {		                                	
+		    	                	        PreparedStatement nps = null;
+		    	                	        ResultSet nrs = null;
+		    	                	        //'searchnew' will be the query that will be send to the database to find the stock and available
+		    	                	        String searchnew = "SELECT freeRent FROM membershipCard " + whereCustId;
+		    	            		        System.out.println(searchnew);
+		    	            		        nps = conection.prepareStatement(searchnew);
+		    	            		        nrs = nps.executeQuery();
+		    	            		        //We will take the result of the query and this will be written on the JTextField 'freeRent'
+		    	            		        while(nrs.next()) {
+		    	            		        	freeRent.setText(nrs.getString("freeRent"));
+		    	            		            res = nrs.getString("freeRent");
+		    	            		            System.out.println("Free Rent: " + nrs.getString("freeRent"));
+		    	            		        }
+		    	            		        
+		    	            		        strfreeRent = freeRent.getText();		//Storing the content of the JTextField on a String
+		    	            		        System.out.println(strfreeRent);
+		    	            		        intfreeRent = Integer.parseInt(freeRent.getText());		//Converting the value of that String to an Integer
+		    	            		        intfreeRent = intfreeRent -1;		//Subtracting -1 to the quantity of Free Rent of the Customer
+		    	            		        System.out.println(intfreeRent);
+		    	            		        
+		    	            		        qttyfreeRent = Integer.toString(intfreeRent);
+		    	            		        
+		    	            		        newfreeRent.setText(qttyfreeRent);		//The value of that String will be written on a JTextField
+		    	            		        System.out.println("Quantity of Free rent: " + qttyfreeRent);
+		    	            		        //Updating Free Renty quantity
+		    	            		        try {
+		    	            		        	//'freeRentLeft' will be the query that we will send to the database to find the results
+		    	            	            	String freeRentLeft = "UPDATE membershipCard SET freeRent = ? " + whereCustId;
+		    	            	                System.out.println("My update Free Rent: " + freeRentLeft);
+		    	            	                PreparedStatement statementnew = conection.prepareStatement(freeRentLeft);
+		    	            	                
+		    	            	                statementnew.setString(1, newfreeRent.getText());
+		    	            	                
+		    	            	                statementnew.execute();
+		    	            	                
+		    	            	                conection.close();
+		    	                                
+		    	                                JOptionPane.showMessageDialog(null, "New Title rented successfully using Free Points");
+		    	                                ID.setText("");
+		    	                                titleId.setText("");
+		    	                                available.setText("");
+		    	                                newAvailable.setText("");
+		    	                                
+		    	                                normalScreen();
+		    	            	                
+		    	            		        } catch (Exception e){      //If something goes wrong
+			    	    	                    JOptionPane.showMessageDialog(null, "Error updating quantity of Free Rents");
+			    	    	                }
+		                                } catch (Exception e){      //If something goes wrong
+		    	    	                    JOptionPane.showMessageDialog(null, "Error calculating quantity of Free Rents");
+		    	    	                }
+		                	        } catch (Exception e){      //If something goes wrong
+			    	                    JOptionPane.showMessageDialog(null, "Error updating Loyalty Points!");
+			    	                }
+	                	        }
+	                        } catch (Exception e){      //If something goes wrong
+	    	                    JOptionPane.showMessageDialog(null, "Error calculating Loyalty Points!");
+	    	                }
+    		        	} catch (Exception e){      //If something goes wrong
+    	                    JOptionPane.showMessageDialog(null, "Error inserting information of the rent");
+    	                }
+		    	    } catch (Exception e){      //If something goes wrong
+	                    JOptionPane.showMessageDialog(null, "Error updating quantity Available");
+	                }
+		        }
+	        }catch (Exception e){      //If something goes wrong
+	            JOptionPane.showMessageDialog(null, "Error finding Availability of Title");
+	        }
+	        
+            }
+		}
+		
+		
+		//This method will configure the format of the dates	
+		public static String formatCalendar(Calendar dayRented) {
+			DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
+		
+			return dateFormat.format(dayRented.getTime());	
+		}
+
+		public void resetTextField() {
+			name.setText("");
+			ID.setText("");
+			titleId.setText("");
+		}
 	@Override
+	
 	public void actionPerformed(ActionEvent e) {
 		String ac = e.getActionCommand();
 		if(ac.equals("exit")){
