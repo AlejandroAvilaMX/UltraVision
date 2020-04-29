@@ -390,6 +390,7 @@ public class VL extends JFrame implements ActionListener {
             public void actionPerformed(ActionEvent arg0){
             	btnSaveNew.setVisible(true);
             	editScreen();
+            	titleId.setEditable(false); 
             }
         });
         
@@ -668,7 +669,7 @@ public class VL extends JFrame implements ActionListener {
 		                            	
 		                            conection.close();
 		    	                        
-		    	                    JOptionPane.showMessageDialog(null, "Title updated successfully");
+		    	                    JOptionPane.showMessageDialog(null, "Movie title updated successfully");
 		    	                    titleId.setText("");
 		    	                    name.setText("");
 		    	                    releaseYear.setText("");
@@ -683,6 +684,7 @@ public class VL extends JFrame implements ActionListener {
 		    	                    available.setText("");
 		    	                    rentPrice.setText("");
 		    	                    lastRegister.setText("");
+		    	                    titleId.setEditable(true);
 		    	                    
 		    	                } catch (Exception e){      //If something goes wrong
 		    	                	JOptionPane.showMessageDialog(null, "Error updating Movie Title!");		//If something goes wrong when trying to update a Title
@@ -709,6 +711,7 @@ public class VL extends JFrame implements ActionListener {
             	normalScreen();
             	btnSaveNew.setVisible(false);
             	btnSaveUpdate.setVisible(false);
+            	titleId.setEditable(true);
             }
         });
         
@@ -788,28 +791,40 @@ public class VL extends JFrame implements ActionListener {
 	}
 	//This method will return the components of the window to their original state
 	public void normalScreen() {
+		titleId.setText("");
+		name.setText("");
 		lreleaseYear.setVisible(false);
 		releaseYear.setVisible(false);
+		releaseYear.setText("");
 		lgenre.setVisible(false);
 		genre.setVisible(false);
+		genre.setText("");
 		lproductionCompany.setVisible(false);
 		productionCompany.setVisible(false);
+		productionCompany.setText("");
 		ldirector.setVisible(false);
 		director.setVisible(false);
+		director.setText("");
 		lcountry.setVisible(false);
 		country.setVisible(false);
+		country.setText("");
 		lduration.setVisible(false);
 		duration.setVisible(false);
+		duration.setText("");
 		llanguage.setVisible(false);
 		language.setVisible(false);
+		language.setText("");
 		lformat.setVisible(false);
 		movieFormat.setVisible(false);
 		lstock.setVisible(false);
 		stock.setVisible(false);
+		stock.setText("");
 		lavailable.setVisible(false);
 		available.setVisible(false);
+		available.setText("");
 		lrentPrice.setVisible(false);
 		rentPrice.setVisible(false);
+		rentPrice.setText("");
 		
 		btnNew.setVisible(true);
 		btnUpdateVL.setVisible(true);

@@ -338,6 +338,7 @@ public class MC extends JFrame implements ActionListener{
         	public void actionPerformed(ActionEvent arg0){
         		btnSaveNew.setVisible(true);
             	editScreen();
+            	titleId.setEditable(false);
             	}
         	});
         
@@ -404,6 +405,7 @@ public class MC extends JFrame implements ActionListener{
 	                    available.setText("");
 	                    rentPrice.setText("");
 	                    lastRegister.setText("");
+	                    
                     
                     } catch (Exception e){      //If something goes wrong
                     	JOptionPane.showMessageDialog(null, "Error deleting the CD Title!");
@@ -512,6 +514,7 @@ public class MC extends JFrame implements ActionListener{
 		                        available.setText("");
 		                        rentPrice.setText("");
 		                        lastRegister.setText(""); 
+		                        titleId.setEditable(true);
 		                    
 	                       	} catch (Exception e){      //If something goes wrong
 	                        	JOptionPane.showMessageDialog(null, "Error inserting a new CD Title!");
@@ -639,6 +642,7 @@ public class MC extends JFrame implements ActionListener{
             	normalScreen();
             	btnSaveNew.setVisible(false);
             	btnSaveUpdate.setVisible(false);
+            	titleId.setEditable(true);
             }
         });
         
@@ -702,20 +706,29 @@ public class MC extends JFrame implements ActionListener{
 	}
 	//This method will return the components of the window to their original state
 	public void normalScreen() {
+		titleId.setText("");
+		name.setText("");
 		lreleaseYear.setVisible(false);
 		releaseYear.setVisible(false);
+		releaseYear.setText("");
 		lgenre.setVisible(false);
 		genre.setVisible(false);
+		genre.setText("");
 		lartist.setVisible(false);
 		artist.setVisible(false);
+		artist.setText("");
 		lproductionCompany.setVisible(false);
 		productionCompany.setVisible(false);
+		productionCompany.setText("");
 		lstock.setVisible(false);
 		stock.setVisible(false);
+		stock.setText("");
 		lavailable.setVisible(false);
 		available.setVisible(false);
+		available.setText("");
 		lrentPrice.setVisible(false);
 		rentPrice.setVisible(false);
+		rentPrice.setText("");
 		
 		btnNew.setVisible(true);
 		btnUpdateMC.setVisible(true);

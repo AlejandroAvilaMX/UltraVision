@@ -748,24 +748,35 @@ public class Customers extends JFrame implements ActionListener{
 	}
 	//This method will return the components of the window to their original state.
 	public void normalScreen() {
+		ID.setText("");
+		name.setText("");
 		lsurname.setVisible(false);
 		surname.setVisible(false);
+		surname.setText("");
 		lstreet.setVisible(false);
 		street.setVisible(false);
+		street.setText("");
 		lnumber.setVisible(false);
 		number.setVisible(false);
+		number.setText("");
 		lpostalCode.setVisible(false);
 		postalCode.setVisible(false);
+		postalCode.setText("");
 		lcity.setVisible(false);
 		city.setVisible(false);
+		city.setText("");
 		lcountry.setVisible(false);
 		country.setVisible(false);
+		country.setText("");
 		lphoneNumber.setVisible(false);
 		phoneNumber.setVisible(false);
+		phoneNumber.setText("");
 		lemail.setVisible(false);
 		email.setVisible(false);
+		email.setText("");
 		lcardNumber.setVisible(false);
 		cardNumber.setVisible(false);
+		cardNumber.setText("");
 		llevelId.setVisible(false);
 		comboLevel.setVisible(false);
 		btnNew.setVisible(true);
