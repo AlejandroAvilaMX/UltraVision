@@ -47,6 +47,7 @@ public class Customers extends JFrame implements ActionListener{
     private JComboBox<String> comboLevel;
     private String res;
     private JButton btnSearch, btnNew, btnUpdateCustomer, btnDeleteCustomer, btnSaveNew, btnSaveUpdate, btnCancel;
+    private DefaultTableModel model;
      
 	public Customers() {
 		this.setVisible(true);

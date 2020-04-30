@@ -110,14 +110,15 @@ public class MembershipCards extends JFrame implements ActionListener{
         btnRefresh.setBounds(40, 70, 100, 30);
         btnRefresh.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
+            	//Call method 'refresh'
             	refresh();
-            	
+            	//Add the model to the table
             	JTable table = new JTable(model);
-                
+                //Add the scroll to the table
                 JScrollPane scroll= new JScrollPane(table);
                 table.setBounds(40,120,1000,200);
                 scroll.setBounds(40,120,1000,200);
-
+                //Add the scroll to the Panel
                 p.add(scroll);
             }
         });
@@ -154,13 +155,15 @@ public class MembershipCards extends JFrame implements ActionListener{
         btnSearch.setBounds(340, 435, 110, 30);
         btnSearch.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
+            	//Call method 'search'
             	search();
-            	
+            	//Add the model to the table
             	JTable table = new JTable(model);
+                //Add the scroll to the table
                 JScrollPane scroll= new JScrollPane(table);
                 table.setBounds(40,120,1000,200);
                 scroll.setBounds(40,120,1000,200);
-
+                //Add the scroll to the Panel
                 p.add(scroll);
             }
         });
@@ -285,9 +288,9 @@ public class MembershipCards extends JFrame implements ActionListener{
             		JOptionPane.showMessageDialog(null, "Card Number and Level ID cannot be empty");
             	}else {
             		if(levelId.getText().equals("PR") || levelId.getText().equals("TV") || levelId.getText().equals("ML") || levelId.getText().equals("VL")) {		//If something goes wrong with our JComboBox we must type the Level Id correct
-
-            			levelDescription();		//Go to check the Description of the selected Level
-                		
+            			//Call method 'levelDescription'
+            			levelDescription();
+                		//Call method 'updateCard'
             			updateCard();
                 	}
             	}         
@@ -300,6 +303,7 @@ public class MembershipCards extends JFrame implements ActionListener{
         btnCancel.setVisible(false);
         btnCancel.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
+            	//Call method 'normalScreen'
             	normalScreen();
             	btnSaveNew.setVisible(false);
             	btnSaveUpdate.setVisible(false);
@@ -336,6 +340,7 @@ public class MembershipCards extends JFrame implements ActionListener{
         btnUpdateCard.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
             	btnSaveUpdate.setVisible(true);
+            	//Call method 'editScreen'
             	editScreen();     
             }
         });
@@ -414,7 +419,7 @@ public class MembershipCards extends JFrame implements ActionListener{
         this.validate();
         this.repaint();
 	}
-	//This will modify the window to be able to see all the required information to update the membership card
+	//This methodwill modify the window to be able to see all the required information to update the membership card
 	public void editScreen() {
 		lID.setVisible(false);
 		lCustomerId.setVisible(true);
@@ -447,7 +452,7 @@ public class MembershipCards extends JFrame implements ActionListener{
 		cardNumber.setText("");
     	ID.setText("");
 	}
-	//This will Refresh our table after the changes realized
+	//This method will Refresh our table after doing any changes
 	public void refresh() {
         ConectionDB con = new ConectionDB();
         Connection conection = con.conect();
@@ -490,7 +495,7 @@ public class MembershipCards extends JFrame implements ActionListener{
             JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
         }
 	}
-	//This will search by name
+	//This method will search by name
 	public void search() {
         ConectionDB con = new ConectionDB();
         Connection conection = con.conect();
@@ -541,50 +546,54 @@ public class MembershipCards extends JFrame implements ActionListener{
             JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
         }
 	}
-	//This will Update the details of the Credit Card
+	//This method will Update the details of the Credit Card
 	public void updateCard() {
-		ConectionDB con = new ConectionDB();
-        Connection conection = con.conect();
-        //Declaring our 'where' condition to be used as filter
-        String filter = ID.getText();
-        System.out.println("My filter is: " + filter);
-        String where = "";
-        //Our filter must not be empty
-        if(!"".equals(filter)){
-            where = "WHERE IdCard = '" + filter + "'";
-            System.out.println("My where is: " + where);
-            try{
-                //'updatecard' will be the query that we will send to the database to find the results
-                String updatecard = "UPDATE membershipCard SET cardNumber = ?, levelId = ?, level = ? " + where; 
-                System.out.println(updatecard);
-                PreparedStatement statement = conection.prepareStatement(updatecard);
-                statement.setString(1, cardNumber.getText());
-                statement.setString(2, levelId.getText());
-                statement.setString(3, level.getText());
-                statement.execute();
-                   
-                conection.close();
-                
-                JOptionPane.showMessageDialog(null, "Membeship Card updated successfully\n"
-                		+ "Please Refresh");
-                ID.setText("");
-                name.setText("");
-                levelId.setText("");
-                cardNumber.setText("");
-            
-                normalScreen();
-                btnSaveUpdate.setVisible(false);
-                
-                } catch (Exception e){		//If something goes wrong
-                	JOptionPane.showMessageDialog(null, "Error updating Membership Card! \n"
-                			+ "� Card ID must be a valid numeric ID");
-                }
-        } else{       //The ID must have a valid ID number
-            JOptionPane.showMessageDialog(null, "Error updating Customer! \n"
-                    + "� The ID cannot be empty");
-        }
+		if(cardNumber.getText().length()<16) {
+			JOptionPane.showMessageDialog(null, "The Card Number must have 16 digits...!!");
+		} else {
+			ConectionDB con = new ConectionDB();
+	        Connection conection = con.conect();
+	        //Declaring our 'where' condition to be used as filter
+	        String filter = ID.getText();
+	        System.out.println("My filter is: " + filter);
+	        String where = "";
+	        //Our filter must not be empty
+	        if(!"".equals(filter)){
+	            where = "WHERE IdCard = '" + filter + "'";
+	            System.out.println("My where is: " + where);
+	            try{
+	                //'updatecard' will be the query that we will send to the database to find the results
+	                String updatecard = "UPDATE membershipCard SET cardNumber = ?, levelId = ?, level = ? " + where; 
+	                System.out.println(updatecard);
+	                PreparedStatement statement = conection.prepareStatement(updatecard);
+	                statement.setString(1, cardNumber.getText());
+	                statement.setString(2, levelId.getText());
+	                statement.setString(3, level.getText());
+	                statement.execute();
+	                   
+	                conection.close();
+	                
+	                JOptionPane.showMessageDialog(null, "Membeship Card updated successfully\n"
+	                		+ "Please Refresh");
+	                ID.setText("");
+	                name.setText("");
+	                levelId.setText("");
+	                cardNumber.setText("");
+	            
+	                normalScreen();
+	                btnSaveUpdate.setVisible(false);
+	                
+	                } catch (Exception e){		//If something goes wrong
+	                	JOptionPane.showMessageDialog(null, "Error updating Membership Card! \n"
+	                			+ "� Card ID must be a valid numeric ID");
+	                }
+	        } else{       //The ID must have a valid ID number
+	            JOptionPane.showMessageDialog(null, "Error updating Customer! \n"
+	                    + "� The ID cannot be empty");
+	        }
+		}
 	}
-	//This will take the written value of the Level Id and depending on it, it will add the description of the level
+	//This method will take the written value of the Level Id and depending on it, it will add the description of the level
 	public void levelDescription() {
 		if(levelId.getText().equals("PR")) {
     		System.out.println("LevelId: " + levelId.getText());
