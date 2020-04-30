@@ -3,8 +3,7 @@
  * 
  * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
  */
-package utravision;
-
+package access;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,13 +28,15 @@ import javax.swing.table.DefaultTableModel;
 
 import customers.Customers;
 import customers.MembershipCards;
-import mainmenus.MainMenuAdmin;
 import rent.Rent;
 import titles.Titles;
+import utravision.ConectionDB;
+import utravision.LoginController;
 
 public class Access extends JFrame implements ActionListener{
 	private JLabel ltitle, lusername, lpassword;
 	private JTextField username, password;
+	private DefaultTableModel model;
 
 	public Access() {
 		this.setVisible(true);
@@ -56,10 +57,6 @@ public class Access extends JFrame implements ActionListener{
         JMenu myMenu = new JMenu("File");       //Title of the menu
         myMenuBar.add(myMenu);
         //Options of the menu
-        JMenuItem Menu = new JMenuItem("Main Menu");
-        myMenu.add(Menu);
-        Menu.addActionListener(this);
-        Menu.setActionCommand("menu");
         
         JMenuItem Users = new JMenuItem("Customers");
         myMenu.add(Users);
@@ -100,48 +97,15 @@ public class Access extends JFrame implements ActionListener{
         btnRefresh.setBounds(40, 90, 100, 30);
         btnRefresh.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                try{
-                    
-                    DefaultTableModel model = new DefaultTableModel();
-                    
-                    PreparedStatement ps = null;
-                    ResultSet rs = null;
-                    //'refresh' will be the query that we will show all the information on the table access
-                    String refresh = "SELECT username, password FROM access;";
-                    //Adding the result to the rows of the table
-                    ps = conection.prepareStatement(refresh);
-                    rs = ps.executeQuery();
-                    
-                    ResultSetMetaData rsMD = rs.getMetaData();
-                    int qttycol = rsMD.getColumnCount();
-                    
-                    model.addColumn("Username");
-                    model.addColumn("Password");
-                    
-                    while(rs.next()){
-                        Object[] col = new Object[qttycol];
-                        
-                        for(int i = 0; i<qttycol; i++){
-                            col[i] = rs.getObject(i+1);
-                        }
-                        
-                        model.addRow(col);
-                        
-                    }
+                refresh();
+                
+                JTable table = new JTable(model);
+                
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,140,200,120);
+                scroll.setBounds(40,140,200,120);
 
-                    JTable table = new JTable(model);
-                    
-                    JScrollPane scroll= new JScrollPane(table);
-                    table.setBounds(40,140,200,120);
-                    scroll.setBounds(40,140,200,120);
-
-                    p.add(scroll);
-                    
-                } catch (SQLException ex){
-                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-                }
+                p.add(scroll);
             }
         });
         
@@ -166,29 +130,7 @@ public class Access extends JFrame implements ActionListener{
             	if(username.getText().equals("") || password.getText().equals("")) {		//we must type something in username and password
             		JOptionPane.showMessageDialog(null, "Username and Password cannot be empty");
             	} else {
-            		ConectionDB con = new ConectionDB();
-                    Connection conection = con.conect();
-                    
-                    try{
-                    	//'adduser' will be the query that we will send to the database to add the new access
-                    	String adduser = "INSERT INTO access (username, password) VALUES(?, ?)"; 
-                        
-                        PreparedStatement statement = conection.prepareStatement(adduser);
-                        statement.setString(1, username.getText());
-                        statement.setString(2, password.getText());
-                        
-                        statement.executeUpdate();
-                           
-                        conection.close();
-                        
-                        JOptionPane.showMessageDialog(null, "New Access inserted successfully");
-                        username.setText("");
-                        password.setText("");
-                        
-                    } catch (Exception e){      //If something goes wrong
-                        JOptionPane.showMessageDialog(null, "Error inserting a new User!");
-                    }
-                    
+            		newAccess();
             	}      
             }
         });
@@ -199,39 +141,7 @@ public class Access extends JFrame implements ActionListener{
         btnDelete.setBounds(300, 400, 100, 30);
         btnDelete.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                //We will use the username as the filter
-                String filter = username.getText();
-                String where = "";
-                System.out.println("My filter is " + filter);
-                //Our filter must not be empty
-                if(!"".equals(filter)){     //
-                    where = "WHERE username = '" + filter + "'";
-                    System.out.println("My WHERE is: " + where);
-                    try{
-                    	//'deleteuser' will be the query that we will send to the database to delete the access
-                    String deleteuser = "DELETE FROM access WHERE username = ?"; 
-                    
-                    PreparedStatement statement = conection.prepareStatement(deleteuser);
-                    statement.setString(1, username.getText());
-                    System.out.println("my query is: " +deleteuser);
-                    statement.execute();
-                       
-                    conection.close();
-                    
-                    JOptionPane.showMessageDialog(null, "Access deleted successfully");
-                    username.setText("");
-                    password.setText("");
-                    
-                    } catch (Exception e){      //If something goes wrong
-                    	JOptionPane.showMessageDialog(null, "Error deleting the Access!");
-                    }
-                    
-                } else {       //The username must be a valid username
-                    JOptionPane.showMessageDialog(null, "Error deleting the Access! Possible reassons: \n"
-                            + "* The username cannot be empty");
-                }
+                deleteAccess();
             }
         });
         
@@ -246,6 +156,105 @@ public class Access extends JFrame implements ActionListener{
         
         this.validate();
         this.repaint();
+	}
+	
+	public void refresh() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        try{
+            
+            model = new DefaultTableModel();
+            
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'refresh' will be the query that we will show all the information on the table access
+            String refresh = "SELECT username, password FROM access;";
+            //Adding the result to the rows of the table
+            ps = conection.prepareStatement(refresh);
+            rs = ps.executeQuery();
+            
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+            
+            model.addColumn("Username");
+            model.addColumn("Password");
+            
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }
+                
+                model.addRow(col);
+                
+            }
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+	}
+	
+	public void newAccess() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        
+        try{
+        	//'adduser' will be the query that we will send to the database to add the new access
+        	String adduser = "INSERT INTO access (username, password) VALUES(?, ?)"; 
+            
+            PreparedStatement statement = conection.prepareStatement(adduser);
+            statement.setString(1, username.getText());
+            statement.setString(2, password.getText());
+            
+            statement.executeUpdate();
+               
+            conection.close();
+            
+            JOptionPane.showMessageDialog(null, "New Access inserted successfully\n"
+            		+ "Please Refresh");
+            username.setText("");
+            password.setText("");
+            
+        } catch (Exception e){      //If something goes wrong
+            JOptionPane.showMessageDialog(null, "Error inserting a new User!");
+        }
+	}
+	
+	public void deleteAccess() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        //We will use the username as the filter
+        String filter = username.getText();
+        String where = "";
+        System.out.println("My filter is " + filter);
+        //Our filter must not be empty
+        if(!"".equals(filter)){     //
+            where = "WHERE username = '" + filter + "'";
+            System.out.println("My WHERE is: " + where);
+            try{
+            //'deleteuser' will be the query that we will send to the database to delete the access
+            String deleteuser = "DELETE FROM access WHERE username = ?"; 
+            
+            PreparedStatement statement = conection.prepareStatement(deleteuser);
+            statement.setString(1, username.getText());
+            System.out.println("my query is: " +deleteuser);
+            statement.execute();
+               
+            conection.close();
+            
+            JOptionPane.showMessageDialog(null, "Access deleted successfully\n"
+            		+ "Please Refresh");
+            username.setText("");
+            password.setText("");
+            
+            } catch (Exception e){      //If something goes wrong
+            	JOptionPane.showMessageDialog(null, "Error deleting the Access!");
+            }
+            
+        } else {       //The username must be a valid username
+            JOptionPane.showMessageDialog(null, "Error deleting the Access! Possible reassons: \n"
+                    + "* The username cannot be empty");
+        }
 	}
 	
 	@Override

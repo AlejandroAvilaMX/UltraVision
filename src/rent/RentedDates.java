@@ -32,9 +32,9 @@ import validations.ValidLength;
 
 public class RentedDates extends JFrame implements ActionListener{
 	private JLabel lID;
-	private JTextField ID, loyaltyPoints, newloyaltyPoints, availableqtty, freeRent, newfreeRent;
-	private int intloyaltyPoints, intfreeRent;
-	private String res, strfreeRent, qttyfreeRent;
+	private JTextField ID, loyaltyPoints, newloyaltyPoints, availableqtty, freeRent, newfreeRent, qttyRent, newqttyRent;
+	private int intloyaltyPoints, intfreeRent, intqttyRent;
+	private String res, strfreeRent, qttyfreeRent, strqttyRent;
 	private JButton btnNewRent;
 
 	public RentedDates() {
@@ -58,11 +58,11 @@ public class RentedDates extends JFrame implements ActionListener{
         ID.setBounds(70, 120, 80, 25);
 
 
-        loyaltyPoints = new JTextField();
-        loyaltyPoints.setBounds(70, 170, 100, 25);
+        qttyRent = new JTextField();
+        qttyRent.setBounds(70, 170, 100, 25);
         //stock.setVisible(false);
-        newloyaltyPoints = new JTextField();
-        newloyaltyPoints.setBounds(70, 200, 100, 25);
+        newqttyRent = new JTextField();
+        newqttyRent.setBounds(70, 200, 100, 25);
         //newstock.setVisible(false);
         
         availableqtty = new JTextField();
@@ -83,7 +83,14 @@ public class RentedDates extends JFrame implements ActionListener{
         btnNewRent.setActionCommand("btnCustomers"); 
         btnNewRent.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent arg0){
+        		if(ID.getText().equals("")) {
+        			JOptionPane.showMessageDialog(null, "ID cannot be empty");
+        		} else {
+        			qttyRent();
+        		}
         		
+        		
+        		/*
         		//checkAvailability();
         		
         		ConectionDB con = new ConectionDB();
@@ -161,15 +168,15 @@ public class RentedDates extends JFrame implements ActionListener{
                 
                 
         		
-        		
+        		*/
             	}
         	});
         
         
         p.add(lID);
         p.add(ID);
-        p.add(loyaltyPoints);
-        p.add(newloyaltyPoints);
+        p.add(qttyRent);
+        p.add(newqttyRent);
         p.add(availableqtty);
         p.add(btnNewRent);
         p.add(freeRent);
@@ -179,7 +186,7 @@ public class RentedDates extends JFrame implements ActionListener{
         this.repaint();
        
 	}
-	
+	/*
 	public void numberOffreeRent() {
 		
 		ConectionDB con = new ConectionDB();
@@ -439,9 +446,60 @@ public class RentedDates extends JFrame implements ActionListener{
             JOptionPane.showMessageDialog(null, "Error finding Availability of Title");
         }
 
+	}*/
+	
+	public void qttyRent() {
+		
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        
+        try {
+        
+        	String filter = ID.getText();
+            String where = "";
+            //Our filter must not be empty
+            if(!"".equals(filter)){
+                where = "WHERE custId = " + filter;
+                System.out.println("where: " + where);
+            }
+        	
+            PreparedStatement ps = null;
+	        ResultSet rs = null;
+	        
+	        //'search' will be the query that will be send to the database to find the stock and available
+	        String search = "SELECT qttyRent FROM membershipCard " + where;
+	        System.out.println(search);
+	        ps = conection.prepareStatement(search);
+	        rs = ps.executeQuery();
+	        //We will take the result of the query and this will be written on the JTextField 'loyaltyPoints'
+	        while(rs.next()) {
+	        	qttyRent.setText(rs.getString("qttyRent"));
+	            res = rs.getString("qttyRent");
+	            System.out.println("Quantity of titles rented: " + rs.getString("qttyRent"));
+	        }
+	        
+	        strqttyRent = qttyRent.getText();		//Storing the content of the JTextField on a String
+	        System.out.println(qttyRent);
+	        intqttyRent = Integer.parseInt(qttyRent.getText());		//Converting the value of that String to an Integer
+	        
+            if(intqttyRent == 4) {
+            	JOptionPane.showMessageDialog(null, "The Rent of the Title is not possible!\n"
+            			+ "The Customer is allowed to rent only 4 Titles");
+            } else {
+            	JOptionPane.showMessageDialog(null, "Process of Rent Title");
+            	conection.close();
+            }
+        	
+        } catch (Exception e){      //If something goes wrong
+            JOptionPane.showMessageDialog(null, "Error finding the quantity available of Rent");
+        }
+		
+		
 	}
+
 	
 	
+	/*
 	public void checkAvailability() {
 		
 		ConectionDB con = new ConectionDB();
@@ -634,6 +692,8 @@ public class RentedDates extends JFrame implements ActionListener{
             
 		
 	}*/
+	
+	
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
