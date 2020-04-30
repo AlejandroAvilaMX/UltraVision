@@ -44,6 +44,7 @@ public class MembershipCards extends JFrame implements ActionListener{
 	private JTextField ID, name, cardNumber, level, levelId, loyaltyPoints, freeRent;
 	private JComboBox<String> comboLevel;
 	private JButton btnSearch, btnNew, btnUpdateCard, btnDeleteCard, btnSaveNew, btnSaveUpdate, btnCancel;
+	private DefaultTableModel model;
 
 	public MembershipCards() {
 		this.setVisible(true);
@@ -109,55 +110,15 @@ public class MembershipCards extends JFrame implements ActionListener{
         btnRefresh.setBounds(40, 70, 100, 30);
         btnRefresh.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                try{
-                    
-                    DefaultTableModel model = new DefaultTableModel();
-                    
-                    PreparedStatement ps = null;
-                    ResultSet rs = null;
-                    //'refresh' will be the query that we will send to the database to show all the Membership Cards
-                    String refresh = "SELECT membershipCard.idCard, CONCAT(customer.name, ' ', customer.surname) AS customerName, customer.custId, membershipCard.cardNumber, membershipCard.levelId, membershipCard.level, membershipCard.loyaltyPoints, membershipCard.freeRent "
-                    		+ "FROM membershipCard "
-                    		+ "INNER JOIN customer ON membershipCard.idCard=customer.custId;";
-                    //Adding the result to the rows of the table
-                    ps = conection.prepareStatement(refresh);
-                    rs = ps.executeQuery();
-                    
-                    ResultSetMetaData rsMD = rs.getMetaData();
-                    int qttycol = rsMD.getColumnCount();
-                    
-                    model.addColumn("Card Id");
-                    model.addColumn("Customer Name");
-                    model.addColumn("Customer Id");
-                    model.addColumn("Card Number");
-                    model.addColumn("Level Id");
-                    model.addColumn("Level");
-                    model.addColumn("Loyalty Points");
-                    model.addColumn("Free Rent");
-                    
-                    while(rs.next()){
-                        Object[] col = new Object[qttycol];
-                        
-                        for(int i = 0; i<qttycol; i++){
-                            col[i] = rs.getObject(i+1);
-                        }
-                        
-                        model.addRow(col);
-                    }
+            	refresh();
+            	
+            	JTable table = new JTable(model);
+                
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
 
-                    JTable table = new JTable(model);
-                    
-                    JScrollPane scroll= new JScrollPane(table);
-                    table.setBounds(40,120,1000,200);
-                    scroll.setBounds(40,120,1000,200);
-
-                    p.add(scroll);
-                    
-                } catch (SQLException ex){
-                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-                }
+                p.add(scroll);
             }
         });
         //Button MembershipCards
@@ -193,62 +154,14 @@ public class MembershipCards extends JFrame implements ActionListener{
         btnSearch.setBounds(340, 435, 110, 30);
         btnSearch.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                
-                String filter = name.getText();
-                String where = "";
-                //Our filter must not be empty
-                if(!"".equals(filter)){
-                    where = "WHERE customer.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
-                }
-                try{
-                    
-                    DefaultTableModel model = new DefaultTableModel();
-                    
-                    PreparedStatement ps = null;
-                    ResultSet rs = null;
-                    //'search' will be the query that we will send to the database to find the results
-                    String search = "SELECT membershipCard.idCard, CONCAT(customer.name, ' ', customer.surname) AS customerName, customer.custId, membershipCard.cardNumber, membershipCard.levelId, membershipCard.level, membershipCard.loyaltyPoints, membershipCard.freeRent "
-                    		+ "FROM membershipCard "
-                    		+ "INNER JOIN customer ON membershipCard.idCard=customer.custId " + where;
-                    
-                    System.out.println(search);
-                    ps = conection.prepareStatement(search);
-                    rs = ps.executeQuery();
-                    //Adding the result to the rows of the table
-                    ResultSetMetaData rsMD = rs.getMetaData();
-                    int qttycol = rsMD.getColumnCount();
-                    
-                    model.addColumn("Card Id");
-                    model.addColumn("Customer Name");
-                    model.addColumn("Customer Id");
-                    model.addColumn("Card Number");
-                    model.addColumn("Level Id");
-                    model.addColumn("Level");
-                    model.addColumn("Loyalty Points");
-                    model.addColumn("Free Rent");
-                    
-                    while(rs.next()){
-                        Object[] col = new Object[qttycol];
-                        
-                        for(int i = 0; i<qttycol; i++){
-                            col[i] = rs.getObject(i+1);
-                        }
-                        
-                        model.addRow(col);
-                    }
+            	search();
+            	
+            	JTable table = new JTable(model);
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
 
-                    JTable table = new JTable(model);
-                    JScrollPane scroll= new JScrollPane(table);
-                    table.setBounds(40,120,1000,200);
-                    scroll.setBounds(40,120,1000,200);
-
-                    p.add(scroll);
-                    
-                } catch (SQLException ex){
-                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-                }
+                p.add(scroll);
             }
         });
         
@@ -375,45 +288,7 @@ public class MembershipCards extends JFrame implements ActionListener{
 
             			levelDescription();		//Go to check the Description of the selected Level
                 		
-                		ConectionDB con = new ConectionDB();
-                        Connection conection = con.conect();
-                        //Declaring our 'where' condition to be used as filter
-                        String filter = ID.getText();
-                        System.out.println("My filter is: " + filter);
-                        String where = "";
-                        //Our filter must not be empty
-                        if(!"".equals(filter)){
-                            where = "WHERE IdCard = '" + filter + "'";
-                            System.out.println("My where is: " + where);
-                            try{
-	                            //'updatecard' will be the query that we will send to the database to find the results
-	                            String updatecard = "UPDATE membershipCard SET cardNumber = ?, levelId = ?, level = ? " + where; 
-	                            System.out.println(updatecard);
-	                            PreparedStatement statement = conection.prepareStatement(updatecard);
-	                            statement.setString(1, cardNumber.getText());
-	                            statement.setString(2, levelId.getText());
-	                            statement.setString(3, level.getText());
-	                            statement.execute();
-	                               
-	                            conection.close();
-	                            
-	                            JOptionPane.showMessageDialog(null, "Membeship Card updated successfully");
-	                            ID.setText("");
-	                            name.setText("");
-	                            levelId.setText("");
-	                            cardNumber.setText("");
-                            
-	                            normalScreen();
-	                            btnSaveUpdate.setVisible(false);
-	                            
-	                            } catch (Exception e){		//If something goes wrong
-	                            	JOptionPane.showMessageDialog(null, "Error updating Membership Card! \n"
-	                            			+ "� Card ID must be a valid numeric ID");
-	                            }
-                        } else{       //The ID must have a valid ID number
-                            JOptionPane.showMessageDialog(null, "Error updating Customer! \n"
-                                    + "� The ID cannot be empty");
-                        }
+            			updateCard();
                 	}
             	}         
             }
@@ -571,6 +446,143 @@ public class MembershipCards extends JFrame implements ActionListener{
 		
 		cardNumber.setText("");
     	ID.setText("");
+	}
+	//This will Refresh our table after the changes realized
+	public void refresh() {
+        ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        try{
+            
+            model = new DefaultTableModel();
+            
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'refresh' will be the query that we will send to the database to show all the Membership Cards
+            String refresh = "SELECT membershipCard.idCard, CONCAT(customer.name, ' ', customer.surname) AS customerName, customer.custId, membershipCard.cardNumber, membershipCard.levelId, membershipCard.level, membershipCard.loyaltyPoints, membershipCard.freeRent "
+            		+ "FROM membershipCard "
+            		+ "INNER JOIN customer ON membershipCard.idCard=customer.custId;";
+            //Adding the result to the rows of the table
+            ps = conection.prepareStatement(refresh);
+            rs = ps.executeQuery();
+            
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+            
+            model.addColumn("Card Id");
+            model.addColumn("Customer Name");
+            model.addColumn("Customer Id");
+            model.addColumn("Card Number");
+            model.addColumn("Level Id");
+            model.addColumn("Level");
+            model.addColumn("Loyalty Points");
+            model.addColumn("Free Rent");
+            
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }
+                
+                model.addRow(col);
+            }
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+	}
+	//This will search by name
+	public void search() {
+        ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        
+        String filter = name.getText();
+        String where = "";
+        //Our filter must not be empty
+        if(!"".equals(filter)){
+            where = "WHERE customer.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
+        }
+        try{
+            
+            model = new DefaultTableModel();
+            
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'search' will be the query that we will send to the database to find the results
+            String search = "SELECT membershipCard.idCard, CONCAT(customer.name, ' ', customer.surname) AS customerName, customer.custId, membershipCard.cardNumber, membershipCard.levelId, membershipCard.level, membershipCard.loyaltyPoints, membershipCard.freeRent "
+            		+ "FROM membershipCard "
+            		+ "INNER JOIN customer ON membershipCard.idCard=customer.custId " + where;
+            
+            System.out.println(search);
+            ps = conection.prepareStatement(search);
+            rs = ps.executeQuery();
+            //Adding the result to the rows of the table
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+            
+            model.addColumn("Card Id");
+            model.addColumn("Customer Name");
+            model.addColumn("Customer Id");
+            model.addColumn("Card Number");
+            model.addColumn("Level Id");
+            model.addColumn("Level");
+            model.addColumn("Loyalty Points");
+            model.addColumn("Free Rent");
+            
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }
+                
+                model.addRow(col);
+            }            
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+	}
+	//This will Update the details of the Credit Card
+	public void updateCard() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        //Declaring our 'where' condition to be used as filter
+        String filter = ID.getText();
+        System.out.println("My filter is: " + filter);
+        String where = "";
+        //Our filter must not be empty
+        if(!"".equals(filter)){
+            where = "WHERE IdCard = '" + filter + "'";
+            System.out.println("My where is: " + where);
+            try{
+                //'updatecard' will be the query that we will send to the database to find the results
+                String updatecard = "UPDATE membershipCard SET cardNumber = ?, levelId = ?, level = ? " + where; 
+                System.out.println(updatecard);
+                PreparedStatement statement = conection.prepareStatement(updatecard);
+                statement.setString(1, cardNumber.getText());
+                statement.setString(2, levelId.getText());
+                statement.setString(3, level.getText());
+                statement.execute();
+                   
+                conection.close();
+                
+                JOptionPane.showMessageDialog(null, "Membeship Card updated successfully\n"
+                		+ "Please Refresh");
+                ID.setText("");
+                name.setText("");
+                levelId.setText("");
+                cardNumber.setText("");
+            
+                normalScreen();
+                btnSaveUpdate.setVisible(false);
+                
+                } catch (Exception e){		//If something goes wrong
+                	JOptionPane.showMessageDialog(null, "Error updating Membership Card! \n"
+                			+ "� Card ID must be a valid numeric ID");
+                }
+        } else{       //The ID must have a valid ID number
+            JOptionPane.showMessageDialog(null, "Error updating Customer! \n"
+                    + "� The ID cannot be empty");
+        }
 	}
 	//This will take the written value of the Level Id and depending on it, it will add the description of the level
 	public void levelDescription() {
