@@ -53,11 +53,10 @@ public class Access extends JFrame implements ActionListener{
         //My Menu Bar
         JMenuBar myMenuBar = new JMenuBar();
         this.setJMenuBar(myMenuBar);
-    
-        JMenu myMenu = new JMenu("File");       //Title of the menu
+      //Title of the menu
+        JMenu myMenu = new JMenu("File");
         myMenuBar.add(myMenu);
         //Options of the menu
-        
         JMenuItem Users = new JMenuItem("Customers");
         myMenu.add(Users);
         Users.addActionListener(this);
@@ -97,14 +96,15 @@ public class Access extends JFrame implements ActionListener{
         btnRefresh.setBounds(40, 90, 100, 30);
         btnRefresh.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                refresh();
-                
+                //Call the method 'refresh'
+            	refresh();
+            	//Add the model to the table
                 JTable table = new JTable(model);
-                
+                //Add the scroll to the table
                 JScrollPane scroll= new JScrollPane(table);
                 table.setBounds(40,140,200,120);
                 scroll.setBounds(40,140,200,120);
-
+                //Add the scroll to the Panel
                 p.add(scroll);
             }
         });
@@ -130,6 +130,7 @@ public class Access extends JFrame implements ActionListener{
             	if(username.getText().equals("") || password.getText().equals("")) {		//we must type something in username and password
             		JOptionPane.showMessageDialog(null, "Username and Password cannot be empty");
             	} else {
+            		//Call method 'newAccess'
             		newAccess();
             	}      
             }
@@ -141,7 +142,8 @@ public class Access extends JFrame implements ActionListener{
         btnDelete.setBounds(300, 400, 100, 30);
         btnDelete.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                deleteAccess();
+                //Call mehod 'deleteAccess'
+            	deleteAccess();
             }
         });
         
