@@ -53,7 +53,7 @@ public class Access extends JFrame implements ActionListener{
         //My Menu Bar
         JMenuBar myMenuBar = new JMenuBar();
         this.setJMenuBar(myMenuBar);
-      //Title of the menu
+        //Title of the menu
         JMenu myMenu = new JMenu("File");
         myMenuBar.add(myMenu);
         //Options of the menu
@@ -159,7 +159,7 @@ public class Access extends JFrame implements ActionListener{
         this.validate();
         this.repaint();
 	}
-	
+	//This method will Refresh our table after doing any changes
 	public void refresh() {
 		ConectionDB con = new ConectionDB();
         Connection conection = con.conect();
@@ -195,7 +195,7 @@ public class Access extends JFrame implements ActionListener{
             JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
         }
 	}
-	
+	//This method will add a new access to the system
 	public void newAccess() {
 		ConectionDB con = new ConectionDB();
         Connection conection = con.conect();
@@ -221,7 +221,7 @@ public class Access extends JFrame implements ActionListener{
             JOptionPane.showMessageDialog(null, "Error inserting a new User!");
         }
 	}
-	
+	//This method will delete an access to the system
 	public void deleteAccess() {
 		ConectionDB con = new ConectionDB();
         Connection conection = con.conect();

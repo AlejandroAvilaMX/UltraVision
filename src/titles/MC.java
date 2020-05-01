@@ -46,6 +46,7 @@ public class MC extends JFrame implements ActionListener{
     private JTextField titleId, lastRegister, name, releaseYear, genre, typeId, type, artist, productionCompany, format, stock, available, rentPrice, musicId;
     private String res;
     private JButton btnSearch, btnNew, btnUpdateMC, btnDeleteMC, btnSaveNew, btnSaveUpdate, btnCancel;
+    DefaultTableModel model;
 
 	public MC() {
 		this.setVisible(true);
@@ -110,59 +111,17 @@ public class MC extends JFrame implements ActionListener{
         btnRefresh.setBounds(40, 70, 110, 30);
         btnRefresh.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-     
-		        ConectionDB con = new ConectionDB();
-		        Connection conection = con.conect();
-		        	try{
-		        		DefaultTableModel model = new DefaultTableModel();
-		                    
-		                PreparedStatement ps = null;
-		                ResultSet rs = null;
-		                //'refresh' will be the query that we will send to the database to show all the titles that are of the CD type
-		                String refresh = "SELECT title.titleId, title.name, title.releaseYear, title.genre, music.artist, music.productionCompany, music.format, title.stock, title.available, title.rentPrice  "
-		                		+ "FROM title  INNER JOIN music "
-		                		+ "ON title.titleId=music.musicId "
-		                		+ "WHERE music.format = 'CD';";
-		                System.out.println(refresh);
-		                //Adding the result to the rows of the table
-		                ps = conection.prepareStatement(refresh);
-		                rs = ps.executeQuery();
-		                    
-		                ResultSetMetaData rsMD = rs.getMetaData();
-		                int qttycol = rsMD.getColumnCount();
-		                    
-		                model.addColumn("ID");
-		                model.addColumn("Name");
-		                model.addColumn("Release Year");
-		                model.addColumn("Genre");
-		                model.addColumn("Artist");
-		                model.addColumn("Production Company");
-		                model.addColumn("Format");
-		                model.addColumn("Stock");
-		                model.addColumn("Available");
-		                model.addColumn("Rent Price");
-		                    
-		                while(rs.next()){
-		                    Object[] col = new Object[qttycol];
-		                    
-		                    for(int i = 0; i<qttycol; i++){
-		                        col[i] = rs.getObject(i+1);
-		                    }
-		                    
-		                    model.addRow(col);
-		                }
-		                JTable table = new JTable(model);
-		                
-		                JScrollPane scroll= new JScrollPane(table);
-		                table.setBounds(40,120,1000,200);
-		                scroll.setBounds(40,120,1000,200);
-		                p.add(scroll);
-		                    
-		                } catch (SQLException ex){
-		                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-		                }
-		        	}
-            }); 
+            	refresh();
+            	
+            	JTable table = new JTable(model);
+                
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
+                p.add(scroll);
+		        	
+            }    
+        }); 
         
         ltitleId = new JLabel("ID");
         ltitleId.setFont(fontlabel);
@@ -736,7 +695,53 @@ public class MC extends JFrame implements ActionListener{
 		
 		btnCancel.setVisible(false);
 	}
-	
+	//This wil refresh our table after doing any changes
+	public void refresh() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        	try{
+        		model = new DefaultTableModel();
+                    
+                PreparedStatement ps = null;
+                ResultSet rs = null;
+                //'refresh' will be the query that we will send to the database to show all the titles that are of the CD type
+                String refresh = "SELECT title.titleId, title.name, title.releaseYear, title.genre, music.artist, music.productionCompany, music.format, title.stock, title.available, title.rentPrice  "
+                		+ "FROM title  INNER JOIN music "
+                		+ "ON title.titleId=music.musicId "
+                		+ "WHERE music.format = 'CD';";
+                System.out.println(refresh);
+                //Adding the result to the rows of the table
+                ps = conection.prepareStatement(refresh);
+                rs = ps.executeQuery();
+                    
+                ResultSetMetaData rsMD = rs.getMetaData();
+                int qttycol = rsMD.getColumnCount();
+                    
+                model.addColumn("ID");
+                model.addColumn("Name");
+                model.addColumn("Release Year");
+                model.addColumn("Genre");
+                model.addColumn("Artist");
+                model.addColumn("Production Company");
+                model.addColumn("Format");
+                model.addColumn("Stock");
+                model.addColumn("Available");
+                model.addColumn("Rent Price");
+                    
+                while(rs.next()){
+                    Object[] col = new Object[qttycol];
+                    
+                    for(int i = 0; i<qttycol; i++){
+                        col[i] = rs.getObject(i+1);
+                    }
+                    
+                    model.addRow(col);
+                }    
+                
+        	} catch (SQLException ex){
+                JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+            }
+	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String ac = e.getActionCommand();

@@ -64,8 +64,8 @@ public class Customers extends JFrame implements ActionListener{
         //My Menu Bar
         JMenuBar myMenuBar = new JMenuBar();
         this.setJMenuBar(myMenuBar);
-    
-        JMenu myMenu = new JMenu("File");       //Title of the menu
+        //Title of the menu
+        JMenu myMenu = new JMenu("File");
         myMenuBar.add(myMenu);
         //Options of the menu
         JMenuItem Menu = new JMenuItem("Main Menu");
@@ -112,55 +112,16 @@ public class Customers extends JFrame implements ActionListener{
         btnRefresh.setBounds(40, 70, 100, 30);
         btnRefresh.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                try{
-                    
-                    DefaultTableModel model = new DefaultTableModel();
-                    
-                    PreparedStatement ps = null;
-                    ResultSet rs = null;
-                    //'refresh' will be the query that we will send to the database to show all the Customers
-                    String refresh = "SELECT custId, name, surname, street, number, postalCode, city, country, phoneNumber, email FROM customer;";
-                    //Adding the result to the rows of the table
-                    ps = conection.prepareStatement(refresh);
-                    rs = ps.executeQuery();
-                    
-                    ResultSetMetaData rsMD = rs.getMetaData();
-                    int qttycol = rsMD.getColumnCount();
-                    
-                    model.addColumn("ID");
-                    model.addColumn("First Name");
-                    model.addColumn("Second Name");
-                    model.addColumn("Street");
-                    model.addColumn("Number");
-                    model.addColumn("Post Code");
-                    model.addColumn("City");
-                    model.addColumn("Country");
-                    model.addColumn("phoneNumber");
-                    model.addColumn("Email");
-                    
-                    while(rs.next()){
-                        Object[] col = new Object[qttycol];
-                        
-                        for(int i = 0; i<qttycol; i++){
-                            col[i] = rs.getObject(i+1);
-                        }
-                        
-                        model.addRow(col);
-                    }
-
-                    JTable table = new JTable(model);
-                    
-                    JScrollPane scroll= new JScrollPane(table);
-                    table.setBounds(40,120,1000,200);
-                    scroll.setBounds(40,120,1000,200);
-
-                    p.add(scroll);
-                    
-                } catch (SQLException ex){
-                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-                }
+                //Call method 'refresh'
+            	refresh();
+            	//Add the model to the table
+            	JTable table = new JTable(model);
+            	//Add the scroll to the table
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
+                //Add the scroll to the Panel
+                p.add(scroll);
             }
         });
         
@@ -185,39 +146,40 @@ public class Customers extends JFrame implements ActionListener{
             rs = ps.executeQuery();
             //Adding the result to the columns                    
             ResultSetMetaData rsMD = rs.getMetaData();
-                    int qttycol = rsMD.getColumnCount();
+            int qttycol = rsMD.getColumnCount();
                     
-                    model.addColumn("ID");
-                    model.addColumn("First Name");
-                    model.addColumn("Second Name");
-                    model.addColumn("Street");
-                    model.addColumn("Number");
-                    model.addColumn("Post Code");
-                    model.addColumn("City");
-                    model.addColumn("Country");
-                    model.addColumn("phoneNumber");
-                    model.addColumn("Email");
+            model.addColumn("ID");
+            model.addColumn("First Name");
+            model.addColumn("Second Name");
+            model.addColumn("Street");
+            model.addColumn("Number");
+            model.addColumn("Post Code");
+            model.addColumn("City");
+            model.addColumn("Country");
+            model.addColumn("phoneNumber");
+            model.addColumn("Email");
                     
-                    while(rs.next()){
-                        Object[] col = new Object[qttycol];
+            while(rs.next()){
+            	Object[] col = new Object[qttycol];
                         
-                        for(int i = 0; i<qttycol; i++){
-                            col[i] = rs.getObject(i+1);
-                        }
-                        
-                        model.addRow(col);
-                    }
-
-                    JTable table = new JTable(model);
-                    JScrollPane scroll= new JScrollPane(table);
-                    table.setBounds(40,120,1000,200);
-                    scroll.setBounds(40,120,1000,200);
-
-                    p.add(scroll);
-                    
-                } catch (SQLException ex){
-                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+                for(int i = 0; i<qttycol; i++){
+                	col[i] = rs.getObject(i+1);
                 }
+                        
+                model.addRow(col);
+            }
+            //Add the model to the table
+            JTable table = new JTable(model);
+            //Add the scroll to the table
+            JScrollPane scroll= new JScrollPane(table);
+            table.setBounds(40,120,1000,200);
+            scroll.setBounds(40,120,1000,200);
+            //Add the Scroll to the Panel
+            p.add(scroll);
+                   
+        } catch (SQLException ex){
+        	JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
         
         lID = new JLabel("ID");
         lID.setFont(fontlabel);
@@ -240,62 +202,16 @@ public class Customers extends JFrame implements ActionListener{
         btnSearch.setBounds(340, 435, 110, 30);
         btnSearch.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                
-                String filter = name.getText();
-                String where = "";
-                //Our filter must not be empty
-                if(!"".equals(filter)){
-                    where = "WHERE name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
-                }
-                try{
-                    
-                    DefaultTableModel model = new DefaultTableModel();
-                    
-                    PreparedStatement ps = null;
-                    ResultSet rs = null;
-                    //'search' will be the query that we will send to the database to find the results
-                    String search = "SELECT custId, name, surname, street, number, postalCode, city, country, phoneNumber, email FROM customer " + where;
-                    
-                    System.out.println(search);
-                    ps = conection.prepareStatement(search);
-                    rs = ps.executeQuery();
-                    //Adding the result to the rows of the table
-                    ResultSetMetaData rsMD = rs.getMetaData();
-                    int qttycol = rsMD.getColumnCount();
-                    
-                    model.addColumn("ID");
-                    model.addColumn("First Name");
-                    model.addColumn("Second Name");
-                    model.addColumn("Street");
-                    model.addColumn("Number");
-                    model.addColumn("Post Code");
-                    model.addColumn("City");
-                    model.addColumn("Country");
-                    model.addColumn("phoneNumber");
-                    model.addColumn("Email");
-                    
-                    while(rs.next()){
-                        Object[] col = new Object[qttycol];
-                        
-                        for(int i = 0; i<qttycol; i++){
-                            col[i] = rs.getObject(i+1);
-                        }
-                        
-                        model.addRow(col);
-                    }
-
-                    JTable table = new JTable(model);
-                    JScrollPane scroll= new JScrollPane(table);
-                    table.setBounds(40,120,1000,200);
-                    scroll.setBounds(40,120,1000,200);
-
-                    p.add(scroll);
-                    
-                } catch (SQLException ex){
-                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-                }
+                //Call method 'search'
+            	search();
+            	//Add the model to the table
+                JTable table = new JTable(model);
+                //Add the scroll to the table
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
+                //Add Scroll to the Panel
+                p.add(scroll);
             }
         });
         
@@ -430,6 +346,7 @@ public class Customers extends JFrame implements ActionListener{
         btnNew.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
             	btnSaveNew.setVisible(true);
+            	ID.setEditable(false);
             	editScreen();
             }
         });
@@ -449,62 +366,8 @@ public class Customers extends JFrame implements ActionListener{
         btnDeleteCustomer.setBounds(900, 580, 100, 30);
         btnDeleteCustomer.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                //Declaring our 'where' condition to be used as filter
-                String filter = ID.getText();
-                String where = "";
-                System.out.println("My filter is " + filter);
-                //Our filter must not be empty
-                if(!"".equals(filter)){     //
-                    where = "WHERE custId = '" + filter + "'";
-                    System.out.println("My WHERE is: " + where);
-                    try{
-                    	//'deleteCard' will be the query that we will send to the database to delete Membership Card
-                    	String deleteCard = "DELETE FROM membershipCard WHERE IdCard = ?"; 
-                        
-                        PreparedStatement statement = conection.prepareStatement(deleteCard);
-                        statement.setString(1, ID.getText());
-                        System.out.println("my query is: " + deleteCard);
-                        statement.execute();
-                        
-                        try {
-                        	//'deleteCustomer' will be the query that we will send to the database to delete Customer
-                        	String deleteCustomer = "DELETE FROM customer WHERE custId = ?"; 
-                            
-                            PreparedStatement stt = conection.prepareStatement(deleteCustomer);
-                            stt.setString(1, ID.getText());
-                            System.out.println("my query is: " + deleteCustomer);
-                            stt.execute();
-                               
-                            conection.close();
-                        	
-                        } catch(SQLException ex) {		//If something goes wrong when trying to delete the Membership Card
-                        	JOptionPane.showMessageDialog(null, "Error deleting the Membership Card...!!");
-                        }
-                        
-                        JOptionPane.showMessageDialog(null, "Customer deleted successfully");
-	                    ID.setText("");
-	                    name.setText("");
-	                    surname.setText("");
-	                    street.setText("");
-	                    number.setText("");
-	                    postalCode.setText("");
-	                    city.setText("");
-	                    country.setText("");
-	                    phoneNumber.setText("");
-	                    email.setText("");
-	                    cardNumber.setText("");
-	                    lastRegister.setText("");
-
-                    } catch (Exception e){      //If something goes wrong when trying to delete the Customer
-                    	JOptionPane.showMessageDialog(null, "Error deleting the Customer!");
-                    }
-                    
-                }else {       //The ID must not be a empty
-                    JOptionPane.showMessageDialog(null, "Error deleting the Customer! Possible reassons: \n"
-                            + "* The ID cannot be empty");
-                }
+            	//Call the method to delete the Customer
+            	deleteCustomer();
             }
         });
         //Save New VL button
@@ -518,87 +381,10 @@ public class Customers extends JFrame implements ActionListener{
             	if(name.getText().equals("") || surname.getText().equals("") || cardNumber.getText().equals("")) {		//We must type a Name and surname 
             		JOptionPane.showMessageDialog(null, "Name, Surname and Card Number cannot be empty");
             	}else {
-            		
+            		//Call the method to get the description of the level
             		levelDescription();
-            		
-            		ConectionDB con = new ConectionDB();
-                    Connection conection = con.conect();
-                    
-                    try{
-                        //'adduser' will be query that will be send to the database to add a new register on the table customer                    
-                        String adduser = "INSERT INTO customer (name, surname, street, number, postalCode, city, country, phoneNumber, email) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"; 
-                        
-                        PreparedStatement statement = conection.prepareStatement(adduser);
-                        statement.setString(1, name.getText());
-                        statement.setString(2, surname.getText());
-                        statement.setString(3, street.getText());
-                        statement.setString(4, number.getText());
-                        statement.setString(5, postalCode.getText());
-                        statement.setString(6, city.getText());
-                        statement.setString(7, country.getText());
-                        statement.setString(8, phoneNumber.getText());
-                        statement.setString(9, email.getText());
-                        
-                        statement.executeUpdate();
-                        //Once the information of the table customer is inserted, we will take the last Customer Id registered
-                        try{
-                            
-                            PreparedStatement ps = null;
-                            ResultSet rs = null;
-                            //'search' will be the query that will be send to the database to find the last Customer Id added
-                            String search = "SELECT custId FROM customer ORDER BY custId DESC LIMIT 1";
-                            
-                            System.out.println(search);
-                            ps = conection.prepareStatement(search);
-                            rs = ps.executeQuery();
-                            //We will take the result of the query and this will be written on the JTextField 'lastRegister'
-                            while(rs.next()) {
-                            	lastRegister.setText(rs.getString("custId"));
-                            	res = rs.getString("custId");
-                            	System.out.println("The last register is: " + rs.getString("custId"));
-                            }
-                            //Once we know the last Customer Id and when the Id is already on the JTextField we will insert the information on the table membershiCard
-                            try{
-                                //'addcard' will be the query that will be send to the database to add a the Card details of the new customer
-                                String addcard = "INSERT INTO membershipCard (cardNumber, levelId, level, custId) VALUES(?, ?, ?, ?)"; 
-                                System.out.println(cardNumber.getText());
-                                System.out.println(levelId.getText());
-                                System.out.println(level.getText());
-                                System.out.println(lastRegister.getText());
-                                System.out.println(addcard);
-                                PreparedStatement stt = conection.prepareStatement(addcard);
-                                stt.setString(1, cardNumber.getText());
-                                stt.setString(2, levelId.getText());
-                                stt.setString(3, level.getText());
-                                stt.setString(4, lastRegister.getText());
-                                System.out.println("The levelID is: " + levelId.getText());
-                                stt.executeUpdate();
-                                
-                            } catch (Exception e){      //If something goes wrong when we try to save the details of the Membership Card 
-                            	JOptionPane.showMessageDialog(null, "Error inserting a new Membership Card!");
-                            	}
-                        } catch (SQLException ex){		//If something goes wrong when we try to find the Id of the last Customer 
-                            JOptionPane.showMessageDialog(null, "Error finding last Register...!!");
-                        }
-                        
-                        conection.close();
-                        
-                        JOptionPane.showMessageDialog(null, "New User inserted successfully");
-                        ID.setText("");
-                        name.setText("");
-                        surname.setText("");
-                        street.setText("");
-                        number.setText("");
-                        postalCode.setText("");
-                        city.setText("");
-                        country.setText("");
-                        phoneNumber.setText("");
-                        email.setText("");
-                        cardNumber.setText("");
-                        
-                    } catch (Exception e){      //If something goes wrong
-                        JOptionPane.showMessageDialog(null, "Error inserting a new User!");
-                    }
+            		//Call the method to save the new Customer
+            		newCustomer();
             	}      
             }
         });
@@ -614,56 +400,8 @@ public class Customers extends JFrame implements ActionListener{
             	if(name.getText().equals("") || surname.getText().equals("")) {		//We must type a name and surname
             		JOptionPane.showMessageDialog(null, "Name and surname cannot be empty");
             	}else {
-            		ConectionDB con = new ConectionDB();
-                    Connection conection = con.conect();
-                    //Declaring our 'where' condition to be used as filter
-                    String filter = ID.getText();
-                    System.out.println("My filter is: " + filter);
-                    String where = "";
-                    //Our filter must not be empty
-                    if(!"".equals(filter)){
-                        where = "WHERE custId = '" + filter + "'";
-                        System.out.println("My where is: " + where);
-                        try{
-                        //'updatecustomer' will be the query that we will send to the database to find the results             
-                        String updatecustomer = "UPDATE customer SET name = ?, surname = ?, street = ?, number = ?, postalCode = ?, city = ?, country = ?, phoneNumber = ?, email = ? " + where; 
-                        System.out.println(updatecustomer);
-                        PreparedStatement statement = conection.prepareStatement(updatecustomer);
-                        statement.setString(1, name.getText());
-                        statement.setString(2, surname.getText());
-                        statement.setString(3, street.getText());
-                        statement.setString(4, number.getText());
-                        statement.setString(5, postalCode.getText());
-                        statement.setString(6, city.getText());
-                        statement.setString(7, country.getText());
-                        statement.setString(8, phoneNumber.getText());
-                        statement.setString(9, email.getText());
-                        
-                        statement.execute();
-                           
-                        conection.close();
-                        
-                        JOptionPane.showMessageDialog(null, "User updated successfully");
-                        ID.setText("");
-                        name.setText("");
-                        surname.setText("");
-                        street.setText("");
-                        number.setText("");
-                        postalCode.setText("");
-                        city.setText("");
-                        country.setText("");
-                        phoneNumber.setText("");
-                        email.setText("");
-                        
-                        } catch (Exception e){
-                        	JOptionPane.showMessageDialog(null, "Error updating Customer! \n"		//If the Customer ID is not valid
-                        			+ "* Customer ID must be a valid numeric ID");
-                        }
-                        
-                    } else{       //The ID must not be empty
-                        JOptionPane.showMessageDialog(null, "Error updating Customer! \n"
-                                + "* The ID cannot be empty");
-                    }
+            		//Call method to save the update information
+            		updateCustomer();
             	}
             }
         });
@@ -677,6 +415,7 @@ public class Customers extends JFrame implements ActionListener{
             	normalScreen();
             	btnSaveNew.setVisible(false);
             	btnSaveUpdate.setVisible(false);
+            	ID.setEditable(true);
             }
         });
         
@@ -720,7 +459,7 @@ public class Customers extends JFrame implements ActionListener{
         this.validate();
         this.repaint();
 	}
-	//This will modify the window to be able to see all the required information to add a new customer and his membership card
+	//This method will modify the window to be able to see all the required information to add a new customer and his membership card
 	public void editScreen() {
 		lsurname.setVisible(true);
 		surname.setVisible(true);
@@ -785,7 +524,7 @@ public class Customers extends JFrame implements ActionListener{
 		btnDeleteCustomer.setVisible(true);
 		btnCancel.setVisible(false);
 	}
-	//This will modify the window to be able to see all the required information to update Customers
+	//This method will modify the window to be able to see all the required information to update Customers
 	public void updateScreen() {
 		lsurname.setVisible(true);
 		surname.setVisible(true);
@@ -809,8 +548,317 @@ public class Customers extends JFrame implements ActionListener{
 		btnDeleteCustomer.setVisible(false);
 		btnCancel.setVisible(true);
 	}
-	
-	//This will take the written value of the Level Id and depending on it, it will add the description of the level
+	//This method will Refresh our table after doing any changes
+	public void refresh() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        try{
+            
+            model = new DefaultTableModel();
+            
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'refresh' will be the query that we will send to the database to show all the Customers
+            String refresh = "SELECT custId, name, surname, street, number, postalCode, city, country, phoneNumber, email FROM customer;";
+            //Adding the result to the rows of the table
+            ps = conection.prepareStatement(refresh);
+            rs = ps.executeQuery();
+            
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+            
+            model.addColumn("ID");
+            model.addColumn("First Name");
+            model.addColumn("Second Name");
+            model.addColumn("Street");
+            model.addColumn("Number");
+            model.addColumn("Post Code");
+            model.addColumn("City");
+            model.addColumn("Country");
+            model.addColumn("phoneNumber");
+            model.addColumn("Email");
+            
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }
+                
+                model.addRow(col);
+            }
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+	}
+	//This method will search by name
+	public void search() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        
+        String filter = name.getText();
+        String where = "";
+        //Our filter must not be empty
+        if(!"".equals(filter)){
+            where = "WHERE name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
+        }
+        try{
+            
+            model = new DefaultTableModel();
+            
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'search' will be the query that we will send to the database to find the results
+            String search = "SELECT custId, name, surname, street, number, postalCode, city, country, phoneNumber, email FROM customer " + where;
+            
+            System.out.println(search);
+            ps = conection.prepareStatement(search);
+            rs = ps.executeQuery();
+            //Adding the result to the rows of the table
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+            
+            model.addColumn("ID");
+            model.addColumn("First Name");
+            model.addColumn("Second Name");
+            model.addColumn("Street");
+            model.addColumn("Number");
+            model.addColumn("Post Code");
+            model.addColumn("City");
+            model.addColumn("Country");
+            model.addColumn("phoneNumber");
+            model.addColumn("Email");
+            
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }
+                
+                model.addRow(col);
+            }    
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+	}
+	//This method will save the information of a new Customer
+	public void newCustomer() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        
+        try{
+            //'adduser' will be query that will be send to the database to add a new register on the table customer                    
+            String adduser = "INSERT INTO customer (name, surname, street, number, postalCode, city, country, phoneNumber, email) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)"; 
+            
+            PreparedStatement statement = conection.prepareStatement(adduser);
+            statement.setString(1, name.getText());
+            statement.setString(2, surname.getText());
+            statement.setString(3, street.getText());
+            statement.setString(4, number.getText());
+            statement.setString(5, postalCode.getText());
+            statement.setString(6, city.getText());
+            statement.setString(7, country.getText());
+            statement.setString(8, phoneNumber.getText());
+            statement.setString(9, email.getText());
+            
+            statement.executeUpdate();
+            //Once the information of the table customer is inserted, we will take the last Customer Id registered
+            lastCustomer();
+            
+            conection.close();
+            
+            JOptionPane.showMessageDialog(null, "New User inserted successfully\n"
+            		+ "Please refresh");
+            ID.setText("");
+            name.setText("");
+            surname.setText("");
+            street.setText("");
+            number.setText("");
+            postalCode.setText("");
+            city.setText("");
+            country.setText("");
+            phoneNumber.setText("");
+            email.setText("");
+            cardNumber.setText("");
+            ID.setEditable(true);
+            
+        } catch (Exception e){      //If something goes wrong
+            JOptionPane.showMessageDialog(null, "Error inserting a new User!");
+        }
+	}
+	//This method will take the last Customer register
+	public void lastCustomer() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+		try{
+            
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'search' will be the query that will be send to the database to find the last Customer Id added
+            String search = "SELECT custId FROM customer ORDER BY custId DESC LIMIT 1";
+            
+            System.out.println(search);
+            ps = conection.prepareStatement(search);
+            rs = ps.executeQuery();
+            //We will take the result of the query and this will be written on the JTextField 'lastRegister'
+            while(rs.next()) {
+            	lastRegister.setText(rs.getString("custId"));
+            	res = rs.getString("custId");
+            	System.out.println("The last register is: " + rs.getString("custId"));
+            }
+            //Once we know the last Customer Id and when the Id is already on the JTextField we will insert the information on the table membershiCard
+            saveCard();
+        } catch (SQLException ex){		//If something goes wrong when we try to find the Id of the last Customer 
+            JOptionPane.showMessageDialog(null, "Error finding last Register...!!");
+        }
+	}
+	//This method will save the Card Number
+	public void saveCard() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+		try{
+            //'addcard' will be the query that will be send to the database to add a the Card details of the new customer
+            String addcard = "INSERT INTO membershipCard (cardNumber, levelId, level, custId) VALUES(?, ?, ?, ?)"; 
+            System.out.println(cardNumber.getText());
+            System.out.println(levelId.getText());
+            System.out.println(level.getText());
+            System.out.println(lastRegister.getText());
+            System.out.println(addcard);
+            PreparedStatement stt = conection.prepareStatement(addcard);
+            stt.setString(1, cardNumber.getText());
+            stt.setString(2, levelId.getText());
+            stt.setString(3, level.getText());
+            stt.setString(4, lastRegister.getText());
+            System.out.println("The levelID is: " + levelId.getText());
+            stt.executeUpdate();
+            
+        } catch (Exception e){      //If something goes wrong when we try to save the details of the Membership Card 
+        	JOptionPane.showMessageDialog(null, "Error inserting a new Membership Card!");
+        }
+	}
+	//This method will update the details of the Customer
+	public void updateCustomer() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        //Declaring our 'where' condition to be used as filter
+        String filter = ID.getText();
+        System.out.println("My filter is: " + filter);
+        String where = "";
+        //Our filter must not be empty
+        if(!"".equals(filter)){
+            where = "WHERE custId = '" + filter + "'";
+            System.out.println("My where is: " + where);
+            try{
+            //'updatecustomer' will be the query that we will send to the database to find the results             
+            String updatecustomer = "UPDATE customer SET name = ?, surname = ?, street = ?, number = ?, postalCode = ?, city = ?, country = ?, phoneNumber = ?, email = ? " + where; 
+            System.out.println(updatecustomer);
+            PreparedStatement statement = conection.prepareStatement(updatecustomer);
+            statement.setString(1, name.getText());
+            statement.setString(2, surname.getText());
+            statement.setString(3, street.getText());
+            statement.setString(4, number.getText());
+            statement.setString(5, postalCode.getText());
+            statement.setString(6, city.getText());
+            statement.setString(7, country.getText());
+            statement.setString(8, phoneNumber.getText());
+            statement.setString(9, email.getText());
+            
+            statement.execute();
+               
+            conection.close();
+            
+            JOptionPane.showMessageDialog(null, "User updated successfully\n"
+            		+ "Please refresh");
+            ID.setText("");
+            name.setText("");
+            surname.setText("");
+            street.setText("");
+            number.setText("");
+            postalCode.setText("");
+            city.setText("");
+            country.setText("");
+            phoneNumber.setText("");
+            email.setText("");
+            
+            } catch (Exception e){
+            	JOptionPane.showMessageDialog(null, "Error updating Customer! \n"		//If the Customer ID is not valid
+            			+ "	· Customer ID must be a valid numeric ID");
+            }
+            
+        } else {       //The ID must not be empty
+            JOptionPane.showMessageDialog(null, "Error updating Customer! \n"
+                    + "	· The ID cannot be empty");
+        }
+	}
+	//This method will delete the Customer
+	public void deleteCustomer() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        //Declaring our 'where' condition to be used as filter
+        String filter = ID.getText();
+        String where = "";
+        System.out.println("My filter is " + filter);
+        //Our filter must not be empty
+        if(!"".equals(filter)){     //
+            where = "WHERE custId = '" + filter + "'";
+            System.out.println("My WHERE is: " + where);
+            try{
+            	//'deleteCard' will be the query that we will send to the database to delete Membership Card
+            	String deleteCard = "DELETE FROM membershipCard WHERE IdCard = ?"; 
+                
+                PreparedStatement statement = conection.prepareStatement(deleteCard);
+                statement.setString(1, ID.getText());
+                System.out.println("my query is: " + deleteCard);
+                statement.execute();
+                
+                //Call method to delete the Membership Card of the Customer
+                deleteCard();
+                
+                conection.close();
+                
+                JOptionPane.showMessageDialog(null, "Customer deleted successfully\n"
+                		+ "Please refresh");
+                ID.setText("");
+                name.setText("");
+                surname.setText("");
+                street.setText("");
+                number.setText("");
+                postalCode.setText("");
+                city.setText("");
+                country.setText("");
+                phoneNumber.setText("");
+                email.setText("");
+                cardNumber.setText("");
+                lastRegister.setText("");
+
+            } catch (Exception e){      //If something goes wrong when trying to delete the Customer
+            	JOptionPane.showMessageDialog(null, "Error deleting the Customer!");
+            }
+            
+        }else {       //The ID must not be a empty
+            JOptionPane.showMessageDialog(null, "Error deleting the Customer! Possible reassons: \n"
+                    + "	· The ID cannot be empty");
+        }
+	}
+	//This method will delete the Membership Card of the Customer
+	public void deleteCard() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+		try {
+        	//'deleteCustomer' will be the query that we will send to the database to delete Customer
+        	String deleteCustomer = "DELETE FROM customer WHERE custId = ?"; 
+            
+            PreparedStatement stt = conection.prepareStatement(deleteCustomer);
+            stt.setString(1, ID.getText());
+            System.out.println("my query is: " + deleteCustomer);
+            stt.execute();
+            
+        } catch(SQLException ex) {		//If something goes wrong when trying to delete the Membership Card
+        	JOptionPane.showMessageDialog(null, "Error deleting the Membership Card...!!");
+        }
+	}
+	//This method will take the written value of the Level Id and depending on it, it will add the description of the level
 	public void levelDescription() {
 		if(levelId.getText().equals("PR")) {
     		System.out.println("LevelId: " + levelId.getText());

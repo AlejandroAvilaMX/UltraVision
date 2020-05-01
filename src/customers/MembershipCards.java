@@ -58,7 +58,6 @@ public class MembershipCards extends JFrame implements ActionListener{
         Font fonttitle = new Font("Arial", Font.BOLD, 28);      //Font style (title)
         Font fontlabel = new Font("Calibri", Font.PLAIN, 16);       //Font style (labels)
         Font fontButton = new Font("Tahoma", Font.BOLD, 12);        //Font style (buttons)
-        
         //My Menu Bar
         JMenuBar myMenuBar = new JMenuBar();
         this.setJMenuBar(myMenuBar);
@@ -419,7 +418,7 @@ public class MembershipCards extends JFrame implements ActionListener{
         this.validate();
         this.repaint();
 	}
-	//This methodwill modify the window to be able to see all the required information to update the membership card
+	//This method will modify the window to be able to see all the required information to update the membership card
 	public void editScreen() {
 		lID.setVisible(false);
 		lCustomerId.setVisible(true);
