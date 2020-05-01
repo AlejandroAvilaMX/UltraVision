@@ -48,6 +48,7 @@ public class VL extends JFrame implements ActionListener {
     private String res;
     private JComboBox<String> movieFormat;
     private JButton btnSearch, btnNew, btnUpdateVL, btnDeleteVL, btnSaveNew, btnSaveUpdate, btnCancel;
+    private DefaultTableModel model;
     
 	public VL() {
 		this.setVisible(true);
@@ -112,57 +113,18 @@ public class VL extends JFrame implements ActionListener {
         btnRefresh.setBounds(40, 70, 110, 30);
         btnRefresh.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-     
-		        ConectionDB con = new ConectionDB();
-		        Connection conection = con.conect();
-		        	try{
-		        		DefaultTableModel model = new DefaultTableModel();
-		                    
-		                PreparedStatement ps = null;
-		                ResultSet rs = null;
-		                //'refresh' will be the query that we will send to the database to show all the all titles that are of the Movies
-		                String refresh = "SELECT title.titleId, title.name, title.releaseYear, title.genre, movie.productionCompany, movie.director, movie.country, movie.duration, movie.language, movie.format "
-		                		+ "FROM title "
-		                		+ "INNER JOIN movie ON title.titleId=movie.movieId; ";
-		                //Adding the result to the rows of the table
-		                ps = conection.prepareStatement(refresh);
-		                rs = ps.executeQuery();
-		                    
-		                ResultSetMetaData rsMD = rs.getMetaData();
-		                int qttycol = rsMD.getColumnCount();
-		                    
-		                model.addColumn("ID");
-		                model.addColumn("Name");
-		                model.addColumn("Release Year");
-		                model.addColumn("Genre");
-		                model.addColumn("Production Company");
-		                model.addColumn("Director");
-		                model.addColumn("Country");
-		                model.addColumn("Duration");
-		                model.addColumn("Language");
-		                model.addColumn("Format");
-		                    
-		                while(rs.next()){
-		                    Object[] col = new Object[qttycol];
-		                    
-		                    for(int i = 0; i<qttycol; i++){
-		                        col[i] = rs.getObject(i+1);
-		                    }
-		                    
-		                    model.addRow(col);
-		                }
-		                JTable table = new JTable(model);
-		                
-		                JScrollPane scroll= new JScrollPane(table);
-		                table.setBounds(40,120,1000,200);
-		                scroll.setBounds(40,120,1000,200);
-		                p.add(scroll);
-		                    
-		                } catch (SQLException ex){
-		                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-		                }
-		        	}
-            }); 
+		        //Call method 'refresh'
+            	refresh();
+            	//Add the model to the table
+            	JTable table = new JTable(model);
+            	//Add the scroll to the table
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
+                //Add the scroll to the Panel
+                p.add(scroll);
+            }    
+        }); 
         
         ltitleId = new JLabel("ID");
         ltitleId.setFont(fontlabel);
@@ -189,64 +151,16 @@ public class VL extends JFrame implements ActionListener {
         btnSearch.setBounds(540, 385, 90, 30);
         btnSearch.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                
-                String filter = name.getText();
-                String where = "";
-                //Our filter must not be empty
-                if(!"".equals(filter)){
-                    where = "WHERE title.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
-                }
-                try{
-                    
-                    DefaultTableModel model = new DefaultTableModel();
-                    
-                    PreparedStatement ps = null;
-                    ResultSet rs = null;
-                    //'search' will be the query that we will send to the database to show the search result
-                    String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, movie.productionCompany, movie.director, movie.country, movie.duration, movie.language, movie.format "
-                    		+ "FROM title "
-                    		+ "INNER JOIN movie ON title.titleId=movie.movieId " + where;
-                    
-                    System.out.println(search);
-                    ps = conection.prepareStatement(search);
-                    rs = ps.executeQuery();
-                    //Adding the result to the rows of the table
-                    ResultSetMetaData rsMD = rs.getMetaData();
-                    int qttycol = rsMD.getColumnCount();
-                    
-                    model.addColumn("ID");
-	                model.addColumn("Name");
-	                model.addColumn("Release Year");
-	                model.addColumn("Genre");
-	                model.addColumn("Production Company");
-	                model.addColumn("Director");
-	                model.addColumn("Country");
-	                model.addColumn("Duration");
-	                model.addColumn("Language");
-	                model.addColumn("Format");
-                    
-                    while(rs.next()){
-                        Object[] col = new Object[qttycol];
-                        
-                        for(int i = 0; i<qttycol; i++){
-                            col[i] = rs.getObject(i+1);
-                        }
-                        
-                        model.addRow(col);
-                    }
-
-                    JTable table = new JTable(model);
-                    JScrollPane scroll= new JScrollPane(table);
-                    table.setBounds(40,120,1000,200);
-                    scroll.setBounds(40,120,1000,200);
-
-                    p.add(scroll);
-                    
-                } catch (SQLException ex){
-                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-                }
+                //Call method 'search'
+            	search();
+            	//Add the model to the table
+            	JTable table = new JTable(model);
+            	//Add the scroll to the table
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
+                //Add the scroll to the Panel
+                p.add(scroll);
             }
         });
         
@@ -353,7 +267,6 @@ public class VL extends JFrame implements ActionListener {
         new NoLetters(stock);
         new ValidLength(stock, 3);
         
-        
         lavailable = new JLabel("Available");
         lavailable.setFont(fontlabel);
         lavailable.setBounds(360, 590, 120, 20);
@@ -412,64 +325,8 @@ public class VL extends JFrame implements ActionListener {
         btnDeleteVL.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
 
-            	ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();                
-                //Declaring our 'where' condition to be used as filter
-                String filter = titleId.getText();
-                String where = "";
-                System.out.println("My filter is " + filter);
-                //Our filter must not be empty
-                if(!"".equals(filter)){     //
-                    where = "WHERE titleId = '" + filter + "'";
-                    System.out.println("My WHERE is: " + where);
-                    try{
-                    	//'deletetv' will be the query that we will send to the database to delete the movie
-                    	String deletemovie = "DELETE FROM movie WHERE movieId = ?"; 
-                        
-                        PreparedStatement statementcd = conection.prepareStatement(deletemovie);
-                        statementcd.setString(1, titleId.getText());
-                        System.out.println("my query is: " + deletemovie);
-                        statementcd.execute();
-                    
-	                    try {
-	                    	//'deletetitle' will be the query that we will send to the database to delete the title
-	                        String deletetitle = "DELETE FROM title WHERE titleId = ?"; 
-	                        
-	                        PreparedStatement statement = conection.prepareStatement(deletetitle);
-	                        statement.setString(1, titleId.getText());
-	                        System.out.println("my query is: " + deletetitle);
-	                        statement.execute();
-	                    	
-	                    } catch(SQLException ex) {
-	                    	JOptionPane.showMessageDialog(null, "Error deleting the Movie...!!");		//If something  goes wrong when trying to delete the title
-	                    }
-                       
-                    conection.close();
-                    
-                    JOptionPane.showMessageDialog(null, "Movie Title deleted successfully");
-                    titleId.setText("");
-                    name.setText("");
-                    releaseYear.setText("");
-                    genre.setText("");
-                    productionCompany.setText("");
-                    director.setText("");
-                    country.setText("");
-                    duration.setText("");
-                    language.setText("");
-                    format.setText("");
-                    stock.setText("");
-                    available.setText("");
-                    rentPrice.setText("");
-                    lastRegister.setText("");
-                    
-                    } catch (Exception e){      //If something goes wrong
-                    	JOptionPane.showMessageDialog(null, "Error deleting the Movie Title!");
-                    }
-                    
-                } else {       //The ID must not be empty
-                    JOptionPane.showMessageDialog(null, "Error deleting the Movie Title! Possible reassons: \n"
-                            + "	· The ID cannot be empty");
-                }
+            	//call method 'deleteMovie'
+            	deleteMovie();
             }
         });
         
@@ -480,111 +337,8 @@ public class VL extends JFrame implements ActionListener {
         btnSaveNew.setVisible(false);
         btnSaveNew.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-            	//Validation of required fields
-            	if(name.getText().equals("") || releaseYear.getText().equals("") || stock.getText().equals("") || available.getText().equals("") || rentPrice.getText().equals("")) {
-            		JOptionPane.showMessageDialog(null, "One or more required fields are empty, please check: \n"
-            				+ "	  · Name\n"
-            				+ "	  · Release Year\n"
-            				+ "   · Quantity in stock\n"
-            				+ "   · Quantity Available\n"
-            				+ "	  · Rent Price\n");
-            	}else {
-	            	//Validation of Quantity Available and Quantity in Stock
-	            	String txtStock = stock.getText(), txtAvailable = available.getText();
-	                int qttyStock = Integer.parseInt(txtStock), qttyAvailable = Integer.parseInt(txtAvailable);
-	                    
-	                if(qttyAvailable > qttyStock) {		//Quantity available must be bigger than quantity in stock
-	                   	System.out.println("Qtty Stock: " + qttyStock);
-	                   	System.out.println("Qtty Available " + qttyAvailable);
-	                   	JOptionPane.showMessageDialog(null, "The available quantity cannot be bigger than the stock quantity");
-	               	}else {
-		               	//Validation of Current Year less than 2020
-		               	String txtReleaseYear = releaseYear.getText();
-		               	int yearNumber = Integer.parseInt(txtReleaseYear);
-                  	
-	                   	if(yearNumber <= 2020) {		//Year number must be equal or less than current year (2020)
-	                   		ConectionDB con = new ConectionDB();
-	                        Connection conection = con.conect();
-	                        try{
-	                        	//'addtitle' will be the query that we will send to the database to find the results            
-	                        	String addtitle = "INSERT INTO title (name, releaseYear, genre, typeId, type, stock, available, rentPrice) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"; 
-	                            System.out.println("Query insert new Title: " + addtitle);
-	                            PreparedStatement statement = conection.prepareStatement(addtitle);
-	                            statement.setString(1, name.getText());
-	                            statement.setString(2, releaseYear.getText());
-	                            statement.setString(3, genre.getText());
-	                            statement.setString(4, typeId.getText());
-	                            statement.setString(5, type.getText());
-	                            statement.setString(6, stock.getText());
-	                            statement.setString(7, available.getText());
-	                            statement.setString(8, rentPrice.getText());
-	                               
-	                            statement.executeUpdate();
-	                            //Once the information of the table title is inserted, we will take the last title Id registered     
-	                            try{
-	                                   
-	                            	PreparedStatement ps = null;
-	                                ResultSet rs = null;
-	                                //'search' will be the query that will be send to the database to find the last Title Id added
-	                                String search = "SELECT titleId FROM title ORDER BY titleId DESC LIMIT 1";
-	                                 
-	                                System.out.println(search);
-	                                ps = conection.prepareStatement(search);
-	                                rs = ps.executeQuery();
-	                                //We will take the result of the query and this will be written on the JTextField 'lastRegister'
-	                                while(rs.next()) {
-	                                	lastRegister.setText(rs.getString("titleId"));
-	                                    res = rs.getString("titleId");
-	                                    System.out.println("The last register is: " + rs.getString("titleId"));    
-	                                }
-	                                //Once we know the last Title Id and when the Id is already on the JTextField we will insert the information on the table movie    
-	                                try {
-	                                   	String addmovie = "INSERT INTO movie (productionCompany, director, country, duration, language, format, movieId) VALUES(?, ?, ?, ?, ?, ?, ?)"; 
-	                                    System.out.println("Query insert new DVD: " + addmovie);
-	                                    PreparedStatement newstatement = conection.prepareStatement(addmovie);
-	                                    newstatement.setString(1, productionCompany.getText());
-	                                    newstatement.setString(2, director.getText());
-	                                    newstatement.setString(3, country.getText());
-	                                    newstatement.setString(4, duration.getText());
-	                                    newstatement.setString(5, language.getText());
-	                                    newstatement.setString(6, format.getText());
-	                                    newstatement.setString(7, lastRegister.getText());
-	                                    
-	                                    newstatement.executeUpdate();
-	                                    	
-	                                } catch (SQLException ex) {
-	                                  	JOptionPane.showMessageDialog(null, "Error inserting new Movie...!!");		//If something goes wrong when trying to insert a new Movie
-	                                }    
-	                            } catch (SQLException ex){
-	                            	JOptionPane.showMessageDialog(null, "Error finding last Register...!!");		//If something goes wrong when we try to find the Id of the last Title
-	                            }
-	                       
-	                            conection.close();
-	                                
-	                            JOptionPane.showMessageDialog(null, "New Movie inserted successfully");
-	                            titleId.setText("");
-	                            name.setText("");
-	                            releaseYear.setText("");
-	                            genre.setText("");
-	                            productionCompany.setText("");
-	                            director.setText("");
-	                            country.setText("");
-	                            duration.setText("");
-	                            language.setText("");
-	                            format.setText("");
-	                            stock.setText("");
-	                            available.setText("");
-	                            rentPrice.setText("");
-	                            lastRegister.setText("");
-	                            
-	                        } catch (Exception e){      //If something goes wrong
-	                            JOptionPane.showMessageDialog(null, "Error inserting a new Movie Title!");
-	                        }	
-	                   	}else {		//If the Release Year is greater than current year (2020)
-	                   		JOptionPane.showMessageDialog(null, "Release year cannot be after the current year");
-	                    }
-	               	}   
-            	}	
+            	//Call method 'saveMovie'
+            	saveMovie();
             }    
         });
         
@@ -595,109 +349,8 @@ public class VL extends JFrame implements ActionListener {
         btnSaveUpdate.setVisible(false);
         btnSaveUpdate.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-            	//Validation of required fields
-            	if(name.getText().equals("") || releaseYear.getText().equals("") || stock.getText().equals("") || available.getText().equals("") || rentPrice.getText().equals("")) {
-            		JOptionPane.showMessageDialog(null, "One or more required fields are empty, please check: \n"
-            				+ "	  · Name\n"
-            				+ "	  · Release Year\n"
-            				+ "	  · Artist Name\n"
-            				+ "   · Quantity in stock\n"
-            				+ "   · Quantity Available\n"
-            				+ "	  · Rent Price\n");
-            	}else {
-            		
-            		//Validation of Quantity Available and Quantity in Stock
-	        		String txtStock = stock.getText(), txtAvailable = available.getText();
-	        		int qttyStock = Integer.parseInt(txtStock), qttyAvailable = Integer.parseInt(txtAvailable);
-
-	        		if(qttyAvailable > qttyStock) {		//Quantity available must be bigger than quantity in stock
-	                   	System.out.println("Qtty Stock: " + qttyStock);
-	                   	System.out.println("Qtty Available " + qttyAvailable);
-	                   	JOptionPane.showMessageDialog(null, "The available quantity cannot be bigger than the stock quantity");
-	        		}else {
-	                	//Validation of Current Year less than 2020
-		               	String txtReleaseYear = releaseYear.getText();
-		               	int yearNumber = Integer.parseInt(txtReleaseYear);
-	                	
-		               	if(yearNumber <= 2020) {		//Year number must be equal or less than current year (2020)
-		               		ConectionDB con = new ConectionDB();
-		                    Connection conection = con.conect();
-		                    //Declaring our 'where' condition to be used as filter
-		                    String filter = titleId.getText();
-		                    System.out.println("My title filter is: " + filter);
-		                    String filterdvd = titleId.getText();
-		                    System.out.println("My dvd filter is: " + filter);
-		                    String where = "";
-		                    //Our filter must not be empty
-		                    if(!"".equals(filter)){
-		                    	where = "WHERE titleId = '" + filter + "'";
-		                        System.out.println("My where is: " + where);
-		    	                try{
-		    	                	//'updatetitle' will be the query that we will send to the database to update the title                 
-		    	                    String updatetitle = "UPDATE title SET name = ?, releaseYear = ?, genre = ?, stock = ?, available = ?, rentPrice = ? " + where; 
-		    	                    System.out.println("My update title: " + updatetitle);
-		    	                    PreparedStatement statement = conection.prepareStatement(updatetitle);
-		    	                    statement.setString(1, name.getText());
-		    	                    statement.setString(2, releaseYear.getText());
-		    	                    statement.setString(3, genre.getText());
-		    	                    statement.setString(4, stock.getText());
-		    	                    statement.setString(5, available.getText());
-		    	                    statement.setString(6, rentPrice.getText());
-		    	                    
-		                            statement.execute();
-		                            //Our filter must not be empty
-		                            if(!"".equals(filterdvd)){
-		                            	where = "WHERE movieId = '" + filter + "'";
-		                                System.out.println("My where is: " + where);
-		                                try{
-		                                	//'updatedvd' will be the query that we will send to the database to update the title  
-		                                    String updatedvd = "UPDATE movie SET productionCompany = ?, director = ?, country = ?, duration = ?, language = ?, format = ? " + where;
-		        	                        System.out.println("My update DVD: " + updatedvd);
-		        	                        PreparedStatement newstatement = conection.prepareStatement(updatedvd);
-		        	                        newstatement.setString(1, productionCompany.getText());
-		                                    newstatement.setString(2, director.getText());
-		                                    newstatement.setString(3, country.getText());
-		                                    newstatement.setString(4, duration.getText());
-		                                    newstatement.setString(5, language.getText());
-		                                    newstatement.setString(6, format.getText());;
-		        	                        
-		        	                        newstatement.execute();
-		                                }catch(SQLException ex) {
-		                                	JOptionPane.showMessageDialog(null, "Error updating Movie...!!");		//If something goes wrong when trying to update a Movie
-		                                }
-		                            }
-		                            	
-		                            conection.close();
-		    	                        
-		    	                    JOptionPane.showMessageDialog(null, "Movie title updated successfully");
-		    	                    titleId.setText("");
-		    	                    name.setText("");
-		    	                    releaseYear.setText("");
-		    	                    genre.setText("");
-		    	                    productionCompany.setText("");
-		    	                    director.setText("");
-		    	                    country.setText("");
-		    	                    duration.setText("");
-		    	                    language.setText("");
-		    	                    format.setText("");
-		    	                    stock.setText("");
-		    	                    available.setText("");
-		    	                    rentPrice.setText("");
-		    	                    lastRegister.setText("");
-		    	                    titleId.setEditable(true);
-		    	                    
-		    	                } catch (Exception e){      //If something goes wrong
-		    	                	JOptionPane.showMessageDialog(null, "Error updating Movie Title!");		//If something goes wrong when trying to update a Title
-		    	                }    
-		                    }else {       //The ID must not be empty
-		                        JOptionPane.showMessageDialog(null, "Error updating Movie! \n"
-		                        		+ "	· The ID cannot be empty");
-		                    }    
-		               	}else {		//If the Release Year is greater than current year (2020)
-	                    	JOptionPane.showMessageDialog(null, "Release year cannot be after the current year");
-	                    }   	
-	        		}
-            	}
+            	//Call method 'updateMovie'
+            	updateMovie();
             } 
         });
         
@@ -832,6 +485,415 @@ public class VL extends JFrame implements ActionListener {
 		
 		btnCancel.setVisible(false);
 	}
+	//This will refresh our table after doing any changes
+	public void refresh() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        try{
+        	model = new DefaultTableModel();
+                    
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'refresh' will be the query that we will send to the database to show all the all titles that are of the Movies
+            String refresh = "SELECT title.titleId, title.name, title.releaseYear, title.genre, movie.productionCompany, movie.director, movie.country, movie.duration, movie.language, movie.format "
+              		+ "FROM title "
+              		+ "INNER JOIN movie ON title.titleId=movie.movieId; ";
+            //Adding the result to the rows of the table
+            ps = conection.prepareStatement(refresh);
+            rs = ps.executeQuery();
+                    
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+                  
+            model.addColumn("ID");
+            model.addColumn("Name");
+            model.addColumn("Release Year");
+            model.addColumn("Genre");
+            model.addColumn("Production Company");
+            model.addColumn("Director");
+            model.addColumn("Country");
+            model.addColumn("Duration");
+            model.addColumn("Language");
+            model.addColumn("Format");
+                    
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                    
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }       
+                model.addRow(col);
+            }        
+        } catch (SQLException ex){
+        		JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+	}
+	//This method will search using the name of the Title
+	public void search() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        
+        String filter = name.getText();
+        String where = "";
+        //Our filter must not be empty
+        if(!"".equals(filter)){
+            where = "WHERE title.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
+        }
+        try{
+            
+            model = new DefaultTableModel();
+            
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'search' will be the query that we will send to the database to show the search result
+            String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, movie.productionCompany, movie.director, movie.country, movie.duration, movie.language, movie.format "
+            		+ "FROM title "
+            		+ "INNER JOIN movie ON title.titleId=movie.movieId " + where;
+            
+            System.out.println(search);
+            ps = conection.prepareStatement(search);
+            rs = ps.executeQuery();
+            //Adding the result to the rows of the table
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+            
+            model.addColumn("ID");
+            model.addColumn("Name");
+            model.addColumn("Release Year");
+            model.addColumn("Genre");
+            model.addColumn("Production Company");
+            model.addColumn("Director");
+            model.addColumn("Country");
+            model.addColumn("Duration");
+            model.addColumn("Language");
+            model.addColumn("Format");
+            
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }
+                
+                model.addRow(col);
+            }            
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+	}
+	//This method will delete the details of a Movie
+	public void deleteMovie() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();                
+        //Declaring our 'where' condition to be used as filter
+        String filter = titleId.getText();
+        String where = "";
+        System.out.println("My filter is " + filter);
+        //Our filter must not be empty
+        if(!"".equals(filter)){     //
+            where = "WHERE titleId = '" + filter + "'";
+            System.out.println("My WHERE is: " + where);
+            try{
+            	//'deletetv' will be the query that we will send to the database to delete the movie
+            	String deletemovie = "DELETE FROM movie WHERE movieId = ?"; 
+                
+                PreparedStatement statementcd = conection.prepareStatement(deletemovie);
+                statementcd.setString(1, titleId.getText());
+                System.out.println("my query is: " + deletemovie);
+                statementcd.execute();
+            
+                try {
+                	//'deletetitle' will be the query that we will send to the database to delete the title
+                    String deletetitle = "DELETE FROM title WHERE titleId = ?"; 
+                    
+                    PreparedStatement statement = conection.prepareStatement(deletetitle);
+                    statement.setString(1, titleId.getText());
+                    System.out.println("my query is: " + deletetitle);
+                    statement.execute();
+                	
+                } catch(SQLException ex) {
+                	JOptionPane.showMessageDialog(null, "Error deleting the Movie...!!");		//If something  goes wrong when trying to delete the title
+                }
+               
+            conection.close();
+            
+            JOptionPane.showMessageDialog(null, "Movie Title deleted successfully\n"
+            		+ "Please refresh");
+            titleId.setText("");
+            name.setText("");
+            releaseYear.setText("");
+            genre.setText("");
+            productionCompany.setText("");
+            director.setText("");
+            country.setText("");
+            duration.setText("");
+            language.setText("");
+            format.setText("");
+            stock.setText("");
+            available.setText("");
+            rentPrice.setText("");
+            lastRegister.setText("");
+            
+            } catch (Exception e){      //If something goes wrong
+            	JOptionPane.showMessageDialog(null, "Error deleting the Movie Title!");
+            }
+            
+        } else {       //The ID must not be empty
+            JOptionPane.showMessageDialog(null, "Error deleting the Movie Title! Possible reassons: \n"
+                    + "	· The ID cannot be empty");
+        }
+	}
+	//This method will send the information of the new TV Box Serie to be inserted
+	public void saveMovie() {
+		//Validation of required fields
+    	if(name.getText().equals("") || releaseYear.getText().equals("") || stock.getText().equals("") || available.getText().equals("") || rentPrice.getText().equals("")) {
+    		JOptionPane.showMessageDialog(null, "One or more required fields are empty, please check: \n"
+    				+ "	  · Name\n"
+    				+ "	  · Release Year\n"
+    				+ "   · Quantity in stock\n"
+    				+ "   · Quantity Available\n"
+    				+ "	  · Rent Price\n");
+    	}else {
+        	//Call method 'quantityValidations'   
+    		quantityValidation();
+    	}
+	}
+	//This method will check if the quantity in stock and available are corrects
+	public void quantityValidation() {
+		//Validation of Quantity Available and Quantity in Stock
+    	String txtStock = stock.getText(), txtAvailable = available.getText();
+        int qttyStock = Integer.parseInt(txtStock), qttyAvailable = Integer.parseInt(txtAvailable);
+            
+        if(qttyAvailable > qttyStock) {		//Quantity available must be bigger than quantity in stock
+           	System.out.println("Qtty Stock: " + qttyStock);
+           	System.out.println("Qtty Available " + qttyAvailable);
+           	JOptionPane.showMessageDialog(null, "The available quantity cannot be bigger than the stock quantity");
+       	}else {
+           	//Call method 'validationsYear'
+       		validationsYear();
+       	}
+	}
+	//This method will validate the Release Year
+	public void validationsYear() {
+		String txtReleaseYear = releaseYear.getText();
+        int yearNumber = Integer.parseInt(txtReleaseYear);
+        
+        //Release Year must be a 4 digit number
+        if(releaseYear.getText().length()<4) {
+        	JOptionPane.showMessageDialog(null, "A valid Release Year must have 4 digits");
+        } else {
+        	//Validation of Current Year less than 2020
+	       	if(yearNumber <= 2020) {		//Year number must be equal or less than current year (2020)
+	       		//Call method 'insertInformation'
+	       		insertInformation();
+	       	}else {		//If the Release Year is greater than current year (2020)
+	       		JOptionPane.showMessageDialog(null, "Release year cannot be after the current year");
+	        }
+        }
+	}
+	//This method will send the information to add a new Movie
+	public void insertInformation() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        try{
+        	//'addtitle' will be the query that we will send to the database to find the results            
+        	String addtitle = "INSERT INTO title (name, releaseYear, genre, typeId, type, stock, available, rentPrice) VALUES(?, ?, ?, ?, ?, ?, ?, ?)"; 
+            System.out.println("Query insert new Title: " + addtitle);
+            PreparedStatement statement = conection.prepareStatement(addtitle);
+            statement.setString(1, name.getText());
+            statement.setString(2, releaseYear.getText());
+            statement.setString(3, genre.getText());
+            statement.setString(4, typeId.getText());
+            statement.setString(5, type.getText());
+            statement.setString(6, stock.getText());
+            statement.setString(7, available.getText());
+            statement.setString(8, rentPrice.getText());
+               
+            statement.executeUpdate();
+            //Once the information of the table title is inserted, we will take the last title Id registered     
+            try{
+                   
+            	PreparedStatement ps = null;
+                ResultSet rs = null;
+                //'search' will be the query that will be send to the database to find the last Title Id added
+                String search = "SELECT titleId FROM title ORDER BY titleId DESC LIMIT 1";
+                 
+                System.out.println(search);
+                ps = conection.prepareStatement(search);
+                rs = ps.executeQuery();
+                //We will take the result of the query and this will be written on the JTextField 'lastRegister'
+                while(rs.next()) {
+                	lastRegister.setText(rs.getString("titleId"));
+                    res = rs.getString("titleId");
+                    System.out.println("The last register is: " + rs.getString("titleId"));    
+                }
+                //Once we know the last Title Id and when the Id is already on the JTextField we will insert the information on the table movie    
+                try {
+                   	String addmovie = "INSERT INTO movie (productionCompany, director, country, duration, language, format, movieId) VALUES(?, ?, ?, ?, ?, ?, ?)"; 
+                    System.out.println("Query insert new DVD: " + addmovie);
+                    PreparedStatement newstatement = conection.prepareStatement(addmovie);
+                    newstatement.setString(1, productionCompany.getText());
+                    newstatement.setString(2, director.getText());
+                    newstatement.setString(3, country.getText());
+                    newstatement.setString(4, duration.getText());
+                    newstatement.setString(5, language.getText());
+                    newstatement.setString(6, format.getText());
+                    newstatement.setString(7, lastRegister.getText());
+                    
+                    newstatement.executeUpdate();
+                    	
+                } catch (SQLException ex) {
+                  	JOptionPane.showMessageDialog(null, "Error inserting new Movie...!!");		//If something goes wrong when trying to insert a new Movie
+                }    
+            } catch (SQLException ex){
+            	JOptionPane.showMessageDialog(null, "Error finding last Register...!!");		//If something goes wrong when we try to find the Id of the last Title
+            }
+       
+            conection.close();
+                
+            JOptionPane.showMessageDialog(null, "New Movie inserted successfully\n"
+            		+ "Please refresh");
+            titleId.setText("");
+            name.setText("");
+            releaseYear.setText("");
+            genre.setText("");
+            productionCompany.setText("");
+            director.setText("");
+            country.setText("");
+            duration.setText("");
+            language.setText("");
+            format.setText("");
+            stock.setText("");
+            available.setText("");
+            rentPrice.setText("");
+            lastRegister.setText("");
+            
+        } catch (Exception e){      //If something goes wrong
+            JOptionPane.showMessageDialog(null, "Error inserting a new Movie Title!");
+        }
+	}
+	//This method will update the details of a Movie
+	public void updateMovie() {
+		//Validation of required fields
+    	if(name.getText().equals("") || releaseYear.getText().equals("") || stock.getText().equals("") || available.getText().equals("") || rentPrice.getText().equals("")) {
+    		JOptionPane.showMessageDialog(null, "One or more required fields are empty, please check: \n"
+    				+ "	  · Name\n"
+    				+ "	  · Release Year\n"
+    				+ "	  · Artist Name\n"
+    				+ "   · Quantity in stock\n"
+    				+ "   · Quantity Available\n"
+    				+ "	  · Rent Price\n");
+    	}else {
+    		//Validation of Quantity Available and Quantity in Stock
+    		String txtStock = stock.getText(), txtAvailable = available.getText();
+    		int qttyStock = Integer.parseInt(txtStock), qttyAvailable = Integer.parseInt(txtAvailable);
+
+    		if(qttyAvailable > qttyStock) {		//Quantity available must be bigger than quantity in stock
+               	System.out.println("Qtty Stock: " + qttyStock);
+               	System.out.println("Qtty Available " + qttyAvailable);
+               	JOptionPane.showMessageDialog(null, "The available quantity cannot be bigger than the stock quantity");
+    		}else {
+    			String txtReleaseYear = releaseYear.getText();
+                int yearNumber = Integer.parseInt(txtReleaseYear);
+                
+                //Release Year must be a 4 digit number
+                if(releaseYear.getText().length()<4) {
+                	JOptionPane.showMessageDialog(null, "A valid Release Year must have 4 digits");
+                } else {
+        			//Validation of Current Year less than 2020
+                	if(yearNumber <= 2020) {		//Year number must be equal or less than current year (2020)
+	               		ConectionDB con = new ConectionDB();
+	                    Connection conection = con.conect();
+	                    //Declaring our 'where' condition to be used as filter
+	                    String filter = titleId.getText();
+	                    System.out.println("My title filter is: " + filter);
+	                    String where = "";
+	                    //Our filter must not be empty
+	                    if(!"".equals(filter)){
+	                    	where = "WHERE titleId = '" + filter + "'";
+	                        System.out.println("My where is: " + where);
+	                        //Call method 'updateInformation'
+	                        updateInformation();
+	    	                    
+	                    }else {       //The ID must not be empty
+	                        JOptionPane.showMessageDialog(null, "Error updating Movie! \n"
+	                        		+ "	· The ID cannot be empty");
+	                    }    
+	               	}else {		//If the Release Year is greater than current year (2020)
+	                	JOptionPane.showMessageDialog(null, "Release year cannot be after the current year");
+	                }   	
+                }
+    		}
+    	}
+	}
+	//This method will send the information of the Movie to be updated
+    public void updateInformation() {
+    		ConectionDB con = new ConectionDB();
+    	    Connection conection = con.conect();
+    	    
+    		String filterdvd = titleId.getText();
+            System.out.println("My dvd filter is: " + filterdvd);
+            String where = "WHERE titleID = " + filterdvd;
+            
+    		try{
+            	//'updatetitle' will be the query that we will send to the database to update the title                 
+                String updatetitle = "UPDATE title SET name = ?, releaseYear = ?, genre = ?, stock = ?, available = ?, rentPrice = ? " + where; 
+                System.out.println("My update title: " + updatetitle);
+                PreparedStatement statement = conection.prepareStatement(updatetitle);
+                statement.setString(1, name.getText());
+                statement.setString(2, releaseYear.getText());
+                statement.setString(3, genre.getText());
+                statement.setString(4, stock.getText());
+                statement.setString(5, available.getText());
+                statement.setString(6, rentPrice.getText());
+                
+                statement.execute();
+                //Our filter must not be empty
+                if(!"".equals(filterdvd)){
+                	String filter = titleId.getText();
+                	where = "WHERE movieId = '" + filter + "'";
+                    System.out.println("My where is: " + where);
+                    try{
+                    	//'updatedvd' will be the query that we will send to the database to update the title  
+                        String updatedvd = "UPDATE movie SET productionCompany = ?, director = ?, country = ?, duration = ?, language = ?, format = ? " + where;
+                        System.out.println("My update DVD: " + updatedvd);
+                        PreparedStatement newstatement = conection.prepareStatement(updatedvd);
+                        newstatement.setString(1, productionCompany.getText());
+                        newstatement.setString(2, director.getText());
+                        newstatement.setString(3, country.getText());
+                        newstatement.setString(4, duration.getText());
+                        newstatement.setString(5, language.getText());
+                        newstatement.setString(6, format.getText());;
+                        
+                        newstatement.execute();
+                    }catch(SQLException ex) {
+                    	JOptionPane.showMessageDialog(null, "Error updating Movie...!!");		//If something goes wrong when trying to update a Movie
+                    }
+                }
+                	
+                conection.close();
+                    
+                JOptionPane.showMessageDialog(null, "Movie title updated successfully");
+                titleId.setText("");
+                name.setText("");
+                releaseYear.setText("");
+                genre.setText("");
+                productionCompany.setText("");
+                director.setText("");
+                country.setText("");
+                duration.setText("");
+                language.setText("");
+                format.setText("");
+                stock.setText("");
+                available.setText("");
+                rentPrice.setText("");
+                lastRegister.setText("");
+                titleId.setEditable(true);
+                
+            } catch (Exception e){      //If something goes wrong
+            	JOptionPane.showMessageDialog(null, "Error updating Movie Title!");		//If something goes wrong when trying to update a Title
+            }
+    	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {

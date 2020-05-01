@@ -517,7 +517,7 @@ public class TV extends JFrame implements ActionListener{
             PreparedStatement ps = null;
             ResultSet rs = null;
             //'search' will be the query that we will send to the database to show the search result
-            String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, tvboxset.director, tvboxset.country, tvboxset.language, tvboxset.seasons, tvboxset.episodes, title.stock, title.available, tvbtitleoxset.rentPrice  "
+            String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, tvboxset.director, tvboxset.country, tvboxset.language, tvboxset.seasons, tvboxset.episodes, title.stock, title.available, title.rentPrice  "
             		+ "FROM title "
             		+ "INNER JOIN tvboxset ON title.titleId=tvboxset.serieId " + where;
             
