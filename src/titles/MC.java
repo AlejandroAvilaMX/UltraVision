@@ -296,7 +296,7 @@ public class MC extends JFrame implements ActionListener{
         btnSaveUpdate.setVisible(false);
         btnSaveUpdate.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-            	//Call method 'requiredFields'
+            	//Call method 'updateCDMusic'
             	updateCDMusic();
             }
         });
@@ -465,7 +465,7 @@ public class MC extends JFrame implements ActionListener{
         }
         try{
             
-            DefaultTableModel model = new DefaultTableModel();
+            model = new DefaultTableModel();
             
             PreparedStatement ps = null;
             ResultSet rs = null;
@@ -577,11 +577,11 @@ public class MC extends JFrame implements ActionListener{
     		
     	}else {
     		//Call method 'QuantityAvailable'
-    		QuantityAvailable();
+    		quantityAvailable();
     	}
 	}
-	//This method will check if 
-	public void QuantityAvailable() {
+	//This method will check if the quantity in stock and available are corrects
+	public void quantityAvailable() {
     	//Validation of Quantity Available and Quantity in Stock
 		String txtStock = stock.getText(), txtAvailable = available.getText();
 		int qttyStock = Integer.parseInt(txtStock), qttyAvailable = Integer.parseInt(txtAvailable);
