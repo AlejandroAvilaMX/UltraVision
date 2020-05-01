@@ -547,6 +547,7 @@ public class MembershipCards extends JFrame implements ActionListener{
 	}
 	//This method will Update the details of the Credit Card
 	public void updateCard() {
+		//The Card Number cannot have less than 16 digits
 		if(cardNumber.getText().length()<16) {
 			JOptionPane.showMessageDialog(null, "The Card Number must have 16 digits...!!");
 		} else {

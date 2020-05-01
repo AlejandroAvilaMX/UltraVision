@@ -383,8 +383,13 @@ public class Customers extends JFrame implements ActionListener{
             	}else {
             		//Call the method to get the description of the level
             		levelDescription();
-            		//Call the method to save the new Customer
-            		newCustomer();
+            		//The Card Number cannot have less than 16 digits
+            		if(cardNumber.getText().length()<16) {
+            			JOptionPane.showMessageDialog(null, "The Card Number must have 16 digits...!!");
+            		} else {
+	            		//Call the method to save the new Customer
+	            		newCustomer();
+            		}
             	}      
             }
         });
