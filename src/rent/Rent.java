@@ -37,7 +37,7 @@ import validations.ValidLength;
 public class Rent extends JFrame implements ActionListener{
 	private JLabel ltitle, lname, lID, ltitleId, lCDtitle, lDVDtitle, lMovietitle, lSerietitle;
 	private JTextField name, ID, titleId, CDtitle, DVDtitle, Movietitle, Serietitle, rentedDay, returnDay, stock, newAvailable, available, loyaltyPoints, newloyaltyPoints, freeRent, newfreeRent, qttyRent, newqttyRent, levelId, typeId;
-	private String res, resn, levelDescr, typeDescr, stravailable, strloyaltyPoints, qttyLoyaltyPoints, strfreeRent, qttyfreeRent, strqttyRent, QttyRent;
+	private String res, resn, stravailable, strloyaltyPoints, qttyLoyaltyPoints, strfreeRent, qttyfreeRent, strqttyRent, QttyRent;
 	private int qttyStock, qttyAvailable, intloyaltyPoints, intfreeRent, intqttyRent;
 	boolean rentIsFree = false;
 	private DefaultTableModel model; 
@@ -181,7 +181,7 @@ public class Rent extends JFrame implements ActionListener{
             	lCDtitle.setVisible(true);
             	CDtitle.setVisible(true);
             	btnSearchCD.setVisible(true);
-            	
+            	btnCancel.setBounds(600, 550, 100, 30);
             	//btnSaveUpdate.setVisible(false);
             }
         });
@@ -196,6 +196,7 @@ public class Rent extends JFrame implements ActionListener{
             	lDVDtitle.setVisible(true);
             	DVDtitle.setVisible(true);
             	btnSearchDVD.setVisible(true);
+            	btnCancel.setBounds(600, 550, 100, 30);
             	//btnSaveNew.setVisible(false);
             	//btnSaveUpdate.setVisible(false);
             }
@@ -211,6 +212,7 @@ public class Rent extends JFrame implements ActionListener{
             	lMovietitle.setVisible(true);
             	Movietitle.setVisible(true);
             	btnSearchMovie.setVisible(true);
+            	btnCancel.setBounds(600, 550, 100, 30);
             	//btnSaveNew.setVisible(false);
             	//btnSaveUpdate.setVisible(false);
             }
@@ -226,6 +228,7 @@ public class Rent extends JFrame implements ActionListener{
             	lSerietitle.setVisible(true);
             	Serietitle.setVisible(true);
             	btnSearchSerie.setVisible(true);
+            	btnCancel.setBounds(600, 550, 100, 30);
             	//btnSaveNew.setVisible(false);
             	//btnSaveUpdate.setVisible(false);
             }
@@ -450,11 +453,11 @@ public class Rent extends JFrame implements ActionListener{
         
         levelId = new JTextField();
         levelId.setBounds(70, 170, 100, 25);
-        //levelId.setVisible(false);
+        levelId.setVisible(false);
         
         typeId = new JTextField();
         typeId.setBounds(270, 170, 100, 25);
-        //typeId.setVisible(false);
+        typeId.setVisible(false);
         
         //Save Rent button
         btnSaveRent = new JButton("Rent Title");
@@ -467,8 +470,6 @@ public class Rent extends JFrame implements ActionListener{
             	if(ID.getText().equals("") || ltitleId.getText().equals("")) {		//We must type a Customer ID and Title ID
             		JOptionPane.showMessageDialog(null, "Customer ID and Title ID cannot be empty");
             	}else {
-            		ConectionDB con = new ConectionDB();
-            	    Connection conection = con.conect();
             	    //Check the Level of the Customer
             	    level();
             	    //Call method allowRent
@@ -487,6 +488,7 @@ public class Rent extends JFrame implements ActionListener{
             public void actionPerformed(ActionEvent arg0){
             	normalScreen();
             	resetTextField();
+            	btnCancel.setBounds(600, 550, 100, 30);
             }
         });
         
@@ -503,7 +505,7 @@ public class Rent extends JFrame implements ActionListener{
         
         btnSaveFreeRent = new JButton("Use Free Rent");
         btnSaveFreeRent.setFont(fontButton);
-        btnSaveFreeRent.setBounds(300, 550, 140, 30);
+        btnSaveFreeRent.setBounds(90, 550, 140, 30);
         btnSaveFreeRent.setVisible(false); 
         btnSaveFreeRent.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
@@ -994,7 +996,8 @@ public class Rent extends JFrame implements ActionListener{
                         newqttyRent();
                         conection.close();
                         
-                        JOptionPane.showMessageDialog(null, "New Title rented successfully");
+                        JOptionPane.showMessageDialog(null, "New Title rented successfully\n"
+                        		+ "Please refresh");
                         ID.setText("");
                         titleId.setText("");
                         available.setText("");
@@ -1194,6 +1197,7 @@ public class Rent extends JFrame implements ActionListener{
        	        	btnSaveFreeRent.setVisible(true);
        	        	btnFreeRent.setVisible(false);
        	        	btnSaveRent.setVisible(false);
+       	        	btnCancel.setBounds(450, 550, 140, 30);
        	        	
        	        } else {
        	        	JOptionPane.showMessageDialog(null, "The Customer does not have any Free Rent Available");
@@ -1204,6 +1208,7 @@ public class Rent extends JFrame implements ActionListener{
         }
 	}
 	//Rent a Title using the Free Rent of the Loyalty Points
+	//This method will manage the rent of the Title using the Free Rent of the Customer
 	public void useFreeRent() {
 		ConectionDB con = new ConectionDB();
 	    Connection conection = con.conect();
@@ -1318,6 +1323,7 @@ public class Rent extends JFrame implements ActionListener{
 	    	               	        	btnSaveRent.setVisible(true);
 	    	               	        	btnFreeRent.setVisible(true);
 	    	               	        	btnSaveFreeRent.setVisible(false);
+	    	               	        	btnCancel.setBounds(600, 550, 100, 30);
 	    	               	        	resetTextField();
 	    	               	        } else {
 	    	               	        	intloyaltyPoints = intloyaltyPoints -100;		//Adding +10 to the Loyalty Points of the Customer
@@ -1381,7 +1387,8 @@ public class Rent extends JFrame implements ActionListener{
 	    		   	            	                
 	    		   	            	                conection.close();
 	    		   	                                
-	    		   	                                JOptionPane.showMessageDialog(null, "New Title rented successfully using Free Points");
+	    		   	                                JOptionPane.showMessageDialog(null, "New Title rented successfully using Free Points/n"
+	    		   	                                		+ "Please refresh");
 	    		   	                                ID.setText("");
 	    		   	                                titleId.setText("");
 	    		   	                                available.setText("");
