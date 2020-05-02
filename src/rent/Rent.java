@@ -36,10 +36,11 @@ import validations.ValidLength;
 
 public class Rent extends JFrame implements ActionListener{
 	private JLabel ltitle, lname, lID, ltitleId, lCDtitle, lDVDtitle, lMovietitle, lSerietitle;
-	private JTextField name, ID, titleId, CDtitle, DVDtitle, Movietitle, Serietitle, rentedDay, returnDay, stock, newAvailable, available, loyaltyPoints, newloyaltyPoints, freeRent, newfreeRent, qttyRent, newqttyRent;
-	private String res, resn, stravailable, strloyaltyPoints, qttyLoyaltyPoints, strfreeRent, qttyfreeRent, strqttyRent, QttyRent;
+	private JTextField name, ID, titleId, CDtitle, DVDtitle, Movietitle, Serietitle, rentedDay, returnDay, stock, newAvailable, available, loyaltyPoints, newloyaltyPoints, freeRent, newfreeRent, qttyRent, newqttyRent, levelId, typeId;
+	private String res, resn, levelDescr, typeDescr, stravailable, strloyaltyPoints, qttyLoyaltyPoints, strfreeRent, qttyfreeRent, strqttyRent, QttyRent;
 	private int qttyStock, qttyAvailable, intloyaltyPoints, intfreeRent, intqttyRent;
 	boolean rentIsFree = false;
+	private DefaultTableModel model; 
 	private JButton btnRefresh, btnNewCDRent, btnNewDVDRent, btnNewMovieRent, btnNewSerieRent, btnSearchName, btnSearchCD, btnSearchDVD, btnSearchMovie, btnSearchSerie, btnSaveRent, btnCancel, btnFreeRent, btnSaveFreeRent;
 
 	public Rent() {
@@ -138,11 +139,13 @@ public class Rent extends JFrame implements ActionListener{
                     
                 model.addRow(col);
             }
-            JTable table = new JTable(model);
-                
+            //Add the model to the table
+        	JTable table = new JTable(model);
+        	//Add the scroll to the table
             JScrollPane scroll= new JScrollPane(table);
             table.setBounds(40,120,1000,200);
             scroll.setBounds(40,120,1000,200);
+            //Add the scroll to the Panel
             p.add(scroll);
                     
         } catch (SQLException ex){
@@ -155,58 +158,16 @@ public class Rent extends JFrame implements ActionListener{
         btnRefresh.setBounds(40, 70, 100, 30);
         btnRefresh.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-            	
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                try{
-                    
-                    DefaultTableModel model = new DefaultTableModel();
-                    
-                    PreparedStatement ps = null;
-                    ResultSet rs = null;
-                    //'refresh' will be the query that we will send to the database to show all the Customers
-                    String refresh = "SELECT rent.rentId, CONCAT(customer.name, ' ', customer.surname) AS customerName, title.name AS RentedTitle, rent.rentDay, rent.returnDay, rent.returned, rent.latenessDeduction, rent.damageDeduction "
-                    		+ "FROM rent "
-                    		+ "INNER JOIN customer ON rent.custId=customer.custId "
-                    		+ "INNER JOIN title ON rent.titleId=title.titleId;";
-                    System.out.println("Query refresh: " + refresh);
-                    //Adding the result to the rows of the table
-                    ps = conection.prepareStatement(refresh);
-                    rs = ps.executeQuery();
-                    
-                    ResultSetMetaData rsMD = rs.getMetaData();
-                    int qttycol = rsMD.getColumnCount();
-                    
-                    model.addColumn("Rent ID");
-                    model.addColumn("Customer Name");
-                    model.addColumn("Rented Title");
-                    model.addColumn("Rent Day");
-                    model.addColumn("Return Day");
-                    model.addColumn("Returned");
-                    model.addColumn("Lateness Deduction");
-                    model.addColumn("Damage Deduction");
-                    
-                    while(rs.next()){
-                        Object[] col = new Object[qttycol];
-                        
-                        for(int i = 0; i<qttycol; i++){
-                            col[i] = rs.getObject(i+1);
-                        }
-                        
-                        model.addRow(col);
-                    }
-
-                    JTable table = new JTable(model);
-                    
-                    JScrollPane scroll= new JScrollPane(table);
-                    table.setBounds(40,120,1000,200);
-                    scroll.setBounds(40,120,1000,200);
-
-                    p.add(scroll);
-                    
-                } catch (SQLException ex){
-                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-                }
+            	//Call method 'refresh'
+            	refresh();
+            	//Add the model to the table
+            	JTable table = new JTable(model);
+            	//Add the scroll to the table
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
+              //Add the scroll to the Panel
+                p.add(scroll);
             }
         });
         
@@ -296,60 +257,17 @@ public class Rent extends JFrame implements ActionListener{
         btnSearchName.setVisible(false);
         btnSearchName.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                
-                String filter = name.getText();
-                String where = "";
-                //Our filter must not be empty
-                if(!"".equals(filter)){
-                    where = "WHERE name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
-                }
-                try{
-                    
-                    DefaultTableModel model = new DefaultTableModel();
-                    
-                    PreparedStatement ps = null;
-                    ResultSet rs = null;
-                    //'search' will be the query that we will send to the database to find the results
-                    String search = "SELECT customer.custId, customer.name, customer.surname, membershipCard.loyaltyPoints, membershipCard.freeRent, membershipCard.qttyRent "
-                    		+ "FROM customer "
-                    		+ "INNER JOIN membershipCard ON customer.custId=membershipCard.custId " + where;
-                    
-                    System.out.println(search);
-                    ps = conection.prepareStatement(search);
-                    rs = ps.executeQuery();
-                    //Adding the result to the rows of the table
-                    ResultSetMetaData rsMD = rs.getMetaData();
-                    int qttycol = rsMD.getColumnCount();
-                    
-                    model.addColumn("ID");
-                    model.addColumn("First Name");
-                    model.addColumn("Second Name");
-                    model.addColumn("Loyalty Points");
-                    model.addColumn("Free Rent");
-                    model.addColumn("Titles Rented");
-
-                    while(rs.next()){
-                        Object[] col = new Object[qttycol];
-                        
-                        for(int i = 0; i<qttycol; i++){
-                            col[i] = rs.getObject(i+1);
-                        }
-                        
-                        model.addRow(col);
-                    }
-
-                    JTable table = new JTable(model);
-                    JScrollPane scroll= new JScrollPane(table);
-                    table.setBounds(40,120,1000,200);
-                    scroll.setBounds(40,120,1000,200);
-
-                    p.add(scroll);
-                    
-                } catch (SQLException ex){
-                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-                }
+                //Call method 'searchName'
+            	searchName();
+            	//Add the model to the table
+            	JTable table = new JTable(model);
+            	//Add the scroll to the table
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
+                //Add the scroll to the Panel
+                p.add(scroll);
+            	
             }
         });
         
@@ -379,64 +297,16 @@ public class Rent extends JFrame implements ActionListener{
         btnSearchCD.setVisible(false);
         btnSearchCD.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                
-                String filter = CDtitle.getText();
-                System.out.println("My filter is " + filter);
-                String where = "";
-                //Our filter must not be empty
-                if(!"".equals(filter)){
-                    where = "WHERE title.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
-                    System.out.println("My where SQL is " + where);
-                }
-                try{
-                    
-                    DefaultTableModel model = new DefaultTableModel();
-                    
-                    PreparedStatement ps = null;
-                    ResultSet rs = null;
-                    //'search' will be the query that we will send to the database to show the search result
-                    String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, music.artist, title.stock, title.available, title.rentPrice "
-                    		+ "FROM title "
-                    		+ "INNER JOIN music ON title.titleId=music.musicId " + where +" AND format = 'CD'";
-                    
-                    System.out.println(search);
-                    ps = conection.prepareStatement(search);
-                    rs = ps.executeQuery();
-                    //Adding the result to the rows of the table
-                    ResultSetMetaData rsMD = rs.getMetaData();
-                    int qttycol = rsMD.getColumnCount();
-                    
-                    model.addColumn("ID");
-	                model.addColumn("Name");
-	                model.addColumn("Release Year");
-	                model.addColumn("Genre");
-	                model.addColumn("Artist");
-	                model.addColumn("Stock");
-	                model.addColumn("Available");
-	                model.addColumn("Rent Price");
-                    
-                    while(rs.next()){
-                        Object[] col = new Object[qttycol];
-                        
-                        for(int i = 0; i<qttycol; i++){
-                            col[i] = rs.getObject(i+1);
-                        }
-                        
-                        model.addRow(col);
-                    }
-
-                    JTable table = new JTable(model);
-                    JScrollPane scroll= new JScrollPane(table);
-                    table.setBounds(40,120,1000,200);
-                    scroll.setBounds(40,120,1000,200);
-
-                    p.add(scroll);
-                    
-                } catch (SQLException ex){
-                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-                }
+                //Call method 'searchCD'
+            	searchCD();
+            	//Add the model to the table
+            	JTable table = new JTable(model);
+            	//Add the scroll to the table
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
+                //Add the scroll to the Panel
+                p.add(scroll);
             }
         });        
         
@@ -456,62 +326,16 @@ public class Rent extends JFrame implements ActionListener{
         btnSearchDVD.setVisible(false);
         btnSearchDVD.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                
-                String filter = DVDtitle.getText();
-                String where = "";
-                //Our filter must not be empty
-                if(!"".equals(filter)){
-                    where = "WHERE title.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
-                }
-                try{
-                    
-                    DefaultTableModel model = new DefaultTableModel();
-                    
-                    PreparedStatement ps = null;
-                    ResultSet rs = null;
-                    //'search' will be the query that we will send to the database to show the search result
-                    String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, music.artist, title.stock, title.available, title.rentPrice "
-                    		+ "FROM title "
-                    		+ "INNER JOIN music ON title.titleId=music.musicId " + where +" AND format = 'DVD'";
-                    
-                    System.out.println(search);
-                    ps = conection.prepareStatement(search);
-                    rs = ps.executeQuery();
-                    //Adding the result to the rows of the table
-                    ResultSetMetaData rsMD = rs.getMetaData();
-                    int qttycol = rsMD.getColumnCount();
-                    
-                    model.addColumn("ID");
-	                model.addColumn("Name");
-	                model.addColumn("Release Year");
-	                model.addColumn("Genre");
-	                model.addColumn("Artist");
-	                model.addColumn("Stock");
-	                model.addColumn("Available");
-	                model.addColumn("Rent Price");
-                    
-                    while(rs.next()){
-                        Object[] col = new Object[qttycol];
-                        
-                        for(int i = 0; i<qttycol; i++){
-                            col[i] = rs.getObject(i+1);
-                        }
-                        
-                        model.addRow(col);
-                    }
-
-                    JTable table = new JTable(model);
-                    JScrollPane scroll= new JScrollPane(table);
-                    table.setBounds(40,120,1000,200);
-                    scroll.setBounds(40,120,1000,200);
-
-                    p.add(scroll);
-                    
-                } catch (SQLException ex){
-                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-                }
+                //Call method 'searchDVD'
+            	searchDVD();
+            	//Add the model to the table
+            	JTable table = new JTable(model);
+            	//Add the scroll to the table
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
+                //Add the scroll to the Panel
+                p.add(scroll);
             }
         });
         
@@ -531,62 +355,16 @@ public class Rent extends JFrame implements ActionListener{
         btnSearchMovie.setVisible(false);
         btnSearchMovie.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                
-                String filter = Movietitle.getText();
-                String where = "";
-                //Our filter must not be empty
-                if(!"".equals(filter)){
-                    where = "WHERE title.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
-                }
-                try{
-                    
-                    DefaultTableModel model = new DefaultTableModel();
-                    
-                    PreparedStatement ps = null;
-                    ResultSet rs = null;
-                    //'search' will be the query that we will send to the database to show the search result
-                    String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, movie.format, title.stock, title.available, title.rentPrice "
-                    		+ "FROM title "
-                    		+ "INNER JOIN movie ON title.titleId=movie.movieId " + where;
-                    
-                    System.out.println(search);
-                    ps = conection.prepareStatement(search);
-                    rs = ps.executeQuery();
-                    //Adding the result to the rows of the table
-                    ResultSetMetaData rsMD = rs.getMetaData();
-                    int qttycol = rsMD.getColumnCount();
-                    
-                    model.addColumn("ID");
-	                model.addColumn("Name");
-	                model.addColumn("Release Year");
-	                model.addColumn("Genre");
-	                model.addColumn("Format");
-	                model.addColumn("Stock");
-	                model.addColumn("Available");
-	                model.addColumn("Rent Price");
-                    
-                    while(rs.next()){
-                        Object[] col = new Object[qttycol];
-                        
-                        for(int i = 0; i<qttycol; i++){
-                            col[i] = rs.getObject(i+1);
-                        }
-                        
-                        model.addRow(col);
-                    }
-
-                    JTable table = new JTable(model);
-                    JScrollPane scroll= new JScrollPane(table);
-                    table.setBounds(40,120,1000,200);
-                    scroll.setBounds(40,120,1000,200);
-
-                    p.add(scroll);
-                    
-                } catch (SQLException ex){
-                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-                }
+                //Call method 'searchMovie'
+            	searchMovie();
+            	//Add the model to the table
+            	JTable table = new JTable(model);
+            	//Add the scroll to the table
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
+                //Add the scroll to the Panel
+                p.add(scroll);
             }
         });
         
@@ -606,65 +384,18 @@ public class Rent extends JFrame implements ActionListener{
         btnSearchSerie.setVisible(false);
         btnSearchSerie.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-                ConectionDB con = new ConectionDB();
-                Connection conection = con.conect();
-                
-                String filter = Serietitle.getText();
-                String where = "";
-                //Our filter must not be empty
-                if(!"".equals(filter)){
-                    where = "WHERE title.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
-                }
-                try{
-                    
-                    DefaultTableModel model = new DefaultTableModel();
-                    
-                    PreparedStatement ps = null;
-                    ResultSet rs = null;
-                    //'search' will be the query that we will send to the database to show the search result
-                    String search = "SELECT title.titleId, title.name, tvboxset.language, tvboxset.seasons, tvboxset.episodes, title.stock, title.available, title.rentPrice  "
-                    		+ "FROM title "
-                    		+ "INNER JOIN tvboxset ON title.titleId=tvboxset.serieId " + where;
-                    
-                    System.out.println(search);
-                    ps = conection.prepareStatement(search);
-                    rs = ps.executeQuery();
-                    //Adding the result to the rows of the table
-                    ResultSetMetaData rsMD = rs.getMetaData();
-                    int qttycol = rsMD.getColumnCount();
-                    
-                    model.addColumn("ID");
-	                model.addColumn("Name");
-	                model.addColumn("Language");
-	                model.addColumn("Seasons");
-	                model.addColumn("Episodes");
-	                model.addColumn("Stock");
-	                model.addColumn("Available");
-	                model.addColumn("Rent Price");
-                    
-                    while(rs.next()){
-                        Object[] col = new Object[qttycol];
-                        
-                        for(int i = 0; i<qttycol; i++){
-                            col[i] = rs.getObject(i+1);
-                        }
-                        
-                        model.addRow(col);
-                    }
-
-                    JTable table = new JTable(model);
-                    JScrollPane scroll= new JScrollPane(table);
-                    table.setBounds(40,120,1000,200);
-                    scroll.setBounds(40,120,1000,200);
-
-                    p.add(scroll);
-                    
-                } catch (SQLException ex){
-                    JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
-                }
+                //Call method 'searchSerie'
+            	searchSerie();
+            	//Add the model to the table
+            	JTable table = new JTable(model);
+            	//Add the scroll to the table
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
+                //Add the scroll to the Panel
+                p.add(scroll);
             }
         });
-        
         
         Calendar dayRented = Calendar.getInstance();
         System.out.println("Current date: " + formatCalendar(dayRented));		//The Rent day will be the current day
@@ -717,6 +448,14 @@ public class Rent extends JFrame implements ActionListener{
         newqttyRent.setBounds(70, 200, 100, 25);
         newqttyRent.setVisible(false);
         
+        levelId = new JTextField();
+        levelId.setBounds(70, 170, 100, 25);
+        //levelId.setVisible(false);
+        
+        typeId = new JTextField();
+        typeId.setBounds(270, 170, 100, 25);
+        //typeId.setVisible(false);
+        
         //Save Rent button
         btnSaveRent = new JButton("Rent Title");
         btnSaveRent.setFont(fontButton);
@@ -730,49 +469,11 @@ public class Rent extends JFrame implements ActionListener{
             	}else {
             		ConectionDB con = new ConectionDB();
             	    Connection conection = con.conect();
-            	    //Check if the Customer is able to rent a Title
-        	        qttyRent();
-        	        //The Customer cannot rent more than 4 Titles
-        	        if(intqttyRent == 4) {
-                    	JOptionPane.showMessageDialog(null, "The Rent of the Title is not possible!\n"
-                    			+ "The Customer is allowed to rent only 4 Titles");
-        	        } else {
-                	    //Check stock
-                	    try {
-                	    	String filter = titleId.getText();
-                	        String where = "";
-                	        //Our filter must not be empty
-                	        if(!"".equals(filter)){
-                	            where = "WHERE titleID = " + filter;
-                	        }
-                	    	PreparedStatement ps = null;
-                	        ResultSet rs = null;
-                	        //'search' will be the query that will be send to the database to find the stock and available
-                	        String search = "SELECT stock FROM title " + where;
-                	        System.out.println(search);
-                	        ps = conection.prepareStatement(search);
-                	        rs = ps.executeQuery();
-                	        //We will take the result of the query and this will be written on the JTextField 'stock'
-                	        while(rs.next()) {
-                	        	stock.setText(rs.getString("stock"));
-                	            res = rs.getString("stock");
-                	            System.out.println("Stock: " + rs.getString("stock"));
-                	        }
-                	        //The quantity in Stock must be more than 0
-                	        qttyStock = Integer.parseInt(stock.getText());
-                	        if(qttyStock > 0) {
-
-                	        	checkAvailability();
-
-                	        }else {
-                	        	JOptionPane.showMessageDialog(null, "The rent is not possible! \n"
-                	        			+ "Stock quantity of the Title is 0");
-                	        }
-                	    } catch (Exception e){      //If something goes wrong
-                	        JOptionPane.showMessageDialog(null, "Error finding the Stock quantity! \n"
-                	        		+ "Please check the ID of the Title");
-                	    }
-        	        }
+            	    //Check the Level of the Customer
+            	    level();
+            	    //Call method allowRent
+            	    allowRent();
+        	        
             	}
             }
         });
@@ -851,12 +552,14 @@ public class Rent extends JFrame implements ActionListener{
         p.add(btnSaveFreeRent);
         p.add(qttyRent);
         p.add(newqttyRent);
+        p.add(levelId);
+        p.add(typeId);
         
         this.validate();
         this.repaint();
 	}
 
-	//This will modify the window to be able to see all the required information to rent a Title
+	//This method will modify the window to be able to see all the required information to rent a Title
 	public void rentScreen() {
 		lID.setVisible(true);
 		ID.setVisible(true);
@@ -879,7 +582,7 @@ public class Rent extends JFrame implements ActionListener{
 		btnCancel.setVisible(true);
 		btnFreeRent.setVisible(true);
 	}
-	
+	//This method will return the components of the window to their original state
 	public void normalScreen() {
 		lID.setVisible(false);
 		ID.setVisible(false);
@@ -912,8 +615,310 @@ public class Rent extends JFrame implements ActionListener{
 		btnFreeRent.setVisible(false);
 		btnSaveFreeRent.setVisible(false);
 	}
-	
+	//This will refresh our table after doing any changes
+	public void refresh() {
+        ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        try{
+            
+            model = new DefaultTableModel();
+            
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'refresh' will be the query that we will send to the database to show all the Customers
+            String refresh = "SELECT rent.rentId, CONCAT(customer.name, ' ', customer.surname) AS customerName, title.name AS RentedTitle, rent.rentDay, rent.returnDay, rent.returned, rent.latenessDeduction, rent.damageDeduction "
+            		+ "FROM rent "
+            		+ "INNER JOIN customer ON rent.custId=customer.custId "
+            		+ "INNER JOIN title ON rent.titleId=title.titleId;";
+            System.out.println("Query refresh: " + refresh);
+            //Adding the result to the rows of the table
+            ps = conection.prepareStatement(refresh);
+            rs = ps.executeQuery();
+            
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+            
+            model.addColumn("Rent ID");
+            model.addColumn("Customer Name");
+            model.addColumn("Rented Title");
+            model.addColumn("Rent Day");
+            model.addColumn("Return Day");
+            model.addColumn("Returned");
+            model.addColumn("Lateness Deduction");
+            model.addColumn("Damage Deduction");
+            
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }
+                
+                model.addRow(col);
+            }
+
+            
+            
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+	}
+	//This method will search using the name of the Customer
+	public void searchName() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        
+        String filter = name.getText();
+        String where = "";
+        //Our filter must not be empty
+        if(!"".equals(filter)){
+            where = "WHERE name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
+        }
+        try{
+            
+            model = new DefaultTableModel();
+            
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'search' will be the query that we will send to the database to find the results
+            String search = "SELECT customer.custId, customer.name, customer.surname, membershipCard.Level, membershipCard.loyaltyPoints, membershipCard.freeRent, membershipCard.qttyRent "
+            		+ "FROM customer "
+            		+ "INNER JOIN membershipCard ON customer.custId=membershipCard.custId " + where;
+            
+            System.out.println(search);
+            ps = conection.prepareStatement(search);
+            rs = ps.executeQuery();
+            //Adding the result to the rows of the table
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+            
+            model.addColumn("ID");
+            model.addColumn("First Name");
+            model.addColumn("Second Name");
+            model.addColumn("Level");
+            model.addColumn("Loyalty Points");
+            model.addColumn("Free Rent");
+            model.addColumn("Titles Rented");
+
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }
+                
+                model.addRow(col);
+            }
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+
+	}
+	//This method will search using the Title of the CD
+	public void searchCD() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        
+        String filter = CDtitle.getText();
+        System.out.println("My filter is " + filter);
+        String where = "";
+        //Our filter must not be empty
+        if(!"".equals(filter)){
+            where = "WHERE title.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
+            System.out.println("My where SQL is " + where);
+        }
+        try{
+            
+            model = new DefaultTableModel();
+            
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'search' will be the query that we will send to the database to show the search result
+            String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, music.artist, title.stock, title.available, title.rentPrice "
+            		+ "FROM title "
+            		+ "INNER JOIN music ON title.titleId=music.musicId " + where +" AND format = 'CD'";
+            
+            System.out.println(search);
+            ps = conection.prepareStatement(search);
+            rs = ps.executeQuery();
+            //Adding the result to the rows of the table
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+            
+            model.addColumn("ID");
+            model.addColumn("Name");
+            model.addColumn("Release Year");
+            model.addColumn("Genre");
+            model.addColumn("Artist");
+            model.addColumn("Stock");
+            model.addColumn("Available");
+            model.addColumn("Rent Price");
+            
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }
+                
+                model.addRow(col);
+            }  
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+	}
+	//This method will search using the Title of the DVD Music Video
+	public void searchDVD() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        
+        String filter = DVDtitle.getText();
+        String where = "";
+        //Our filter must not be empty
+        if(!"".equals(filter)){
+            where = "WHERE title.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
+        }
+        try{
+            
+            model = new DefaultTableModel();
+            
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'search' will be the query that we will send to the database to show the search result
+            String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, music.artist, title.stock, title.available, title.rentPrice "
+            		+ "FROM title "
+            		+ "INNER JOIN music ON title.titleId=music.musicId " + where +" AND format = 'DVD'";
+            
+            System.out.println(search);
+            ps = conection.prepareStatement(search);
+            rs = ps.executeQuery();
+            //Adding the result to the rows of the table
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+            
+            model.addColumn("ID");
+            model.addColumn("Name");
+            model.addColumn("Release Year");
+            model.addColumn("Genre");
+            model.addColumn("Artist");
+            model.addColumn("Stock");
+            model.addColumn("Available");
+            model.addColumn("Rent Price");
+            
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }
+                model.addRow(col);
+            }
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+	}
+	//This method will search using the Title of the Movie
+	public void searchMovie() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        
+        String filter = Movietitle.getText();
+        String where = "";
+        //Our filter must not be empty
+        if(!"".equals(filter)){
+            where = "WHERE title.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
+        }
+        try{
+            
+            model = new DefaultTableModel();
+            
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'search' will be the query that we will send to the database to show the search result
+            String search = "SELECT title.titleId, title.name, title.releaseYear, title.genre, movie.format, title.stock, title.available, title.rentPrice "
+            		+ "FROM title "
+            		+ "INNER JOIN movie ON title.titleId=movie.movieId " + where;
+            
+            System.out.println(search);
+            ps = conection.prepareStatement(search);
+            rs = ps.executeQuery();
+            //Adding the result to the rows of the table
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+            
+            model.addColumn("ID");
+            model.addColumn("Name");
+            model.addColumn("Release Year");
+            model.addColumn("Genre");
+            model.addColumn("Format");
+            model.addColumn("Stock");
+            model.addColumn("Available");
+            model.addColumn("Rent Price");
+            
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }
+                model.addRow(col);
+            }
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+	}
+	//This method will search using the Title of the TV Box Serie
+	public void searchSerie() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        
+        String filter = Serietitle.getText();
+        String where = "";
+        //Our filter must not be empty
+        if(!"".equals(filter)){
+            where = "WHERE title.name LIKE '%" + filter + "%'";        //This means that if we do not type anything of the name, our WHERE will be empty and if something has been typed, our WHERE will contain the name
+        }
+        try{
+            
+            model = new DefaultTableModel();
+            
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'search' will be the query that we will send to the database to show the search result
+            String search = "SELECT title.titleId, title.name, tvboxset.language, tvboxset.seasons, tvboxset.episodes, title.stock, title.available, title.rentPrice  "
+            		+ "FROM title "
+            		+ "INNER JOIN tvboxset ON title.titleId=tvboxset.serieId " + where;
+            
+            System.out.println(search);
+            ps = conection.prepareStatement(search);
+            rs = ps.executeQuery();
+            //Adding the result to the rows of the table
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+            
+            model.addColumn("ID");
+            model.addColumn("Name");
+            model.addColumn("Language");
+            model.addColumn("Seasons");
+            model.addColumn("Episodes");
+            model.addColumn("Stock");
+            model.addColumn("Available");
+            model.addColumn("Rent Price");
+            
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }
+                model.addRow(col);
+            } 
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+	}
 	//This will check if the title has enough quantity to rent	
+	//This method will check if the Title has availability to be rented
 	public void checkAvailability() {
 			
 			ConectionDB con = new ConectionDB();
@@ -1006,498 +1011,654 @@ public class Rent extends JFrame implements ActionListener{
                 JOptionPane.showMessageDialog(null, "Error finding Availability!");
             }
 		}
-		
-		//This will manage the Loyalty Points	
-		public void loyaltyPoints() {
+	//This will manage the Loyalty Points	
+	//This method will manage the Loyalty Points of the Customer
+	public void loyaltyPoints() {
 					
-			ConectionDB con = new ConectionDB();
-            Connection conection = con.conect();
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
             
-            try{
-            	//Declaring our 'where' condition to be used as filter
-            	String filter = ID.getText();
+        try{
+         	//Declaring our 'where' condition to be used as filter
+           	String filter = ID.getText();
+    	    String where = "";
+    	    //Our filter must not be empty
+    	    if(!"".equals(filter)){
+    	        where = "WHERE custId = " + filter;
+    	    }
+    	  	PreparedStatement ps = null;
+    	    ResultSet rs = null;
+    	       
+    	    //'search' will be the query that will be send to the database to find the stock and available
+    	    String search = "SELECT loyaltyPoints FROM membershipCard " + where;
+    	    System.out.println(search);
+    	    ps = conection.prepareStatement(search);
+    	    rs = ps.executeQuery();
+    	    //We will take the result of the query and this will be written on the JTextField 'loyaltyPoints'
+    	    while(rs.next()) {
+    	    	loyaltyPoints.setText(rs.getString("loyaltyPoints"));
+    	        res = rs.getString("loyaltyPoints");
+    	        System.out.println("Loyalty Points: " + rs.getString("loyaltyPoints"));
+    	    }
+    	       
+    	    strloyaltyPoints = loyaltyPoints.getText();		//Storing the content of the JTextField on a String
+    	    System.out.println(strloyaltyPoints);
+    	    intloyaltyPoints = Integer.parseInt(loyaltyPoints.getText());		//Converting the value of that String to an Integer
+    	    intloyaltyPoints = intloyaltyPoints +10;		//Adding +10 to the Loyalty Points of the Customer
+    	    System.out.println(intloyaltyPoints);
+    	     
+    	    qttyLoyaltyPoints = Integer.toString(intloyaltyPoints);
+    	       
+    	    newloyaltyPoints.setText(qttyLoyaltyPoints);		//The value of that String will be written on a JTextField
+    	    System.out.println("New Loyalty Points: " + qttyLoyaltyPoints);
+    	    try{
+    	      	
+    	      	//'newloyaltypoints' will be the query that we will send to the database to find the results
+               	String newloyaltypoints = "UPDATE membershipCard SET loyaltyPoints = ? " + where;
+                System.out.println("My update Loyalty Points: " + newloyaltypoints);
+                PreparedStatement newstatement = conection.prepareStatement(newloyaltypoints);
+                   
+                newstatement.setString(1, newloyaltyPoints.getText());
+                    
+                newstatement.execute();
+    	        	
+    	    }catch (Exception e){      //If something goes wrong
+               	JOptionPane.showMessageDialog(null, "Error inserting Loyalty Points!");
+            }
+    	        
+    	    freeRent();
+    	        
+    	    conection.close();
+    	        
+    	    //JOptionPane.showMessageDialog(null, "Loyalty Points updated successfully");
+    	    loyaltyPoints.setText("");
+    	    newloyaltyPoints.setText("");
+    	      
+    	        
+        } catch (Exception e){      //If something goes wrong
+          	JOptionPane.showMessageDialog(null, "Error finding Loyalty Points!");
+        }			
+	}
+	//This method will check if the User has a Free Rent
+	public void freeRent() {
+		if(intloyaltyPoints % 100 == 0) {		//The free rent will be available when the loyalty points is any number multiple of 100
+			numberOffreeRent();		//Check the Number of Free Rents available
+			JOptionPane.showMessageDialog(null, "Congratulations! \n"
+	       			+ "You have " + intloyaltyPoints + " Loyalty Points\n"
+	       					+ "You have " + qttyfreeRent + " available Free Rent(s)");
+	       	rentIsFree = true;		//The Customer has at least one Free Rent
+		}
+	}
+	//This method will calculate the number of Free Rents that the Customer has
+	//This method will calculate the number of Free Rents of the Customer
+	public void numberOffreeRent() {
+			
+		ConectionDB con = new ConectionDB();
+	    Connection conection = con.conect();
+	        
+	    try{
+	        	
+	      	String filter = ID.getText();
+		    String where = "";
+		    //Our filter must not be empty
+		    if(!"".equals(filter)){
+		        where = "WHERE custId = " + filter;
+		    }
+		  	PreparedStatement ps = null;
+		    ResultSet rs = null;
+		       
+		    //'search' will be the query that will be send to the database to find the stock and available
+		    String search = "SELECT freeRent FROM membershipCard " + where;
+		    System.out.println(search);
+		    ps = conection.prepareStatement(search);
+		    rs = ps.executeQuery();
+		    //We will take the result of the query and this will be written on the JTextField 'stock'
+		    while(rs.next()) {
+		     	freeRent.setText(rs.getString("freeRent"));
+		        res = rs.getString("freeRent");
+		        System.out.println("Free Rent: " + rs.getString("freeRent"));
+		    }
+		        
+		    strfreeRent = freeRent.getText();
+		    System.out.println(strfreeRent);
+		    intfreeRent = Integer.parseInt(freeRent.getText());
+		    intfreeRent = intloyaltyPoints /100;
+		    System.out.println(intfreeRent);
+		      
+		    qttyfreeRent = Integer.toString(intfreeRent);
+		        
+		    newfreeRent.setText(qttyfreeRent);
+		    System.out.println("Quantity of Free rent: " + qttyfreeRent);
+		       
+		    try{
+		      	
+		    	//'freeRentLeft' will be the query that we will send to the database to find the results
+	            String freeRentLeft = "UPDATE membershipCard SET freeRent = ? " + where;
+	            System.out.println("My update Free Rent: " + freeRentLeft);
+	            PreparedStatement newstatement = conection.prepareStatement(freeRentLeft);
+	                
+	            newstatement.setString(1, newfreeRent.getText());
+	                
+	            newstatement.execute();
+		        
+		    }catch (Exception e){      //If something goes wrong
+	          	JOptionPane.showMessageDialog(null, "Error calculating Free Rent left!");
+	        }
+		    conection.close();
+		        
+		    //JOptionPane.showMessageDialog(null, "Free Rent used successfully");
+		    freeRent.setText("");
+		    newfreeRent.setText("");
+		       
+	    } catch (Exception e){      //If something goes wrong
+	       	JOptionPane.showMessageDialog(null, "Error finding Free Rent!");
+	    }
+	}
+	//This method will check if the Customer is available to use a Free Rent
+	//This method will check if the Customer has any Free Rent available
+	public void checkFreeRent() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        if(ID.getText().equals("")) {
+           	JOptionPane.showMessageDialog(null, "Customer ID empty!");
+        }else {
+          	try{
+            		
+          		String filter = ID.getText();
+       	        String where = "";
+       	        //Our filter must not be empty
+       	        if(!"".equals(filter)){
+       	            where = "WHERE custId = " + filter;
+       	        }
+       	    	PreparedStatement ps = null;
+       	        ResultSet rs = null;
+        	        
+       	        //'search' will be the query that will be send to the database to find the stock and available
+       	        String search = "SELECT freeRent FROM membershipCard " + where;
+       	        System.out.println(search);
+       	        ps = conection.prepareStatement(search);
+       	        rs = ps.executeQuery();
+       	        //We will take the result of the query and this will be written on the JTextField 'freeRent'
+       	        while(rs.next()) {
+       	        	freeRent.setText(rs.getString("freeRent"));
+       	            res = rs.getString("freeRent");
+       	            System.out.println("Free Rent: " + rs.getString("freeRent"));
+       	        }
+       	        
+       	        strfreeRent = freeRent.getText();
+       	        System.out.println(strfreeRent);
+       	        intfreeRent = Integer.parseInt(freeRent.getText());
+       	        //Validation if the Customer has any Free Rent Available
+       	        if(intfreeRent > 0) {
+       	        	JOptionPane.showMessageDialog(null, "This Customer has " + intfreeRent + " Free Rent available(s)");
+       	        	btnSaveFreeRent.setVisible(true);
+       	        	btnFreeRent.setVisible(false);
+       	        	btnSaveRent.setVisible(false);
+       	        	
+       	        } else {
+       	        	JOptionPane.showMessageDialog(null, "The Customer does not have any Free Rent Available");
+       	        }
+          	} catch (Exception e){      //If something goes wrong
+               	JOptionPane.showMessageDialog(null, "Error finding Loyalty Points!");
+            }
+        }
+	}
+	//Rent a Title using the Free Rent of the Loyalty Points
+	public void useFreeRent() {
+		ConectionDB con = new ConectionDB();
+	    Connection conection = con.conect();
+	    //Title ID must not be empty
+	    if(titleId.getText().equals("")) {
+          	JOptionPane.showMessageDialog(null, "Title ID empty!");
+        } else {
+	        
+		    String filter = titleId.getText();
+		    String whereTitleId = "";
+		    //Our filter must not be empty
+		    if(!"".equals(filter)){
+		      	whereTitleId = "WHERE titleID = " + filter;
+		        System.out.println("whereTitleId: " + whereTitleId);
+		    }	
+		    //Check if the Customer is able to rent a Title
+		    qttyRent();
+		    //The Customer cannot rent more than 4 Titles
+		    if(intqttyRent == 4) {
+	           	JOptionPane.showMessageDialog(null, "The Rent of the Title is not possible!\n"
+	          			+ "The Customer is allowed to rent only 4 Titles");
+	        } else {
+	            	
+	          	//Check if the Title has availability
+	    	    try {
+	    	      	PreparedStatement pst = null;
+	    		    ResultSet rst = null;
+	    		       
+	    		    //'newsearch' will be the query that will be send to the database to find the stock and available
+	    		    String newsearch = "SELECT available FROM title " + whereTitleId;
+	    		    System.out.println("newsearch: " + newsearch);
+	    		    pst = conection.prepareStatement(newsearch);
+	    		    rst = pst.executeQuery();
+	    		    //We will take the result of the query and this will be written on the JTextField 'available'
+	    		    while(rst.next()) {
+	    		     	available.setText(rst.getString("available"));
+	    		        res = rst.getString("available");
+	    		        System.out.println("Available: " + rst.getString("available"));
+	    		    }
+	    		        
+	    		    qttyAvailable = Integer.parseInt(available.getText());
+	    		    System.out.println("Available Integer" + qttyAvailable);
+	    		    //The quantity available must not be 0
+	    		    if(qttyAvailable == 0) {
+	    		       	JOptionPane.showMessageDialog(null, "The rent is not possible! \n"
+	    		       			+ "There is not enough titles availables to rent");
+	    		    } else {
+	    		      	//Calculating to new Available quantity
+	    		    	    
+	    		  	    qttyAvailable --;		//Subtracting -1 to the quantity Available
+	    		   	    System.out.println("Available Integer -1: " + qttyAvailable);
+	        	       	stravailable = Integer.toString(qttyAvailable);		//Converting the new quantity available to an Integer
+	        	      	System.out.println("stravailable: " + stravailable);
+	        	       	newAvailable.setText(stravailable);		//The value of that String will be written on a JTextField
+	        	       	System.out.println("New Qtty Availalble: " + stravailable);
+	        	       	//Updating quantity available
+	    		   	    try {
+	    		   	    	//'updateavailable' will be the query that we will send to the database to find the results
+	                       	String updateavailable = "UPDATE title SET available = ? " + whereTitleId;
+	                        System.out.println("My update Available: " + updateavailable);
+	                        PreparedStatement newstatement = conection.prepareStatement(updateavailable);
+	                            
+	                        newstatement.setString(1, newAvailable.getText());
+	                           
+	                        newstatement.execute();
+	                        //JOptionPane.showMessageDialog(null, "available updated");
+	                        //Saving information of the rent of the Title
+	                        try {
+	        		        		
+	                          	//'addrent' will be query that will be send to the database to add a new register on the table rent                    
+	    	                    String addrent = "INSERT INTO rent (rentDay, returnDay, titleId, custId) VALUES(?, ?, ?, ?)"; 
+	    	                    System.out.println("Query new Rent " + addrent);
+	    	                    PreparedStatement statement = conection.prepareStatement(addrent);
+	    	                    statement.setString(1, rentedDay.getText());
+	    	                    statement.setString(2, returnDay.getText());
+	    	                    statement.setString(3, titleId.getText());
+	    	                    statement.setString(4, ID.getText());
+	    	                        
+	    	                    statement.executeUpdate();
+	    	                    //JOptionPane.showMessageDialog(null, "information updated");
+	    	                    //Check and calculate Loyalty Points
+	    	                    try {
+	    	                      	String newfilter = ID.getText();
+	    	                        String whereCustId = "";
+	    	                        //Our filter must not be empty
+	    	                        if(!"".equals(newfilter)){
+	    	                        	whereCustId = "WHERE custId = " + newfilter;
+	    	                            System.out.println("whereCustId: " + whereCustId);
+	    	                        }	        
+	    	                            
+	    	                      	PreparedStatement ps = null;
+	    	               	        ResultSet rs = null;
+	    	               	        
+	    	                       	//'search' will be the query that will be send to the database to find the stock and available
+	    	               	        String search = "SELECT loyaltyPoints FROM membershipCard " + whereCustId;
+	    	               	        System.out.println(search);
+	    	               	        ps = conection.prepareStatement(search);
+	    	               	        rs = ps.executeQuery();
+	    	               	        //We will take the result of the query and this will be written on the JTextField 'loyaltyPoints'
+	    	               	        while(rs.next()) {
+	    	               	        	loyaltyPoints.setText(rs.getString("loyaltyPoints"));
+	    	               	            res = rs.getString("loyaltyPoints");
+	    	               	            System.out.println("Loyalty Points: " + rs.getString("loyaltyPoints"));
+	    	               	        }
+	    	                	        
+	    	               	        strloyaltyPoints = loyaltyPoints.getText();		//Storing the content of the JTextField on a String
+	    	               	        System.out.println(strloyaltyPoints);
+	    	               	        intloyaltyPoints = Integer.parseInt(loyaltyPoints.getText());		//Converting the value of that String to an Integer
+	    	               	        //The Customer must have at least 100 Loyalty Points
+	    	               	        if(intloyaltyPoints < 100) {
+	    	               	        	JOptionPane.showMessageDialog(null, "The Customer does not have enough Loyalty Points for a Free Rent!");
+	    	               	        	btnSaveRent.setVisible(true);
+	    	               	        	btnFreeRent.setVisible(true);
+	    	               	        	btnSaveFreeRent.setVisible(false);
+	    	               	        	resetTextField();
+	    	               	        } else {
+	    	               	        	intloyaltyPoints = intloyaltyPoints -100;		//Adding +10 to the Loyalty Points of the Customer
+	    		               	        System.out.println(intloyaltyPoints);
+	    		               	        
+	    		               	        qttyLoyaltyPoints = Integer.toString(intloyaltyPoints);
+	    	               	        
+	    		               	        newloyaltyPoints.setText(qttyLoyaltyPoints);		//The value of that String will be written on a JTextField
+	    		               	        System.out.println("New Loyalty Points: " + qttyLoyaltyPoints);
+	    		               	        
+	    		               	        //Updating Loyalty Points
+	    		               	        try {
+	    		               	        	
+	    		               	        	//'newloyaltypoints' will be the query that we will send to the database to find the results
+	    		                           	String newloyaltypoints = "UPDATE membershipCard SET loyaltyPoints = ? " + whereCustId;
+	    		                            System.out.println("My update Loyalty Points: " + newloyaltypoints);
+	    		                            PreparedStatement newstatement1 = conection.prepareStatement(newloyaltypoints);
+	    		                               
+	    		                            newstatement1.setString(1, newloyaltyPoints.getText());
+	    		                               
+	    		                            newstatement1.execute();
+	    		                            //JOptionPane.showMessageDialog(null, "Loyalty Points updated!");
+	    		                            //Check and calculate new quantity of Free Rent
+	    		                            try {		                                	
+	    		   	                	        PreparedStatement nps = null;
+	    		   	                	        ResultSet nrs = null;
+	    		  	                	        //'searchnew' will be the query that will be send to the database to find the stock and available
+	    		   	                	        String searchnew = "SELECT freeRent FROM membershipCard " + whereCustId;
+	    		   	            		        System.out.println(searchnew);
+	    		   	            		        nps = conection.prepareStatement(searchnew);
+	    		   	            		        nrs = nps.executeQuery();
+	    		   	            		        //We will take the result of the query and this will be written on the JTextField 'freeRent'
+	    		   	            		        while(nrs.next()) {
+	    		   	            		        	freeRent.setText(nrs.getString("freeRent"));
+	    		   	            		            res = nrs.getString("freeRent");
+	    		   	            		            System.out.println("Free Rent: " + nrs.getString("freeRent"));
+	    		   	            		        }
+	    		    	            		        
+	    		   	            		        strfreeRent = freeRent.getText();		//Storing the content of the JTextField on a String
+	    		   	            		        System.out.println(strfreeRent);
+	    		   	            		        intfreeRent = Integer.parseInt(freeRent.getText());		//Converting the value of that String to an Integer
+	    		   	            		        intfreeRent = intfreeRent -1;		//Subtracting -1 to the quantity of Free Rent of the Customer
+	    		   	            		        System.out.println(intfreeRent);
+	    		   	            		        
+	    		   	            		        qttyfreeRent = Integer.toString(intfreeRent);
+	    		   	            		        
+	    		   	            		        newfreeRent.setText(qttyfreeRent);		//The value of that String will be written on a JTextField
+	    		   	            		        System.out.println("Quantity of Free rent: " + qttyfreeRent);
+	    		   	            		        //Updating Free Renty quantity
+	    		   	            		        try {
+	    		   	            		        	//'freeRentLeft' will be the query that we will send to the database to find the results
+	    		   	            	            	String freeRentLeft = "UPDATE membershipCard SET freeRent = ? " + whereCustId;
+	    		   	            	                System.out.println("My update Free Rent: " + freeRentLeft);
+	    		   	            	                PreparedStatement statementnew = conection.prepareStatement(freeRentLeft);
+	    		   	            	                
+	    		   	            	                statementnew.setString(1, newfreeRent.getText());
+	    		   	            	                
+	    		   	            	                statementnew.execute();
+	    		   	            	                
+	    		   	            	                newqttyRent();
+	    		   	            	                
+	    		   	            	                conection.close();
+	    		   	                                
+	    		   	                                JOptionPane.showMessageDialog(null, "New Title rented successfully using Free Points");
+	    		   	                                ID.setText("");
+	    		   	                                titleId.setText("");
+	    		   	                                available.setText("");
+	    		   	                                newAvailable.setText("");
+	    		   	                                
+	    		   	                                normalScreen();
+	    		   	            	                
+	    		   	            		        } catch (Exception e){      //If something goes wrong
+	    		    	    	                    JOptionPane.showMessageDialog(null, "Error updating quantity of Free Rents");
+	    		    	    	                }
+	    		                            } catch (Exception e){      //If something goes wrong
+	    		    	    	                JOptionPane.showMessageDialog(null, "Error calculating quantity of Free Rents");
+	    		    	    	            }
+	    		               	        } catch (Exception e){      //If something goes wrong
+	    			    	                JOptionPane.showMessageDialog(null, "Error updating Loyalty Points!");
+	    			    	            }
+	    	               	        }
+	    	                    } catch (Exception e){      //If something goes wrong
+	    	    	                JOptionPane.showMessageDialog(null, "Error calculating Loyalty Points!");
+	    	    	            }
+	                        } catch (Exception e){      //If something goes wrong
+	        	                JOptionPane.showMessageDialog(null, "Error inserting information of the rent");
+	        	            }
+	    		    	} catch (Exception e){      //If something goes wrong
+	    	                JOptionPane.showMessageDialog(null, "Error updating quantity Available");
+	    	            }
+	    		    }
+	    	    }catch (Exception e){      //If something goes wrong
+	    	        JOptionPane.showMessageDialog(null, "Error finding Availability of Title");
+	    	    }    
+	        }
+        }
+	}
+	//This method will check if the level of the Customer
+	//This method will check the Level of the Customer
+	public void level() {
+		ConectionDB con = new ConectionDB();
+	    Connection conection = con.conect();
+	        
+	    try {
+	    	String filter = ID.getText();
+	        String where = "";
+	        //Our filter must not be empty
+	        if(!"".equals(filter)){
+	            where = "WHERE custId = " + filter;
+	            System.out.println("where: " + where);
+	        }
+	        	
+	        PreparedStatement ps = null;
+	        ResultSet rs = null;
+	    	
+	        //'search' will be the query that will be send to the database to find Level of the Customer
+		    String search = "SELECT levelId FROM membershipCard " + where;
+		    System.out.println(search);
+		    ps = conection.prepareStatement(search);
+		    rs = ps.executeQuery();
+		    //We will take the result of the query and this will be written on the JTextField 'level'
+		    while(rs.next()) {
+		    	levelId.setText(rs.getString("levelId"));
+		        res = rs.getString("levelId");
+		        System.out.println("The levelId of the Customer is: " + rs.getString("levelId"));
+		    }
+		    
+		    //Check type of the Title
+		    checkType();
+		    
+	    } catch (Exception e){      //If something goes wrong
+	        JOptionPane.showMessageDialog(null, "Error finding the level Id of the Customer");
+	    }	
+	}
+	//This method will check the type of Title selected
+	public void checkType() {
+		ConectionDB con = new ConectionDB();
+	    Connection conection = con.conect();
+	        
+	    try {
+	    	String filter = titleId.getText();
+	        String where = "";
+	        //Our filter must not be empty
+	        if(!"".equals(filter)){
+	            where = "WHERE titleId = " + filter;
+	            System.out.println("where: " + where);
+	        }
+	        	
+	        PreparedStatement ps = null;
+	        ResultSet rs = null;
+	    	
+	        //'search' will be the query that will be send to the database to find the type of the Title
+		    String search = "SELECT typeId FROM title " + where;
+		    System.out.println(search);
+		    ps = conection.prepareStatement(search);
+		    rs = ps.executeQuery();
+		    //We will take the result of the query and this will be written on the JTextField 'typeId'
+		    while(rs.next()) {
+		    	typeId.setText(rs.getString("typeId"));
+		        res = rs.getString("typeId");
+		        System.out.println("The type of the Title is: " + rs.getString("typeId"));
+		    }
+		    
+		    
+	    } catch (Exception e){      //If something goes wrong
+	        JOptionPane.showMessageDialog(null, "Error finding the Type of the Title");
+	    }	
+	}
+	//This method will compare if the Level of the Customer will allow him to rent the Title selected
+	public void allowRent() {
+		if(levelId.getText().equals("ML") && typeId.getText().equals("MC")) {		//The Customer is Music Lover
+        	System.out.println("Customer is Music Lover");
+        	//Call the method ''qttyRent'
+        	qttyRent();
+        	//Call method 'numberofTitles'
+        	numberofTitles();
+        } else if(levelId.getText().equals("ML") && typeId.getText().equals("ML")) {		//The Customer is Music Lover
+        	System.out.println("Customer is Music Lover");
+        	//Call the method ''qttyRent'
+        	qttyRent();
+        	//Call method 'numberofTitles'
+        	numberofTitles();
+        } else if(levelId.getText().equals("VL") && typeId.getText().equals("VL")) {		//The Customer is Video Lover
+        	System.out.println("Customer is Video Lover");
+        	//Call the method ''qttyRent'
+        	qttyRent();
+        	//Call method 'numberofTitles'
+        	numberofTitles();
+        } else if(levelId.getText().equals("TV") && typeId.getText().equals("TV")) {		//The Customer is TV Lover
+        	System.out.println("Customer is TV Lover");
+        	//Call the method ''qttyRent'
+        	qttyRent();
+        	//Call method 'numberofTitles'
+        	numberofTitles();
+        } else if(levelId.getText().equals("PR")) {		//The Customer is Premium
+        	System.out.println("Customer is Premium");
+        	//Call the method ''qttyRent'
+        	qttyRent();
+        	//Call method 'numberofTitles'
+        	numberofTitles();
+        } else {
+        	JOptionPane.showMessageDialog(null, "Rent not allowed! \n"
+        			+ "The Customer has a " + levelId.getText() + " level\n"
+        			+ "Please select a valid type of title");
+        }
+	}
+	//This method will check if the Customer has rented less than 4 Titles
+	public void numberofTitles() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        //The Customer cannot rent more than 4 Titles
+        if(intqttyRent == 4) {
+        	JOptionPane.showMessageDialog(null, "The Rent of the Title is not possible!\n"
+        			+ "The Customer is allowed to rent only 4 Titles");
+        } else {
+    	    //Check stock
+    	    try {
+    	    	String filter = titleId.getText();
     	        String where = "";
     	        //Our filter must not be empty
     	        if(!"".equals(filter)){
-    	            where = "WHERE custId = " + filter;
+    	            where = "WHERE titleID = " + filter;
     	        }
     	    	PreparedStatement ps = null;
     	        ResultSet rs = null;
-    	        
     	        //'search' will be the query that will be send to the database to find the stock and available
-    	        String search = "SELECT loyaltyPoints FROM membershipCard " + where;
+    	        String search = "SELECT stock FROM title " + where;
     	        System.out.println(search);
     	        ps = conection.prepareStatement(search);
     	        rs = ps.executeQuery();
-    	        //We will take the result of the query and this will be written on the JTextField 'loyaltyPoints'
+    	        //We will take the result of the query and this will be written on the JTextField 'stock'
     	        while(rs.next()) {
-    	        	loyaltyPoints.setText(rs.getString("loyaltyPoints"));
-    	            res = rs.getString("loyaltyPoints");
-    	            System.out.println("Loyalty Points: " + rs.getString("loyaltyPoints"));
+    	        	stock.setText(rs.getString("stock"));
+    	            res = rs.getString("stock");
+    	            System.out.println("Stock: " + rs.getString("stock"));
     	        }
-    	        
-    	        strloyaltyPoints = loyaltyPoints.getText();		//Storing the content of the JTextField on a String
-    	        System.out.println(strloyaltyPoints);
-    	        intloyaltyPoints = Integer.parseInt(loyaltyPoints.getText());		//Converting the value of that String to an Integer
-    	        intloyaltyPoints = intloyaltyPoints +10;		//Adding +10 to the Loyalty Points of the Customer
-    	        System.out.println(intloyaltyPoints);
-    	        
-    	        qttyLoyaltyPoints = Integer.toString(intloyaltyPoints);
-    	        
-    	        newloyaltyPoints.setText(qttyLoyaltyPoints);		//The value of that String will be written on a JTextField
-    	        System.out.println("New Loyalty Points: " + qttyLoyaltyPoints);
-    	        try{
-    	        	
-    	        	//'newloyaltypoints' will be the query that we will send to the database to find the results
-                	String newloyaltypoints = "UPDATE membershipCard SET loyaltyPoints = ? " + where;
-                    System.out.println("My update Loyalty Points: " + newloyaltypoints);
-                    PreparedStatement newstatement = conection.prepareStatement(newloyaltypoints);
-                    
-                    newstatement.setString(1, newloyaltyPoints.getText());
-                    
-                    newstatement.execute();
-    	        	
-    	        }catch (Exception e){      //If something goes wrong
-                	JOptionPane.showMessageDialog(null, "Error inserting Loyalty Points!");
-                }
-    	        
-    	        freeRent();
-    	        
-    	        conection.close();
-    	        
-    	        //JOptionPane.showMessageDialog(null, "Loyalty Points updated successfully");
-    	        loyaltyPoints.setText("");
-    	        newloyaltyPoints.setText("");
-    	        
-    	        
-            } catch (Exception e){      //If something goes wrong
-            	JOptionPane.showMessageDialog(null, "Error finding Loyalty Points!");
-            }
-				
-		}
-		
-		public void freeRent() {
-			if(intloyaltyPoints % 100 == 0) {		//The free rent will be available when the loyalty points is any number multiple of 100
-				numberOffreeRent();		//Check the Number of Free Rents available
-				JOptionPane.showMessageDialog(null, "Congratulations! \n"
-	        			+ "You have " + intloyaltyPoints + " Loyalty Points\n"
-	        					+ "You have " + qttyfreeRent + " available Free Rent(s)");
-	        	rentIsFree = true;		//The Customer has at least one Free Rent
-	        }
-		}
-		
-		public void numberOffreeRent() {
-			
-			ConectionDB con = new ConectionDB();
-	        Connection conection = con.conect();
+    	        //The quantity in Stock must be more than 0
+    	        qttyStock = Integer.parseInt(stock.getText());
+    	        if(qttyStock > 0) {
+
+    	        	checkAvailability();
+
+    	        }else {
+    	        	JOptionPane.showMessageDialog(null, "The rent is not possible! \n"
+    	        			+ "Stock quantity of the Title is 0");
+    	        }
+    	    } catch (Exception e){      //If something goes wrong
+    	        JOptionPane.showMessageDialog(null, "Error finding the Stock quantity! \n"
+    	        		+ "Please check the ID of the Title");
+    	    }
+        }
+	}
+	//This method will check the number of Titles that the Customer has rented
+	public void qttyRent() {
+		ConectionDB con = new ConectionDB();
+	    Connection conection = con.conect();
 	        
-	        try{
-	        	
-	        	String filter = ID.getText();
-		        String where = "";
-		        //Our filter must not be empty
-		        if(!"".equals(filter)){
-		            where = "WHERE custId = " + filter;
-		        }
-		    	PreparedStatement ps = null;
-		        ResultSet rs = null;
-		        
-		        //'search' will be the query that will be send to the database to find the stock and available
-		        String search = "SELECT freeRent FROM membershipCard " + where;
-		        System.out.println(search);
-		        ps = conection.prepareStatement(search);
-		        rs = ps.executeQuery();
-		        //We will take the result of the query and this will be written on the JTextField 'stock'
-		        while(rs.next()) {
-		        	freeRent.setText(rs.getString("freeRent"));
-		            res = rs.getString("freeRent");
-		            System.out.println("Free Rent: " + rs.getString("freeRent"));
-		        }
-		        
-		        strfreeRent = freeRent.getText();
-		        System.out.println(strfreeRent);
-		        intfreeRent = Integer.parseInt(freeRent.getText());
-		        intfreeRent = intloyaltyPoints /100;
-		        System.out.println(intfreeRent);
-		        
-		        qttyfreeRent = Integer.toString(intfreeRent);
-		        
-		        newfreeRent.setText(qttyfreeRent);
-		        System.out.println("Quantity of Free rent: " + qttyfreeRent);
-		        
-		        try{
-		        	
-		        	//'freeRentLeft' will be the query that we will send to the database to find the results
-	            	String freeRentLeft = "UPDATE membershipCard SET freeRent = ? " + where;
-	                System.out.println("My update Free Rent: " + freeRentLeft);
-	                PreparedStatement newstatement = conection.prepareStatement(freeRentLeft);
-	                
-	                newstatement.setString(1, newfreeRent.getText());
-	                
-	                newstatement.execute();
-		        	
-		        }catch (Exception e){      //If something goes wrong
-	            	JOptionPane.showMessageDialog(null, "Error calculating Free Rent left!");
-	            }
-		        conection.close();
-		        
-		        //JOptionPane.showMessageDialog(null, "Free Rent used successfully");
-		        freeRent.setText("");
-		        newfreeRent.setText("");
-		        
-	        } catch (Exception e){      //If something goes wrong
-	        	JOptionPane.showMessageDialog(null, "Error finding Free Rent!");
-	        }
-		}
-	
-		public void checkFreeRent() {
-			ConectionDB con = new ConectionDB();
-            Connection conection = con.conect();
-            if(ID.getText().equals("")) {
-            	JOptionPane.showMessageDialog(null, "Customer ID empty!");
-            }else {
-            	try{
-            		
-            		String filter = ID.getText();
-        	        String where = "";
-        	        //Our filter must not be empty
-        	        if(!"".equals(filter)){
-        	            where = "WHERE custId = " + filter;
-        	        }
-        	    	PreparedStatement ps = null;
-        	        ResultSet rs = null;
-        	        
-        	        //'search' will be the query that will be send to the database to find the stock and available
-        	        String search = "SELECT freeRent FROM membershipCard " + where;
-        	        System.out.println(search);
-        	        ps = conection.prepareStatement(search);
-        	        rs = ps.executeQuery();
-        	        //We will take the result of the query and this will be written on the JTextField 'freeRent'
-        	        while(rs.next()) {
-        	        	freeRent.setText(rs.getString("freeRent"));
-        	            res = rs.getString("freeRent");
-        	            System.out.println("Free Rent: " + rs.getString("freeRent"));
-        	        }
-        	        
-        	        strfreeRent = freeRent.getText();
-        	        System.out.println(strfreeRent);
-        	        intfreeRent = Integer.parseInt(freeRent.getText());
-        	        //Validation if the Customer has any Free Rent Available
-        	        if(intfreeRent > 0) {
-        	        	JOptionPane.showMessageDialog(null, "This Customer has " + intfreeRent + " Free Rent available(s)");
-        	        	btnSaveFreeRent.setVisible(true);
-        	        	btnFreeRent.setVisible(false);
-        	        	btnSaveRent.setVisible(false);
-        	        	
-        	        } else {
-        	        	JOptionPane.showMessageDialog(null, "The Customer does not have any Free Rent Available");
-        	        }
-                } catch (Exception e){      //If something goes wrong
-                	JOptionPane.showMessageDialog(null, "Error finding Loyalty Points!");
-                }
-            }
-		}
-		
-		public void useFreeRent() {
-			ConectionDB con = new ConectionDB();
-	        Connection conection = con.conect();
-	        //Title ID must not be empty
-	        if(titleId.getText().equals("")) {
-            	JOptionPane.showMessageDialog(null, "Title ID empty!");
-            } else {
+	    try {
 	        
-	        String filter = titleId.getText();
-	        String whereTitleId = "";
+	      	String filter = ID.getText();
+	        String where = "";
 	        //Our filter must not be empty
 	        if(!"".equals(filter)){
-	        	whereTitleId = "WHERE titleID = " + filter;
-	            System.out.println("whereTitleId: " + whereTitleId);
-	        }	
-	        //Check if the Customer is able to rent a Title
-	        qttyRent();
-	        //The Customer cannot rent more than 4 Titles
-	        if(intqttyRent == 4) {
-            	JOptionPane.showMessageDialog(null, "The Rent of the Title is not possible!\n"
-            			+ "The Customer is allowed to rent only 4 Titles");
-            } else {
-            	
-            	//Check if the Title has availability
-    	        try {
-    	        	PreparedStatement pst = null;
-    		        ResultSet rst = null;
-    		        
-    		        //'newsearch' will be the query that will be send to the database to find the stock and available
-    		        String newsearch = "SELECT available FROM title " + whereTitleId;
-    		        System.out.println("newsearch: " + newsearch);
-    		        pst = conection.prepareStatement(newsearch);
-    		        rst = pst.executeQuery();
-    		        //We will take the result of the query and this will be written on the JTextField 'available'
-    		        while(rst.next()) {
-    		        	available.setText(rst.getString("available"));
-    		            res = rst.getString("available");
-    		            System.out.println("Available: " + rst.getString("available"));
-    		        }
-    		        
-    		        qttyAvailable = Integer.parseInt(available.getText());
-    		        System.out.println("Available Integer" + qttyAvailable);
-    		        //The quantity available must not be 0
-    		        if(qttyAvailable == 0) {
-    		        	JOptionPane.showMessageDialog(null, "The rent is not possible! \n"
-    		        			+ "There is not enough titles availables to rent");
-    		        } else {
-    		        	//Calculating to new Available quantity
-    		    	    
-    		    	    qttyAvailable --;		//Subtracting -1 to the quantity Available
-    		    	    System.out.println("Available Integer -1: " + qttyAvailable);
-        	        	stravailable = Integer.toString(qttyAvailable);		//Converting the new quantity available to an Integer
-        	        	System.out.println("stravailable: " + stravailable);
-        	        	newAvailable.setText(stravailable);		//The value of that String will be written on a JTextField
-        	        	System.out.println("New Qtty Availalble: " + stravailable);
-        	        	//Updating quantity available
-    		    	    try {
-    		    	    	//'updateavailable' will be the query that we will send to the database to find the results
-                        	String updateavailable = "UPDATE title SET available = ? " + whereTitleId;
-                            System.out.println("My update Available: " + updateavailable);
-                            PreparedStatement newstatement = conection.prepareStatement(updateavailable);
-                            
-                            newstatement.setString(1, newAvailable.getText());
-                            
-                            newstatement.execute();
-                            //JOptionPane.showMessageDialog(null, "available updated");
-                            //Saving information of the rent of the Title
-                            try {
-        		        		
-                            	//'addrent' will be query that will be send to the database to add a new register on the table rent                    
-    	                        String addrent = "INSERT INTO rent (rentDay, returnDay, titleId, custId) VALUES(?, ?, ?, ?)"; 
-    	                        System.out.println("Query new Rent " + addrent);
-    	                        PreparedStatement statement = conection.prepareStatement(addrent);
-    	                        statement.setString(1, rentedDay.getText());
-    	                        statement.setString(2, returnDay.getText());
-    	                        statement.setString(3, titleId.getText());
-    	                        statement.setString(4, ID.getText());
-    	                        
-    	                        statement.executeUpdate();
-    	                        //JOptionPane.showMessageDialog(null, "information updated");
-    	                        //Check and calculate Loyalty Points
-    	                        try {
-    	                        	String newfilter = ID.getText();
-    	                            String whereCustId = "";
-    	                            //Our filter must not be empty
-    	                            if(!"".equals(newfilter)){
-    	                            	whereCustId = "WHERE custId = " + newfilter;
-    	                                System.out.println("whereCustId: " + whereCustId);
-    	                            }	        
-    	                            
-    	                        	PreparedStatement ps = null;
-    	                	        ResultSet rs = null;
-    	                	        
-    	                        	//'search' will be the query that will be send to the database to find the stock and available
-    	                	        String search = "SELECT loyaltyPoints FROM membershipCard " + whereCustId;
-    	                	        System.out.println(search);
-    	                	        ps = conection.prepareStatement(search);
-    	                	        rs = ps.executeQuery();
-    	                	        //We will take the result of the query and this will be written on the JTextField 'loyaltyPoints'
-    	                	        while(rs.next()) {
-    	                	        	loyaltyPoints.setText(rs.getString("loyaltyPoints"));
-    	                	            res = rs.getString("loyaltyPoints");
-    	                	            System.out.println("Loyalty Points: " + rs.getString("loyaltyPoints"));
-    	                	        }
-    	                	        
-    	                	        strloyaltyPoints = loyaltyPoints.getText();		//Storing the content of the JTextField on a String
-    	                	        System.out.println(strloyaltyPoints);
-    	                	        intloyaltyPoints = Integer.parseInt(loyaltyPoints.getText());		//Converting the value of that String to an Integer
-    	                	        //The Customer must have at least 100 Loyalty Points
-    	                	        if(intloyaltyPoints < 100) {
-    	                	        	JOptionPane.showMessageDialog(null, "The Customer does not have enough Loyalty Points for a Free Rent!");
-    	                	        	btnSaveRent.setVisible(true);
-    	                	        	btnFreeRent.setVisible(true);
-    	                	        	btnSaveFreeRent.setVisible(false);
-    	                	        	resetTextField();
-    	                	        } else {
-    	                	        	intloyaltyPoints = intloyaltyPoints -100;		//Adding +10 to the Loyalty Points of the Customer
-    		                	        System.out.println(intloyaltyPoints);
-    		                	        
-    		                	        qttyLoyaltyPoints = Integer.toString(intloyaltyPoints);
-    	                	        
-    		                	        newloyaltyPoints.setText(qttyLoyaltyPoints);		//The value of that String will be written on a JTextField
-    		                	        System.out.println("New Loyalty Points: " + qttyLoyaltyPoints);
-    		                	        
-    		                	        //Updating Loyalty Points
-    		                	        try {
-    		                	        	
-    		                	        	//'newloyaltypoints' will be the query that we will send to the database to find the results
-    		                            	String newloyaltypoints = "UPDATE membershipCard SET loyaltyPoints = ? " + whereCustId;
-    		                                System.out.println("My update Loyalty Points: " + newloyaltypoints);
-    		                                PreparedStatement newstatement1 = conection.prepareStatement(newloyaltypoints);
-    		                                
-    		                                newstatement1.setString(1, newloyaltyPoints.getText());
-    		                                
-    		                                newstatement1.execute();
-    		                                //JOptionPane.showMessageDialog(null, "Loyalty Points updated!");
-    		                                //Check and calculate new quantity of Free Rent
-    		                                try {		                                	
-    		    	                	        PreparedStatement nps = null;
-    		    	                	        ResultSet nrs = null;
-    		    	                	        //'searchnew' will be the query that will be send to the database to find the stock and available
-    		    	                	        String searchnew = "SELECT freeRent FROM membershipCard " + whereCustId;
-    		    	            		        System.out.println(searchnew);
-    		    	            		        nps = conection.prepareStatement(searchnew);
-    		    	            		        nrs = nps.executeQuery();
-    		    	            		        //We will take the result of the query and this will be written on the JTextField 'freeRent'
-    		    	            		        while(nrs.next()) {
-    		    	            		        	freeRent.setText(nrs.getString("freeRent"));
-    		    	            		            res = nrs.getString("freeRent");
-    		    	            		            System.out.println("Free Rent: " + nrs.getString("freeRent"));
-    		    	            		        }
-    		    	            		        
-    		    	            		        strfreeRent = freeRent.getText();		//Storing the content of the JTextField on a String
-    		    	            		        System.out.println(strfreeRent);
-    		    	            		        intfreeRent = Integer.parseInt(freeRent.getText());		//Converting the value of that String to an Integer
-    		    	            		        intfreeRent = intfreeRent -1;		//Subtracting -1 to the quantity of Free Rent of the Customer
-    		    	            		        System.out.println(intfreeRent);
-    		    	            		        
-    		    	            		        qttyfreeRent = Integer.toString(intfreeRent);
-    		    	            		        
-    		    	            		        newfreeRent.setText(qttyfreeRent);		//The value of that String will be written on a JTextField
-    		    	            		        System.out.println("Quantity of Free rent: " + qttyfreeRent);
-    		    	            		        //Updating Free Renty quantity
-    		    	            		        try {
-    		    	            		        	//'freeRentLeft' will be the query that we will send to the database to find the results
-    		    	            	            	String freeRentLeft = "UPDATE membershipCard SET freeRent = ? " + whereCustId;
-    		    	            	                System.out.println("My update Free Rent: " + freeRentLeft);
-    		    	            	                PreparedStatement statementnew = conection.prepareStatement(freeRentLeft);
-    		    	            	                
-    		    	            	                statementnew.setString(1, newfreeRent.getText());
-    		    	            	                
-    		    	            	                statementnew.execute();
-    		    	            	                
-    		    	            	                newqttyRent();
-    		    	            	                
-    		    	            	                conection.close();
-    		    	                                
-    		    	                                JOptionPane.showMessageDialog(null, "New Title rented successfully using Free Points");
-    		    	                                ID.setText("");
-    		    	                                titleId.setText("");
-    		    	                                available.setText("");
-    		    	                                newAvailable.setText("");
-    		    	                                
-    		    	                                normalScreen();
-    		    	            	                
-    		    	            		        } catch (Exception e){      //If something goes wrong
-    			    	    	                    JOptionPane.showMessageDialog(null, "Error updating quantity of Free Rents");
-    			    	    	                }
-    		                                } catch (Exception e){      //If something goes wrong
-    		    	    	                    JOptionPane.showMessageDialog(null, "Error calculating quantity of Free Rents");
-    		    	    	                }
-    		                	        } catch (Exception e){      //If something goes wrong
-    			    	                    JOptionPane.showMessageDialog(null, "Error updating Loyalty Points!");
-    			    	                }
-    	                	        }
-    	                        } catch (Exception e){      //If something goes wrong
-    	    	                    JOptionPane.showMessageDialog(null, "Error calculating Loyalty Points!");
-    	    	                }
-        		        	} catch (Exception e){      //If something goes wrong
-        	                    JOptionPane.showMessageDialog(null, "Error inserting information of the rent");
-        	                }
-    		    	    } catch (Exception e){      //If something goes wrong
-    	                    JOptionPane.showMessageDialog(null, "Error updating quantity Available");
-    	                }
-    		        }
-    	        }catch (Exception e){      //If something goes wrong
-    	            JOptionPane.showMessageDialog(null, "Error finding Availability of Title");
-    	        }    
-            }
+	            where = "WHERE custId = " + filter;
+	            System.out.println("where: " + where);
 	        }
-		}
-		
-		public void qttyRent() {
-			ConectionDB con = new ConectionDB();
-	        Connection conection = con.conect();
-	        
-	        try {
-	        
-	        	String filter = ID.getText();
-	            String where = "";
-	            //Our filter must not be empty
-	            if(!"".equals(filter)){
-	                where = "WHERE custId = " + filter;
-	                System.out.println("where: " + where);
-	            }
 	        	
-	            PreparedStatement ps = null;
-		        ResultSet rs = null;
+	        PreparedStatement ps = null;
+	        ResultSet rs = null;
 		        
-		        //'search' will be the query that will be send to the database to find the stock and available
-		        String search = "SELECT qttyRent FROM membershipCard " + where;
-		        System.out.println(search);
-		        ps = conection.prepareStatement(search);
-		        rs = ps.executeQuery();
-		        //We will take the result of the query and this will be written on the JTextField 'loyaltyPoints'
-		        while(rs.next()) {
-		        	qttyRent.setText(rs.getString("qttyRent"));
-		            res = rs.getString("qttyRent");
-		            System.out.println("Quantity of titles rented: " + rs.getString("qttyRent"));
-		        }
+		    //'search' will be the query that will be send to the database to find the stock and available
+		    String search = "SELECT qttyRent FROM membershipCard " + where;
+		    System.out.println(search);
+		    ps = conection.prepareStatement(search);
+		    rs = ps.executeQuery();
+		    //We will take the result of the query and this will be written on the JTextField 'loyaltyPoints'
+		    while(rs.next()) {
+		      	qttyRent.setText(rs.getString("qttyRent"));
+		        res = rs.getString("qttyRent");
+		        System.out.println("Quantity of titles rented: " + rs.getString("qttyRent"));
+		    }
 		        
-		        strqttyRent = qttyRent.getText();		//Storing the content of the JTextField on a String
-		        System.out.println(strqttyRent);
-		        intqttyRent = Integer.parseInt(qttyRent.getText());		//Converting the value of that String to an Integer
-	        	
-	        } catch (Exception e){      //If something goes wrong
-	            JOptionPane.showMessageDialog(null, "Error finding the quantity available of Rent");
-	        }
-		}
-		
-		public void newqttyRent() {
+		    strqttyRent = qttyRent.getText();		//Storing the content of the JTextField on a String
+		    System.out.println(strqttyRent);
+		    intqttyRent = Integer.parseInt(qttyRent.getText());		//Converting the value of that String to an Integer
+	    
+	    } catch (Exception e){      //If something goes wrong
+	        JOptionPane.showMessageDialog(null, "Error finding the quantity available of Rent");
+	    }	
+	}
+	//This method will calculate the number of Free Rent that the Customer has after using 100 Loyalty Points
+	public void newqttyRent() {
 			
-			ConectionDB con = new ConectionDB();
-	        Connection conection = con.conect();
+		ConectionDB con = new ConectionDB();
+	    Connection conection = con.conect();
 	        
-	        String filter = ID.getText();
-            String where = "";
-            //Our filter must not be empty
-            if(!"".equals(filter)){
-                where = "WHERE custId = " + filter;
-                System.out.println("where: " + where);
-            }
+	    String filter = ID.getText();
+        String where = "";
+        //Our filter must not be empty
+        if(!"".equals(filter)){
+            where = "WHERE custId = " + filter;
+            System.out.println("where: " + where);
+        }
             
-	        intqttyRent = intqttyRent +1;		//Subtracting -1 to the quantity of Free Rent of the Customer
- 		    System.out.println(intqttyRent);
- 		        
- 		    QttyRent = Integer.toString(intqttyRent);
- 		        
- 		    newqttyRent.setText(QttyRent);		//The value of that String will be written on a JTextField
- 		    System.out.println("Quantity of Rents: " + QttyRent);
- 		    //Updating Free Renty quantity
- 		    try {
- 		     	//'freeRentLeft' will be the query that we will send to the database to find the results
- 	          	String qttyrentnew = "UPDATE membershipCard SET qttyRent = ? " + where;
- 	            System.out.println("My update Qtty Rent: " + qttyrentnew);
- 	            PreparedStatement statementnew = conection.prepareStatement(qttyrentnew);
- 	                
- 	            statementnew.setString(1, newqttyRent.getText());
- 	                
- 	            statementnew.execute();
- 	                
-	        	
-	        } catch (Exception e){      //If something goes wrong
-	            JOptionPane.showMessageDialog(null, "Error adding the new quantity available of Rent");
-	        }
-		}
+	    intqttyRent = intqttyRent +1;		//Subtracting -1 to the quantity of Free Rent of the Customer
+ 		System.out.println(intqttyRent);
+ 		    
+ 		QttyRent = Integer.toString(intqttyRent);
+ 		      
+ 		newqttyRent.setText(QttyRent);		//The value of that String will be written on a JTextField
+ 		System.out.println("Quantity of Rents: " + QttyRent);
+ 		//Updating Free Renty quantity
+ 		try {
+ 		  	//'freeRentLeft' will be the query that we will send to the database to find the results
+ 	      	String qttyrentnew = "UPDATE membershipCard SET qttyRent = ? " + where;
+ 	        System.out.println("My update Qtty Rent: " + qttyrentnew);
+ 	        PreparedStatement statementnew = conection.prepareStatement(qttyrentnew);
+ 	              
+ 	        statementnew.setString(1, newqttyRent.getText());
+ 	               
+ 	        statementnew.execute();
+ 	        	
+	    } catch (Exception e){      //If something goes wrong
+	        JOptionPane.showMessageDialog(null, "Error adding the new quantity available of Rent");
+	    }
+	}
+	//This method will configure the format of the dates	
+	public static String formatCalendar(Calendar dayRented) {
+		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
 		
-		//This method will configure the format of the dates	
-		public static String formatCalendar(Calendar dayRented) {
-			DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault());
-		
-			return dateFormat.format(dayRented.getTime());	
-		}
-
-		public void resetTextField() {
-			name.setText("");
-			ID.setText("");
-			titleId.setText("");
-		}
-		
+		return dateFormat.format(dayRented.getTime());	
+	}
+	//This method will leave the TextField in blank
+	//This method will reset the TextField
+	public void resetTextField() {
+		name.setText("");
+		ID.setText("");
+		titleId.setText("");
+	}
+	
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String ac = e.getActionCommand();
