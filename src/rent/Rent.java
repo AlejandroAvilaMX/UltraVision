@@ -41,7 +41,7 @@ public class Rent extends JFrame implements ActionListener{
 	private int qttyStock, qttyAvailable, intloyaltyPoints, intfreeRent, intqttyRent;
 	boolean rentIsFree = false;
 	private DefaultTableModel model; 
-	private JButton btnRefresh, btnNewCDRent, btnNewDVDRent, btnNewMovieRent, btnNewSerieRent, btnSearchName, btnSearchCD, btnSearchDVD, btnSearchMovie, btnSearchSerie, btnSaveRent, btnCancel, btnFreeRent, btnSaveFreeRent;
+	private JButton btnRefresh, btnReturn, btnNewCDRent, btnNewDVDRent, btnNewMovieRent, btnNewSerieRent, btnSearchName, btnSearchCD, btnSearchDVD, btnSearchMovie, btnSearchSerie, btnSaveRent, btnCancel, btnFreeRent, btnSaveFreeRent;
 
 	public Rent() {
 		this.setVisible(true);
@@ -168,6 +168,17 @@ public class Rent extends JFrame implements ActionListener{
                 scroll.setBounds(40,120,1000,200);
               //Add the scroll to the Panel
                 p.add(scroll);
+            }
+        });
+        
+        //Button return
+        btnReturn = new JButton("Return Title");
+        btnReturn.setFont(fontButton);
+        btnReturn.setBounds(905, 70, 130, 30);
+        btnReturn.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent arg0){
+            	System.out.println("Going to Return Title");
+                new returnTitle();
             }
         });
         
@@ -516,6 +527,7 @@ public class Rent extends JFrame implements ActionListener{
         
         p.add(ltitle);
         p.add(btnRefresh);
+        p.add(btnReturn);
         p.add(btnNewCDRent);
         p.add(btnNewDVDRent);
         p.add(btnNewMovieRent);
