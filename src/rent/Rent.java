@@ -35,13 +35,13 @@ import validations.NoNumbers;
 import validations.ValidLength;
 
 public class Rent extends JFrame implements ActionListener{
-	private JLabel ltitle, lname, lID, ltitleId, lCDtitle, lDVDtitle, lMovietitle, lSerietitle;
-	private JTextField name, ID, titleId, CDtitle, DVDtitle, Movietitle, Serietitle, rentedDay, returnDay, stock, newAvailable, available, loyaltyPoints, newloyaltyPoints, freeRent, newfreeRent, qttyRent, newqttyRent, levelId, typeId;
+	private JLabel ltitle, lname, lrentId, lID, ltitleId, lCDtitle, lDVDtitle, lMovietitle, lSerietitle;
+	private JTextField name, rentId, ID, titleId, CDtitle, DVDtitle, Movietitle, Serietitle, rentedDay, returnDay, stock, newAvailable, available, loyaltyPoints, newloyaltyPoints, freeRent, newfreeRent, qttyRent, newqttyRent, levelId, typeId;
 	private String res, resn, stravailable, strloyaltyPoints, qttyLoyaltyPoints, strfreeRent, qttyfreeRent, strqttyRent, QttyRent;
 	private int qttyStock, qttyAvailable, intloyaltyPoints, intfreeRent, intqttyRent;
 	boolean rentIsFree = false;
 	private DefaultTableModel model; 
-	private JButton btnRefresh, btnReturn, btnNewCDRent, btnNewDVDRent, btnNewMovieRent, btnNewSerieRent, btnSearchName, btnSearchCD, btnSearchDVD, btnSearchMovie, btnSearchSerie, btnSaveRent, btnCancel, btnFreeRent, btnSaveFreeRent;
+	private JButton btnRefresh, btnReturnSearch, btnNewCDRent, btnNewDVDRent, btnNewMovieRent, btnNewSerieRent, btnReturnedTitles, btnSearchName, btnSearchCD, btnSearchDVD, btnSearchMovie, btnSearchSerie, btnSaveRent, btnCancel, btnFreeRent, btnSaveFreeRent, btnRentId, btnReturn;
 
 	public Rent() {
 		this.setVisible(true);
@@ -174,11 +174,11 @@ public class Rent extends JFrame implements ActionListener{
         //Button return
         btnReturn = new JButton("Return Title");
         btnReturn.setFont(fontButton);
-        btnReturn.setBounds(905, 70, 130, 30);
+        btnReturn.setBounds(470, 450, 120, 30);
         btnReturn.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0){
-            	System.out.println("Going to Return Title");
-                new returnTitle();
+            	
+            	new returnTitle();
             }
         });
         
@@ -242,6 +242,25 @@ public class Rent extends JFrame implements ActionListener{
             	btnCancel.setBounds(600, 550, 100, 30);
             	//btnSaveNew.setVisible(false);
             	//btnSaveUpdate.setVisible(false);
+            }
+        });
+        
+        //Returned Titles button
+        btnReturnedTitles = new JButton("Returned Titles");
+        btnReturnedTitles.setFont(fontButton);
+        btnReturnedTitles.setBounds(905, 70, 130, 30);
+        btnReturnedTitles.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent arg0){
+            	//Call method 'returnedTitles'
+            	returnedTitles();
+            	//Add the model to the table
+            	JTable table = new JTable(model);
+            	//Add the scroll to the table
+                JScrollPane scroll= new JScrollPane(table);
+                table.setBounds(40,120,1000,200);
+                scroll.setBounds(40,120,1000,200);
+              //Add the scroll to the Panel
+                p.add(scroll);
             }
         });
         
@@ -411,6 +430,26 @@ public class Rent extends JFrame implements ActionListener{
             }
         });
         
+        lrentId = new JLabel("Rent ID");
+        lrentId.setFont(fontlabel);
+        lrentId.setBounds(70, 340, 80, 20);
+        lrentId.setVisible(false);
+        rentId = new JTextField();
+        rentId.setBounds(70, 370, 80, 25);
+        rentId.setVisible(false);
+        new NoLetters(rentId);
+        new ValidLength(rentId, 3);
+        //Search button
+        btnReturnSearch = new JButton("Search");
+        btnReturnSearch.setFont(fontButton);
+        btnReturnSearch.setBounds(200, 365, 90, 30);
+        btnReturnSearch.setVisible(false);
+        btnReturnSearch.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent arg0){
+            	//Call method 'return'
+            }
+        });
+        
         Calendar dayRented = Calendar.getInstance();
         System.out.println("Current date: " + formatCalendar(dayRented));		//The Rent day will be the current day
 
@@ -568,6 +607,9 @@ public class Rent extends JFrame implements ActionListener{
         p.add(newqttyRent);
         p.add(levelId);
         p.add(typeId);
+        p.add(btnReturnedTitles);
+        p.add(btnReturnSearch);
+        p.add(btnRentId);
         
         this.validate();
         this.repaint();
@@ -582,6 +624,8 @@ public class Rent extends JFrame implements ActionListener{
 		btnSearchName.setVisible(true);
 		ltitleId.setVisible(true);
 		titleId.setVisible(true);
+		lrentId.setVisible(false);
+		rentId.setVisible(false);
 
 		btnNewCDRent.setVisible(false);
 		btnSearchCD.setVisible(false);
@@ -591,6 +635,7 @@ public class Rent extends JFrame implements ActionListener{
 		btnSearchMovie.setVisible(false);
 		btnNewSerieRent.setVisible(false);
 		btnSearchSerie.setVisible(false);
+		btnReturn.setVisible(false);
 		
 		btnSaveRent.setVisible(true);
 		btnCancel.setVisible(true);
@@ -599,9 +644,13 @@ public class Rent extends JFrame implements ActionListener{
 	//This method will return the components of the window to their original state
 	public void normalScreen() {
 		lID.setVisible(false);
+		lID.setBounds(70, 340, 80, 20);
 		ID.setVisible(false);
+		ID.setBounds(70, 370, 80, 25);
 		lname.setVisible(false);
+		lname.setBounds(200, 340, 80, 20);
 		name.setVisible(false);
+		name.setBounds(200, 370, 220, 25);
 		btnSearchName.setVisible(false);
 		ltitleId.setVisible(false);
 		titleId.setVisible(false);
@@ -623,13 +672,15 @@ public class Rent extends JFrame implements ActionListener{
 		btnNewDVDRent.setVisible(true);
 		btnNewMovieRent.setVisible(true);
 		btnNewSerieRent.setVisible(true);
+		btnReturn.setVisible(true);
 		
 		btnSaveRent.setVisible(false);
 		btnCancel.setVisible(false);
 		btnFreeRent.setVisible(false);
 		btnSaveFreeRent.setVisible(false);
 	}
-	//This will refresh our table after doing any changes
+	
+	//This method will Refresh our table after doing any changes
 	public void refresh() {
         ConectionDB con = new ConectionDB();
         Connection conection = con.conect();
@@ -670,9 +721,51 @@ public class Rent extends JFrame implements ActionListener{
                 
                 model.addRow(col);
             }
-
+        } catch (SQLException ex){
+            JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
+        }
+	}
+	//This method will show all the Titles that have been returned
+	public void returnedTitles() {
+		ConectionDB con = new ConectionDB();
+        Connection conection = con.conect();
+        try{
             
+            model = new DefaultTableModel();
             
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            //'refresh' will be the query that we will send to the database to show all the Customers
+            String refresh = "SELECT rent.rentId, CONCAT(customer.name, ' ', customer.surname) AS customerName, title.name AS RentedTitle, rent.rentDay, rent.returnDay, rent.latenessDeduction, rent.damageDeduction "
+            		+ "FROM rent "
+            		+ "INNER JOIN customer ON rent.custId=customer.custId "
+            		+ "INNER JOIN title ON rent.titleId=title.titleId "
+            		+ "WHERE returned = 'YES';";
+            System.out.println("Query refresh: " + refresh);
+            //Adding the result to the rows of the table
+            ps = conection.prepareStatement(refresh);
+            rs = ps.executeQuery();
+            
+            ResultSetMetaData rsMD = rs.getMetaData();
+            int qttycol = rsMD.getColumnCount();
+            
+            model.addColumn("Rent ID");
+            model.addColumn("Customer Name");
+            model.addColumn("Rented Title");
+            model.addColumn("Rent Day");
+            model.addColumn("Return Day");
+            model.addColumn("Lateness Deduction");
+            model.addColumn("Damage Deduction");
+            
+            while(rs.next()){
+                Object[] col = new Object[qttycol];
+                
+                for(int i = 0; i<qttycol; i++){
+                    col[i] = rs.getObject(i+1);
+                }
+                
+                model.addRow(col);
+            }
         } catch (SQLException ex){
             JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
         }
@@ -726,7 +819,6 @@ public class Rent extends JFrame implements ActionListener{
         } catch (SQLException ex){
             JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
         }
-
 	}
 	//This method will search using the Title of the CD
 	public void searchCD() {
@@ -931,7 +1023,6 @@ public class Rent extends JFrame implements ActionListener{
             JOptionPane.showMessageDialog(null, "Error Refreshing...!!");
         }
 	}
-	//This will check if the title has enough quantity to rent	
 	//This method will check if the Title has availability to be rented
 	public void checkAvailability() {
 			
@@ -1026,7 +1117,6 @@ public class Rent extends JFrame implements ActionListener{
                 JOptionPane.showMessageDialog(null, "Error finding Availability!");
             }
 		}
-	//This will manage the Loyalty Points	
 	//This method will manage the Loyalty Points of the Customer
 	public void loyaltyPoints() {
 					
@@ -1104,7 +1194,6 @@ public class Rent extends JFrame implements ActionListener{
 	       	rentIsFree = true;		//The Customer has at least one Free Rent
 		}
 	}
-	//This method will calculate the number of Free Rents that the Customer has
 	//This method will calculate the number of Free Rents of the Customer
 	public void numberOffreeRent() {
 			
@@ -1169,7 +1258,6 @@ public class Rent extends JFrame implements ActionListener{
 	       	JOptionPane.showMessageDialog(null, "Error finding Free Rent!");
 	    }
 	}
-	//This method will check if the Customer is available to use a Free Rent
 	//This method will check if the Customer has any Free Rent available
 	public void checkFreeRent() {
 		ConectionDB con = new ConectionDB();
@@ -1219,7 +1307,7 @@ public class Rent extends JFrame implements ActionListener{
             }
         }
 	}
-	//Rent a Title using the Free Rent of the Loyalty Points
+	
 	//This method will manage the rent of the Title using the Free Rent of the Customer
 	public void useFreeRent() {
 		ConectionDB con = new ConectionDB();
@@ -1434,7 +1522,6 @@ public class Rent extends JFrame implements ActionListener{
 	        }
         }
 	}
-	//This method will check if the level of the Customer
 	//This method will check the Level of the Customer
 	public void level() {
 		ConectionDB con = new ConectionDB();
@@ -1641,7 +1728,7 @@ public class Rent extends JFrame implements ActionListener{
             System.out.println("where: " + where);
         }
             
-	    intqttyRent = intqttyRent +1;		//Subtracting -1 to the quantity of Free Rent of the Customer
+	    intqttyRent = intqttyRent +1;		//Adding +1 to the quantity of Free Rent of the Customer
  		System.out.println(intqttyRent);
  		    
  		QttyRent = Integer.toString(intqttyRent);
@@ -1670,7 +1757,6 @@ public class Rent extends JFrame implements ActionListener{
 		return dateFormat.format(dayRented.getTime());	
 	}
 	//This method will leave the TextField in blank
-	//This method will reset the TextField
 	public void resetTextField() {
 		name.setText("");
 		ID.setText("");

@@ -35,7 +35,7 @@ public class RentedDates extends JFrame implements ActionListener{
 	private JTextField ID, loyaltyPoints, newloyaltyPoints, availableqtty, freeRent, newfreeRent, qttyRent, newqttyRent;
 	private int intloyaltyPoints, intfreeRent, intqttyRent;
 	private String res, strfreeRent, qttyfreeRent, strqttyRent;
-	private JButton btnNewRent;
+	private JButton btnNewRent, btnCustomerSearch;
 
 	public RentedDates() {
 		this.setVisible(true);
@@ -74,6 +74,13 @@ public class RentedDates extends JFrame implements ActionListener{
         
         newfreeRent = new JTextField();
         newfreeRent.setBounds(70, 170, 100, 25);
+        
+        //Button Search Customer
+        btnCustomerSearch = new JButton("Search");
+        btnCustomerSearch.setFont(fontButton);
+        btnCustomerSearch.setBounds(440, 365, 190, 50);
+        //btnCustomerSearch.setVisible(false);
+        
         
         //Button Customers
         btnNewRent = new JButton("New");
@@ -181,6 +188,7 @@ public class RentedDates extends JFrame implements ActionListener{
         p.add(btnNewRent);
         p.add(freeRent);
         p.add(newfreeRent);
+        p.add(btnCustomerSearch);
         
         this.validate();
         this.repaint();
