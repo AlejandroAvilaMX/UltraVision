@@ -23,7 +23,6 @@ import access.Access;
 import customers.Customers;
 import customers.MembershipCards;
 import rent.Rent;
-import rent.RentedDates;
 import titles.Titles;
 
 public class WelcomeAdmin extends JFrame implements ActionListener{

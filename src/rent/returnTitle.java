@@ -1,3 +1,11 @@
+/**
+ * This is the Return Title window.
+ * It will have a table with the register of all the titles rented
+ * We will be able to return a Title 
+ * The program will calculate the availability of the Title and the number of Titles that the Customer has rented
+ * 
+ * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
+ */
 package rent;
 
 import java.awt.Font;
@@ -367,8 +375,7 @@ public class returnTitle extends JFrame implements ActionListener{
 		btnAccept.setVisible(false);
 		btnCancel.setVisible(false);
 	}
-	
-	//This method will search using the Rent ID
+
 	//This method will search for a specific rent to see the details 
 	public void search() {
 		try {
@@ -422,7 +429,6 @@ public class returnTitle extends JFrame implements ActionListener{
 	}
 	
 	//This method will Refresh our table after doing any changes
-	//This method will Refresh our table after doing any changes
 	public void refresh() {
 
         ConectionDB con = new ConectionDB();
@@ -470,7 +476,6 @@ public class returnTitle extends JFrame implements ActionListener{
         }
 	}
 	
-	//This method will search using the name of the Customer
 	//This method will search using the name of the Customer
 	public void searchName() {
 		ConectionDB con = new ConectionDB();
@@ -522,7 +527,6 @@ public class returnTitle extends JFrame implements ActionListener{
 	    }
 	}
 	
-	//This method will manage the return of a Title
 	//This method will return the Title rented
 	public void titleReturn() {
 		ConectionDB con = new ConectionDB();
@@ -582,7 +586,6 @@ public class returnTitle extends JFrame implements ActionListener{
 	}
 
 	//This method will manage the quantity available of Titles
-	//This method will manage the quantity of Titles available
 	public void returnAvailability() {
 		ConectionDB con = new ConectionDB();
         Connection conection = con.conect();
@@ -663,7 +666,6 @@ public class returnTitle extends JFrame implements ActionListener{
 	    }    
 	}
 	
-	//This method will manage the quantity of rented Titles of the Customer
 	//This method will manage the number of Titles that the Customer has rented
 	public void returnQttyRented() {
 		ConectionDB con = new ConectionDB();
