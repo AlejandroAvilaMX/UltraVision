@@ -2,7 +2,8 @@
  * This is the class for the TV option (TV Series).
  * It will contain all the information related to movies.
  * It will be possible to add new TV Series, as well as update and delete them.
- * Search tool will be available
+ * Update and Delete will use the ID as the filter.
+ * Search tool will be available and it will use the Name of the TV Box Serie as the filter.
  * 
  * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
  */

@@ -2,7 +2,8 @@
  * This is the class for the VL option (Movie).
  * It will contain all the information related to movies.
  * It will be possible to add new movies, as well as update and delete them.
- * Search tool will be available
+ * Update and Delete will use the ID as the filter.
+ * Search tool will be available and it will use the Name of the Movie as the filter.
  * 
  * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
  */

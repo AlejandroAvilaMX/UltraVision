@@ -1,6 +1,7 @@
 /**
  * This is the Customers window.
  * We can see the details of the all the Customers, updated them and Delete them.
+ * Update and Delete will use the Customer ID as the filter.
  * It will be able to search the information, using the Customer name
  * 
  * author: Cesar Alejandro Avila Calderon		Student Number: 2018451

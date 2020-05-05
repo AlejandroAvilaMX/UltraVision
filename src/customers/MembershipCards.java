@@ -1,6 +1,7 @@
 /**
  * This is Membership Card window.
- * We can see the details of the Membership Card as well as edit them.
+ * We can see the details of the Membership Card as well as update them.
+ * Update will use the Customer ID as the filter.
  * It will be able to search the information, using the Customer name
  * 
  * author: Cesar Alejandro Avila Calderon		Student Number: 2018451

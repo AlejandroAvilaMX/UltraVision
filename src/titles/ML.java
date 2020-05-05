@@ -2,7 +2,8 @@
  * This is the class for the ML option (DVD Music Titles).
  * It will contain all the information related to movies.
  * It will be possible to add new DVD Music Titles, as well as update and delete them.
- * Search tool will be available
+ * Update and Delete will use the ID as the filter.
+ * Search tool will be available and it will use the Name of the DVD music as the filter.
  * 
  * author: Cesar Alejandro Avila Calderon		Student Number: 2018451
  */
